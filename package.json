@@ -1,0 +1,25 @@
+{
+  "name": "chatify",
+  "version": "1.0.0",
+  "description": "Realtime chat app, built with node.js, express and react.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraineralex/chatify.git"
+  },
+  "keywords": [
+    "chat",
+    "realtime"
+  ],
+  "author": "Frainer Encarnación",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fraineralex/chatify/issues"
+  },
+  "homepage": "https://github.com/fraineralex/chatify#readme"
+}
