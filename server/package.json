@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server of the realtime chat app.",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "dev": "tsc && concurrently \"tsc -w\" \"node dist/index.js --watch\""
+  },
+  "keywords": [
+    "api",
+    "server",
+    "express",
+    "realtime"
+  ],
+  "author": "Frainer Encarnación",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "concurrently": "8.2.2",
+    "typescript": "5.4.3"
+  }
+}

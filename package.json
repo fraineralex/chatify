@@ -2,11 +2,20 @@
   "name": "chatify",
   "version": "1.0.0",
   "description": "Realtime chat app, built with node.js, express and react.",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=6.0.0"
+  },
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+		"build": "SKIP_PREFLIGHT_CHECK=true npm run build --workspace=app",
+		"lint": "eslint ./api ./app",
+		"start": "npm run start --workspace=api",
+		"dev:api": "npm run build && npm run dev --workspace=api"
   },
   "repository": {
     "type": "git",
