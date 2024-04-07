@@ -1,10 +1,16 @@
-import { createServer } from 'node:http';
+import express from 'express'
+import logger from 'morgan'
+import path from 'path'
 
-const PORT = process.env.PORT ?? 3000;
+const port = process.env.PORT ?? 3000
 
-const server = createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello World!\n');
-});
+const app = express()
+app.use(logger('dev'))
+app.use(express.static(path.join(process.cwd(), '../client/dist')))
+app.get('/', (req, res) => {
+  res.sendFile(path.join(process.cwd(), '../client/dist/index.html'))
+})
 
-server.listen(PORT, () => console.log(`Listening on http:localhost:${PORT}`));
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`)
+})

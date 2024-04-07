@@ -17,8 +17,13 @@
   "author": "Frainer Encarnación",
   "license": "MIT",
   "devDependencies": {
+    "@types/morgan": "1.9.9",
     "@types/node": "20.11.30",
-    "concurrently": "8.2.2",
-    "typescript": "5.4.3"
+    "concurrently": "8.2.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "express": "^4.19.2",
+    "morgan": "1.10.0"
   }
 }

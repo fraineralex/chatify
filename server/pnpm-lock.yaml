@@ -9,7 +9,7 @@ devDependencies:
     specifier: 20.11.30
     version: 20.11.30
   concurrently:
-    specifier: ^8.2.2
+    specifier: 8.2.2
     version: 8.2.2
   typescript:
     specifier: 5.4.3
