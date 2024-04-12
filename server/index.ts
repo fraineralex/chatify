@@ -5,7 +5,6 @@ import path from 'path'
 import { Server } from 'socket.io'
 import { createServer } from 'node:http'
 import cors from 'cors'
-import { METHODS } from 'http'
 
 const port = process.env.PORT ?? 3000
 
@@ -24,7 +23,7 @@ io.on('connection', socket => {
 app.use(
   cors({
     origin: 'http://localhost:5173',
-    METHODS: ['GET', 'POST']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
   })
 )
 app.use(logger('dev'))
