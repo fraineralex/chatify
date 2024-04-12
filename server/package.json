@@ -17,6 +17,7 @@
   "author": "Frainer Encarnación",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "2.8.17",
     "@types/morgan": "1.9.9",
     "@types/node": "20.11.30",
     "concurrently": "8.2.2"

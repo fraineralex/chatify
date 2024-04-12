@@ -82,6 +82,9 @@ importers:
         specifier: 4.7.5
         version: 4.7.5
     devDependencies:
+      '@types/cors':
+        specifier: 2.8.17
+        version: 2.8.17
       '@types/morgan':
         specifier: 1.9.9
         version: 1.9.9
@@ -715,7 +718,6 @@ packages:
     resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
     dependencies:
       '@types/node': 20.11.30
-    dev: false
 
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
