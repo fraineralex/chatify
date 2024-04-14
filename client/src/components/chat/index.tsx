@@ -1,3 +1,5 @@
+import { io } from 'socket.io-client'
+
 import { Form } from './form'
 import { Header } from './header'
 import { Message } from './message'
@@ -89,6 +91,7 @@ const messages = [
 ]
 
 export function Chat () {
+  const socket = io('http://localhost:3000')
   return (
     <section className='flex flex-col h-screen p-4 border-b col-span-3'>
       <Header name='Frainer' image='/frainer.jpeg' />
@@ -103,7 +106,7 @@ export function Chat () {
           />
         ))}
       </div>
-      <Form />
+      <Form socket={socket} />
     </section>
   )
 }
