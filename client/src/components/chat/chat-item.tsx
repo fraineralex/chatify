@@ -14,7 +14,7 @@ export function ChatItem ({
   unreadMessages
 }: Props) {
   return (
-    <li className='flex items-center space-x-2'>
+    <li className='flex items-center space-x-2 hover:bg-gray-300 border-2 border-transparent rounded-md cursor-pointer'>
       <img
         src={image}
         width='36'
