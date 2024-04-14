@@ -1,14 +1,15 @@
 interface Props {
-  image: string
-  name: string
+  user: {
+    name: string
+    avatar: string
+  }
   lastMessage: string
   lastMessageDate: string
   unreadMessages: number
 }
 
 export function ChatItem ({
-  image,
-  name,
+  user,
   lastMessage,
   lastMessageDate,
   unreadMessages
@@ -16,7 +17,7 @@ export function ChatItem ({
   return (
     <li className='flex items-center space-x-2 hover:bg-gray-300 border-2 border-transparent rounded-md cursor-pointer'>
       <img
-        src={image}
+        src={user.avatar}
         width='36'
         height='36'
         alt={`Chat avatar of ${name}`}
@@ -25,7 +26,7 @@ export function ChatItem ({
       />
       <article className='grid grid-cols-6'>
         <div className='col-span-5'>
-          <h2 className='text-base font-bold'>{name}</h2>
+          <h2 className='text-base font-bold'>{user.name}</h2>
           <p className='text-sm text-gray-500'>{lastMessage}</p>
         </div>
         <aside>
