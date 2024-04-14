@@ -42,7 +42,7 @@ const chats = [
 export function Sidebar () {
   return (
     <div className='flex flex-col border-r'>
-      <nav className='p-4 space-y-4'>
+      <nav className='py-4 px-1 space-y-4'>
         <ul className='space-y-4'>
           {chats.map((chat, index) => (
             <ChatItem key={index} {...chat} />
