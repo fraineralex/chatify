@@ -5,7 +5,7 @@ interface Props {
 
 export function Header ({ name, image }: Props) {
   return (
-    <header className='flex gap-2'>
+    <header className='flex gap-2 border-b py-3'>
       <img
         src={image}
         width='40'

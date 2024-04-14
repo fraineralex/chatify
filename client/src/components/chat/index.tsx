@@ -1,8 +1,8 @@
 import { io } from 'socket.io-client'
-
 import { Form } from './form'
 import { Header } from './header'
 import { Message } from './message'
+import './chat.css'
 
 const messages = [
   {
@@ -93,9 +93,9 @@ const messages = [
 export function Chat () {
   const socket = io('http://localhost:3000')
   return (
-    <section className='flex flex-col h-screen p-4 border-b col-span-3'>
+    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-3'>
       <Header name='Frainer' image='/frainer.jpeg' />
-      <div className='flex-1 p-4 space-y-4 overflow-y-auto'>
+      <div className='flex-1 p-4 space-y-4 overflow-y-auto my-5'>
         {messages.map((message, index) => (
           <Message
             key={index}
@@ -107,6 +107,6 @@ export function Chat () {
         ))}
       </div>
       <Form socket={socket} />
-    </section>
+    </main>
   )
 }
