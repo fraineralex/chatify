@@ -1,3 +1,5 @@
+import { useSocketStore } from '../../store/socket'
+
 interface Props {
   user: {
     name: string
@@ -14,8 +16,24 @@ export function ChatItem ({
   lastMessageDate,
   unreadMessages
 }: Props) {
+  const { currentChat, setCurrentChat } = useSocketStore()
+  const isCurrentChat = currentChat === user.name
+
+  const openChat = () => {
+    if (isCurrentChat) return
+
+    setCurrentChat(user.name)
+  }
+
   return (
-    <li className='flex items-center space-x-2 hover:bg-gray-300 border-2 border-transparent rounded-md cursor-pointer p-1 py-2 w-full'>
+    <li
+      className={`flex items-center space-x-2  border border-transparent border-b-gray-300 cursor-pointer p-1 py-2 w-full ${
+        isCurrentChat
+          ? 'bg-gray-300 rounded-md'
+          : 'rounded-sm hover:bg-gray-200 hover:rounded-md'
+      }`}
+      onClick={openChat}
+    >
       <img
         src={user.avatar}
         width='50'

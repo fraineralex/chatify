@@ -10,7 +10,12 @@ export function Form () {
     const formData = new FormData(form)
     const content = formData.get('content') as string
     if (!content) return
-    socket?.emit('chat message', content)
+    const message = {
+      content,
+      receiver_id: 'fraineralex',
+      sender_id: 'deadpool'
+    }
+    socket?.emit('chat message', message)
     form.reset()
   }
 

@@ -1,10 +1,16 @@
+import { useSocketStore } from '../../store/socket'
 import { Message as Props } from '../../types/chat'
 
-export function Message ({ content, createdAt, isMe = true, user }: Props) {
+export function Message ({ content, createdAt, sender_id }: Props) {
+  const loggedUser = useSocketStore(state => state.loggedUser)
+
   const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit'
   })
+
+  const isMe = sender_id.username === loggedUser
+
   return (
     <article
       className={`flex flex-col space-y-2 ${
@@ -17,10 +23,10 @@ export function Message ({ content, createdAt, isMe = true, user }: Props) {
         }`}
       >
         <img
-          src={user.avatar}
+          src={sender_id.avatar}
           width='28'
           height='28'
-          alt={`Avatar of the user ${user.name} in the chat`}
+          alt={`Avatar of the user ${sender_id.username} in the chat`}
           className='rounded-full align-top'
           style={{ aspectRatio: 28 / 28, objectFit: 'cover' }}
         />
