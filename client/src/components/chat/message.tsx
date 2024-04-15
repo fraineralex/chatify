@@ -1,6 +1,6 @@
 interface Props {
   content: string
-  time: string
+  created_at: Date
   isMe?: boolean
   user: {
     name: string
@@ -8,7 +8,11 @@ interface Props {
   }
 }
 
-export function Message ({ content, time, isMe = true, user }: Props) {
+export function Message ({ content, created_at, isMe = true, user }: Props) {
+  const time = created_at.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
   return (
     <article
       className={`flex flex-col space-y-2 ${
