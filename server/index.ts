@@ -26,9 +26,10 @@ const db = createClient({
 
 await db.execute(`
   CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
+    uuid TEXT PRIMARY KEY,
     content TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    receiver_id TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `)
@@ -40,44 +41,49 @@ io.on('connection', async socket => {
     console.log('An user has disconnected!')
   })
 
-  socket.on('chat message', async content => {
+  socket.on('chat message', async message => {
     let result
-    const username = socket.handshake.auth.username
+    const sender_id = message.sender_id //socket.handshake.auth.username
     const created_at = new Date().toISOString()
+    const uuid = crypto.randomUUID()
+    const content = message.content
+    const receiver_id = message.receiver_id
 
     try {
       result = await db.execute({
-        sql: 'INSERT INTO messages (content, username, created_at) VALUES (:content, :username, :created_at)',
-        args: { content, username, created_at }
+        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :created_at)',
+        args: { uuid, content, sender_id, receiver_id, created_at }
       })
     } catch (error) {
       console.error(error)
       return
     }
 
-    const message = {
-      id: result.lastInsertRowid?.toString(),
+    const createdMessage = {
+      uuid,
       content,
       created_at: created_at,
-      username
+      sender_id,
+      receiver_id
     }
 
-    io.emit('chat message', message)
+    io.emit('chat message', createdMessage)
   })
 
   if (!socket.recovered) {
     try {
       const results = await db.execute({
-        sql: `SELECT id, content, username, created_at FROM messages WHERE id > ?`,
+        sql: `SELECT uuid, content, sender_id, receiver_id, created_at FROM messages WHERE created_at > ?`,
         args: [socket.handshake.auth.serverOffset ?? 0]
       })
 
       results.rows.forEach(row => {
         const message = {
-          id: Number(row.id),
+          uuid: row.uuid,
           content: row.content,
           created_at: row.created_at,
-          username: row.username
+          sender_id: row.sender_id,
+          receiver_id: row.receiver_id
         }
         socket.emit('chat message', message)
       })
