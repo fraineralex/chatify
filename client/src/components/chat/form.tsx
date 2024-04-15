@@ -3,7 +3,7 @@ import { AttachFile, Emoji, Send } from '../general/svg-icons'
 import { Socket } from 'socket.io-client'
 
 interface Props {
-  socket: Socket
+  socket: Socket | null
 }
 
 export function Form ({ socket }: Props) {
@@ -11,10 +11,9 @@ export function Form ({ socket }: Props) {
     event.preventDefault()
     const form = event.currentTarget
     const formData = new FormData(form)
-    const message = formData.get('message') as string
-    if (!message) return
-    socket.emit('chat message', message)
-    console.log('Message sent:', message)
+    const content = formData.get('content') as string
+    if (!content) return
+    socket?.emit('chat message', content)
     form.reset()
   }
 
@@ -34,7 +33,8 @@ export function Form ({ socket }: Props) {
       <input
         className='flex h-10 w-full border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
         placeholder='Type a message'
-        name='message'
+        name='content'
+        autoFocus
       />
       <button
         type='submit'
