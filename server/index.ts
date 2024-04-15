@@ -74,7 +74,7 @@ io.on('connection', async socket => {
 
       results.rows.forEach(row => {
         const message = {
-          id: row.id?.toString(),
+          id: Number(row.id),
           content: row.content,
           created_at: row.created_at,
           username: row.username
