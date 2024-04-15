@@ -1,97 +1,47 @@
-import { io } from 'socket.io-client'
+import { Socket, io } from 'socket.io-client'
 import { Form } from './form'
 import { Header } from './header'
 import { Message } from './message'
 import './chat.css'
-
-const messages = [
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: true,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content:
-      "Yeah! I'm good. And yes, I did. It looks amazing! I can't wait to see it.",
-    time: '10:03 AM',
-    isMe: false,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: true,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content:
-      "Yeah! I'm good. And yes, I did. It looks amazing! I can't wait to see it.",
-    time: '10:03 AM',
-    isMe: false,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: true,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: false,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: false,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: true,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  },
-  {
-    content: "Hey! What's up? Did you see the new Star Wars trailer?",
-    time: '10:01 AM',
-    isMe: true,
-    user: {
-      name: 'Frainer',
-      avatar: '/frainer.jpeg'
-    }
-  }
-]
+import { Messages } from '../../types/chat'
+import { useEffect, useState } from 'react'
 
 export function Chat () {
-  const socket = io('http://localhost:3000')
+  const [messages, setMessages] = useState<Messages>([])
+  const [socket, setSocket] = useState<Socket | null>(null)
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3000', {
+      auth: {
+        serverOffset: 0,
+        username: 'fraineralex'
+      }
+    })
+
+    newSocket?.on('chat message', message => {
+      setMessages(messages => [
+        ...messages,
+        {
+          content: message.content,
+          created_at: new Date(message.created_at),
+          isMe: false,
+          user: {
+            name: message.username,
+            avatar: '/frainer.jpeg'
+          }
+        }
+      ])
+
+      newSocket.auth.serverOffset = message.id
+    })
+
+    setSocket(newSocket)
+
+    return () => {
+      newSocket?.off('chat message')
+    }
+  }, [])
+
   return (
     <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-3'>
       <Header name='Frainer' image='/frainer.jpeg' />
@@ -100,7 +50,7 @@ export function Chat () {
           <Message
             key={index}
             content={message.content}
-            time={message.time}
+            created_at={message.created_at}
             isMe={message.isMe}
             user={message.user}
           />
