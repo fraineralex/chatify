@@ -4,9 +4,12 @@ import { io, Socket } from 'socket.io-client'
 
 type SocketState = {
   socket: Socket
-  setServerOffset: (serverOffset: number) => void
+  setServerOffset: (serverOffset: string) => void
   messages: Messages
   setMessage: (message: Message) => void
+  loggedUser: string
+  currentChat?: string
+  setCurrentChat: (chat: string) => void
 }
 
 const defaultSocket = io('http://localhost:3000', {
@@ -19,14 +22,15 @@ const defaultSocket = io('http://localhost:3000', {
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: defaultSocket,
   messages: [],
+  loggedUser: 'fraineralex',
+  currentChat: undefined,
 
-  setServerOffset: (serverOffset: number) => {
+  setServerOffset: (serverOffset: string) => {
     const newSocket = get().socket
     newSocket.auth = {
       ...newSocket.auth,
       serverOffset
     }
-    console.log(serverOffset)
     set({ socket: newSocket })
   },
 
@@ -34,5 +38,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     const messages = get().messages
     messages.push(message)
     set({ messages })
-  }
+  },
+
+  setCurrentChat: chat => set({ currentChat: chat })
 }))
