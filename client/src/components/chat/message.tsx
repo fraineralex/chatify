@@ -1,15 +1,7 @@
-interface Props {
-  content: string
-  created_at: Date
-  isMe?: boolean
-  user: {
-    name: string
-    avatar: string
-  }
-}
+import { Message as Props } from '../../types/chat'
 
-export function Message ({ content, created_at, isMe = true, user }: Props) {
-  const time = created_at.toLocaleTimeString([], {
+export function Message ({ content, createdAt, isMe = true, user }: Props) {
+  const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit'
   })

@@ -1,9 +1,9 @@
-import { Home } from './pages/home'
+import { ChatScreen } from './pages/chat'
 
 function App () {
   return (
     <>
-      <Home />
+      <ChatScreen />
     </>
   )
 }

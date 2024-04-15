@@ -1,12 +1,9 @@
+import { useSocketStore } from '../../store/socket'
 import { AttachFile, Emoji, Send } from '../general/svg-icons'
 
-import { Socket } from 'socket.io-client'
+export function Form () {
+  const socket = useSocketStore(state => state.socket)
 
-interface Props {
-  socket: Socket | null
-}
-
-export function Form ({ socket }: Props) {
   const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const form = event.currentTarget
