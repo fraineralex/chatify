@@ -6,6 +6,8 @@ import { createServer } from 'node:http'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { createClient } from '@libsql/client'
+import { SOCKET_EVENTS } from './src/constants'
+import { ServerMessage, ServerMessageDB } from './src/types/chat'
 
 dotenv.config({ path: '.env.local' })
 const port = process.env.PORT ?? 3000
@@ -30,44 +32,48 @@ await db.execute(`
     content TEXT NOT NULL,
     sender_id TEXT NOT NULL,
     receiver_id TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    is_edited BOOLEAN DEFAULT FALSE,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    reply_to_id TEXT,
+    type TEXT NOT NULL DEFAULT 'text' CHECK( type IN ('text', 'image', 'audio', 'video', 'file', 'emoji', 'sticker') ),
+    resource_url TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `)
 
-io.on('connection', async socket => {
+io.on(SOCKET_EVENTS.CONNECTION, async socket => {
   console.log('An user has connected!')
 
-  socket.on('disconnect', () => {
+  socket.on(SOCKET_EVENTS.DISCONNECT, () => {
     console.log('An user has disconnected!')
   })
 
-  socket.on('chat message', async message => {
+  socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message: ServerMessage) => {
     let result
-    const sender_id = message.sender_id //socket.handshake.auth.username
-    const created_at = new Date().toISOString()
     const uuid = crypto.randomUUID()
-    const content = message.content
-    const receiver_id = message.receiver_id
+    const created_at = new Date().toISOString()
+    const createdMessage: ServerMessageDB = {
+      uuid,
+      ...message,
+      created_at
+    }
 
     try {
       result = await db.execute({
-        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :created_at)',
-        args: { uuid, content, sender_id, receiver_id, created_at }
+        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, is_deletedreply_to_id, type, resource_url, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :created_at)',
+        args: {
+          uuid,
+          ...message,
+          created_at
+        }
       })
     } catch (error) {
       console.error(error)
       return
     }
 
-    const createdMessage = {
-      uuid,
-      content,
-      created_at: created_at,
-      sender_id,
-      receiver_id
-    }
-
-    io.emit('chat message', createdMessage)
+    io.emit(SOCKET_EVENTS.NEW_MESSAGE, createdMessage)
   })
 
   if (!socket.recovered) {
@@ -85,7 +91,7 @@ io.on('connection', async socket => {
           sender_id: row.sender_id,
           receiver_id: row.receiver_id
         }
-        socket.emit('chat message', message)
+        socket.emit(SOCKET_EVENTS.CHAT_MESSAGE, message)
       })
     } catch (e) {
       console.error(e)
