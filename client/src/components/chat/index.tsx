@@ -33,9 +33,11 @@ export function Chat () {
           <Form />
         </>
       ) : (
-        <p className='text-center text-muted-foreground mt-10'>
-          Select a chat to start messaging
-        </p>
+        <div className='flex-1 flex items-center justify-center'>
+          <h2 className='text-center text-muted-foreground'>
+            Select a chat to start messaging
+          </h2>
+        </div>
       )}
     </main>
   )
