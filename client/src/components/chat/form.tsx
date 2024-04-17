@@ -1,8 +1,10 @@
+import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
+import { ServerMessage } from '../../types/chat'
 import { AttachFile, Emoji, Send } from '../general/svg-icons'
 
 export function Form () {
-  const socket = useSocketStore(state => state.socket)
+  const { socket, loggedUser, currentChat } = useSocketStore()
 
   const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -10,12 +12,18 @@ export function Form () {
     const formData = new FormData(form)
     const content = formData.get('content') as string
     if (!content) return
-    const message = {
+    const message: ServerMessage = {
       content,
-      receiver_id: 'fraineralex',
-      sender_id: 'deadpool'
+      sender_id: loggedUser,
+      receiver_id: currentChat!,
+      type: MESSAGES_TYPES.TEXT,
+      is_deleted: false,
+      is_edited: false,
+      is_read: false,
+      reply_to_id: null,
+      resource_url: null
     }
-    socket?.emit('chat message', message)
+    socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     form.reset()
   }
 
