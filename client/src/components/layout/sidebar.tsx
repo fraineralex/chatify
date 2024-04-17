@@ -11,14 +11,7 @@ export function Sidebar () {
   messages
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .forEach(message => {
-      if (chats.find(chat => chat.user.name === message.sender_id.username))
-        return
-
-      const chat = {
-        user: {
-          name: message.sender_id.username,
-          avatar: message.sender_id.avatar
-        },
+      const lastMessage = {
         lastMessage: message.content,
         lastMessageDate: message.createdAt.toLocaleString([], {
           hour: '2-digit',
@@ -27,7 +20,27 @@ export function Sidebar () {
         unreadMessages: 1
       }
 
-      chats.push(chat)
+      if (!chats.find(chat => chat.user.name === message.sender_id.username)) {
+        chats.push({
+          user: {
+            name: message.sender_id.username,
+            avatar: message.sender_id.avatar
+          },
+          ...lastMessage
+        })
+      }
+
+      if (
+        !chats.find(chat => chat.user.name === message.receiver_id.username)
+      ) {
+        chats.push({
+          user: {
+            name: message.receiver_id.username,
+            avatar: message.receiver_id.avatar
+          },
+          ...lastMessage
+        })
+      }
     })
 
   return (
