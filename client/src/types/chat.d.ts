@@ -4,14 +4,20 @@ export interface Message {
   uuid?: string
   content: string
   createdAt: Date
-  sender_id: {
+  senderId: {
     username: string
     avatar: string
   }
-  receiver_id: {
+  receiverId: {
     username: string
     avatar: string
   }
+  type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+  resourceUrl: string | null
+  isRead: boolean
+  isEdited: boolean
+  isDeleted: boolean
+  replyToId: string | null
 }
 
 export interface ServerMessage {
@@ -44,3 +50,13 @@ export interface Chat {
 }
 
 export type Chats = Chat[]
+
+export interface CurrentChat {
+  name: string
+  draft: string
+}
+
+export interface MessagesToRead {
+  sender_id: string
+  receiver_id: string
+}
