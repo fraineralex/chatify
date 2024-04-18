@@ -1,15 +1,16 @@
 import { useSocketStore } from '../../store/socket'
 import { Message as Props } from '../../types/chat'
+import { CheckCheck } from 'lucide-react'
 
-export function Message ({ content, createdAt, sender_id }: Props) {
+export function Message ({ content, createdAt, senderId, isRead }: Props) {
   const loggedUser = useSocketStore(state => state.loggedUser)
+  const isMe = senderId.username === loggedUser
+  console.log(isRead)
 
   const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit'
   })
-
-  const isMe = sender_id.username === loggedUser
 
   return (
     <article
@@ -18,25 +19,37 @@ export function Message ({ content, createdAt, sender_id }: Props) {
       }`}
     >
       <aside
-        className={`flex items-start rounded-lg pl-2 px-4 py-2 max-w-3xl ${
-          isMe ? 'bg-gray-300' : 'bg-gray-100'
+        className={`flex items-start gap-2 ${
+          isMe ? 'flex-row-reverse' : 'flex-row'
         }`}
       >
         <img
-          src={sender_id.avatar}
+          src={senderId.avatar}
           width='28'
           height='28'
-          alt={`Avatar of the user ${sender_id.username} in the chat`}
-          className='rounded-full align-top'
-          style={{ aspectRatio: 28 / 28, objectFit: 'cover' }}
+          alt={`Avatar of the user ${senderId.username} in the chat`}
+          className='rounded-full align-top h-7 w-7 mt-2'
+          style={{ aspectRatio: 28 / 28, objectFit: 'initial' }}
         />
-        <span className={`items-center ms-2`}>
+
+        <span
+          className={`flex items-center rounded-lg px-2 py-1 max-w-3xl ${
+            isMe ? 'bg-gray-300' : 'bg-gray-100'
+          }`}
+        >
           <p className={`text-sm w-100 inline`}>{content}</p>
-          <p
-            className={`text-gray-400 float-end align-bottom text-[10px] mt-4 ms-5 inline`}
+          <time
+            className={`text-gray-500 float-end align-bottom text-[10px] mt-4 ms-5 inline`}
           >
             {time}
-          </p>
+          </time>
+          {isMe && (
+            <CheckCheck
+              className={`w-4 h-4 float-end align-bottom text-[10px] mt-4 ms-2 inline ${
+                isRead ? 'text-blue-500' : 'text-gray-500'
+              }`}
+            />
+          )}
         </span>
       </aside>
     </article>
