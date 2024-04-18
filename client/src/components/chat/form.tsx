@@ -1,21 +1,23 @@
+import { useState } from 'react'
+import { AttachFile, Emoji, Send } from '../general/svg-icons'
+import { ServerMessage } from '../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
-import { ServerMessage } from '../../types/chat'
-import { AttachFile, Emoji, Send } from '../general/svg-icons'
 
 export function Form () {
-  const { socket, loggedUser, currentChat } = useSocketStore()
+  const { socket, loggedUser, currentChat, setCurrentChatDraft } =
+    useSocketStore()
 
-  const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
+  const [contentMessage, setContentMessage] = useState<string>(currentChat.draft)
+  console.log(currentChat, contentMessage)
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const form = event.currentTarget
-    const formData = new FormData(form)
-    const content = formData.get('content') as string
-    if (!content) return
+    if (!contentMessage) return
     const message: ServerMessage = {
-      content,
+      content: currentChat.draft,
       sender_id: loggedUser,
-      receiver_id: currentChat!,
+      receiver_id: currentChat.name!,
       type: MESSAGES_TYPES.TEXT,
       is_deleted: false,
       is_edited: false,
@@ -23,14 +25,20 @@ export function Form () {
       reply_to_id: null,
       resource_url: null
     }
+
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
-    form.reset()
+    setContentMessage('')
+  }
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setContentMessage(event.target.value)
+    setCurrentChatDraft(event.target.value)
   }
 
   return (
     <form
       className='flex items-center p-2 border-t w-full'
-      onSubmit={sendMessage}
+      onSubmit={handleSubmit}
     >
       <button className='inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground p-4 rounded-full'>
         <Emoji className='w-4 h-4' />
@@ -45,6 +53,8 @@ export function Form () {
         placeholder='Type a message'
         name='content'
         autoFocus
+        onChange={handleChange}
+        value={currentChat.draft}
       />
       <button
         type='submit'
