@@ -1,10 +1,14 @@
 {
-    "compilerOptions": {
-      "target": "ES2022",
-      "module": "esnext",
-      "moduleResolution": "node",
-      "outDir": "./dist",
-      "strict": true,
-      "esModuleInterop": true
-    }
-  }
+  "compilerOptions": {
+  "lib": ["ESNext"],
+  "module": "NodeNext",
+  "moduleResolution": "NodeNext",
+  "esModuleInterop": true, 
+  "target": "ES2021",
+  "forceConsistentCasingInFileNames": true,
+  "types": ["node"],
+  "strict": true,
+  "outDir": "./dist"
+},
+"exclude": ["node_modules"]
+}
