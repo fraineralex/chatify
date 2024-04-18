@@ -16,8 +16,9 @@ export function Chat () {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
   if (messagesEndRef.current) {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight
   }
 
   return (
