@@ -8,8 +8,9 @@ export function Form () {
   const { socket, loggedUser, currentChat, setCurrentChatDraft } =
     useSocketStore()
 
-  const [contentMessage, setContentMessage] = useState<string>(currentChat.draft)
-  console.log(currentChat, contentMessage)
+  const [contentMessage, setContentMessage] = useState<string>(
+    currentChat.draft
+  )
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -28,11 +29,17 @@ export function Form () {
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
+    localStorage.removeItem(currentChat.name)
+    setCurrentChatDraft('')
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContentMessage(event.target.value)
     setCurrentChatDraft(event.target.value)
+  }
+
+  const handleBlur = () => {
+    localStorage.setItem(currentChat.name, contentMessage)
   }
 
   return (
@@ -55,6 +62,7 @@ export function Form () {
         autoFocus
         onChange={handleChange}
         value={currentChat.draft}
+        onBlur={handleBlur}
       />
       <button
         type='submit'
