@@ -1,4 +1,6 @@
+import { SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
+import { MessagesToRead } from '../../types/chat'
 
 interface Props {
   user: {
@@ -16,13 +18,20 @@ export function ChatItem ({
   lastMessageDate,
   unreadMessages
 }: Props) {
-  const { currentChat, setCurrentChat } = useSocketStore()
-  const isCurrentChat = currentChat === user.name
+  const { currentChat, setCurrentChatName, socket, loggedUser } =
+    useSocketStore()
+  const isCurrentChat = currentChat.name === user.name
 
   const openChat = () => {
     if (isCurrentChat) return
 
-    setCurrentChat(user.name)
+    localStorage.setItem(currentChat.name, currentChat.draft || '')
+    setCurrentChatName(user.name)
+    const messagesToRead: MessagesToRead = {
+      sender_id: user.name,
+      receiver_id: loggedUser
+    }
+    socket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
   }
 
   return (
@@ -55,9 +64,11 @@ export function ChatItem ({
           <p className='text-sm text-gray-500 inline-flex overflow-hidden items-center'>
             {lastMessage}
           </p>
-          <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full'>
-            {unreadMessages}
-          </span>
+          {unreadMessages > 0 && (
+            <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full'>
+              {unreadMessages}
+            </span>
+          )}
         </aside>
       </article>
     </li>
