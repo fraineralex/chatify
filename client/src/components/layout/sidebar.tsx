@@ -16,28 +16,37 @@ export function Sidebar () {
         lastMessageDate: message.createdAt.toLocaleString([], {
           hour: '2-digit',
           minute: '2-digit'
-        }),
-        unreadMessages: 1
+        })
       }
 
-      if (!chats.find(chat => chat.user.name === message.sender_id.username)) {
+      if (!chats.find(chat => chat.user.name === message.senderId.username)) {
         chats.push({
           user: {
-            name: message.sender_id.username,
-            avatar: message.sender_id.avatar
+            name: message.senderId.username,
+            avatar: message.senderId.avatar
           },
+          unreadMessages: messages.filter(
+            msg =>
+              msg.isRead === false &&
+              msg.senderId.username === message.senderId.username &&
+              msg.receiverId.username === loggedUser
+          ).length,
           ...lastMessage
         })
       }
 
-      if (
-        !chats.find(chat => chat.user.name === message.receiver_id.username)
-      ) {
+      if (!chats.find(chat => chat.user.name === message.receiverId.username)) {
         chats.push({
           user: {
-            name: message.receiver_id.username,
-            avatar: message.receiver_id.avatar
+            name: message.receiverId.username,
+            avatar: message.receiverId.avatar
           },
+          unreadMessages: messages.filter(
+            msg =>
+              msg.isRead === false &&
+              msg.senderId.username === message.receiverId.username &&
+              msg.receiverId.username === loggedUser
+          ).length,
           ...lastMessage
         })
       }
