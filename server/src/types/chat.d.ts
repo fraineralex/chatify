@@ -1,4 +1,4 @@
-import { MESSAGES_TYPES } from '../constants'
+import { MESSAGES_TYPES } from '../constants/index.ts'
 
 export interface ServerMessage {
   content: string
@@ -15,4 +15,9 @@ export interface ServerMessage {
 export interface ServerMessageDB extends ServerMessage {
   uuid: string
   created_at: string
+}
+
+export interface MessagesToRead {
+  sender_id: string
+  receiver_id: string
 }
