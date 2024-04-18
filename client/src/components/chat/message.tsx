@@ -5,7 +5,7 @@ import { CheckCheck } from 'lucide-react'
 export function Message ({ content, createdAt, senderId, isRead }: Props) {
   const loggedUser = useSocketStore(state => state.loggedUser)
   const isMe = senderId.username === loggedUser
-  console.log(isRead)
+
 
   const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
