@@ -4,14 +4,8 @@ export interface Message {
   uuid?: string
   content: string
   createdAt: Date
-  senderId: {
-    username: string
-    avatar: string
-  }
-  receiverId: {
-    username: string
-    avatar: string
-  }
+  senderId : string
+  receiverId: string
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
   isRead: boolean
