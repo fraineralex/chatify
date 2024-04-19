@@ -4,8 +4,14 @@ import { useSocketStore } from '../store/socket'
 import { SOCKET_EVENTS } from '../constants'
 
 export const useChatMessage = () => {
-  const { setMessage, socket, setServerOffset, currentChat, messages, replaceMessage } =
-    useSocketStore()
+  const {
+    setMessage,
+    socket,
+    setServerOffset,
+    currentChat,
+    messages,
+    replaceMessage
+  } = useSocketStore()
 
   useEffect(() => {
     socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message: ServerMessageDB) => {
@@ -13,14 +19,8 @@ export const useChatMessage = () => {
         uuid: message.uuid,
         content: message.content,
         createdAt: new Date(message.created_at),
-        senderId: {
-          username: message.sender_id,
-          avatar: `/${message.sender_id}.webp`
-        },
-        receiverId: {
-          username: message.receiver_id,
-          avatar: `/${message.receiver_id}.webp`
-        },
+        senderId: message.sender_id,
+        receiverId: message.receiver_id,
         type: message.type,
         isDeleted: !!message.is_deleted,
         isEdited: !!message.is_edited,
