@@ -2,31 +2,33 @@ import { create } from 'zustand'
 import { CurrentChat, Message, Messages } from '../types/chat'
 import { io, Socket } from 'socket.io-client'
 
+const SERVER_DOMAIN =
+  import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
+
 type SocketState = {
   socket: Socket
+  setSocket: (socket: Socket) => void
   setServerOffset: (serverOffset: string) => void
   messages: Messages
   setMessage: (message: Message) => void
   replaceMessage: (message: Message) => void
-  loggedUser: string
   currentChat: CurrentChat
   setCurrentChatName: (name: string) => void
   setCurrentChatDraft: (draft: string) => void
 }
 
-const defaultSocket = io('http://localhost:3000', {
+const defaultSocket = io(SERVER_DOMAIN, {
   auth: {
-    serverOffset: 0,
-    username: 'fraineralex'
+    serverOffset: 0
   }
 })
 
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: defaultSocket,
   messages: [],
-  loggedUser: 'fraineralex',
   currentChat: { name: '', draft: '' },
 
+  setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: string) => {
     const newSocket = get().socket
     newSocket.auth = {
