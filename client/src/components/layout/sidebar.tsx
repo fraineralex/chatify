@@ -1,10 +1,15 @@
 import { useSocketStore } from '../../store/socket'
 import { Chats } from '../../types/chat'
+import { Profile } from '../auth/profile'
 import { ChatItem } from '../chat/chat-item'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export function Sidebar () {
   const messages = useSocketStore(state => state.messages)
-  const loggedUser = useSocketStore(state => state.loggedUser)
+  const { user } = useAuth0()
+
+  const loggedUser =
+    user?.name === 'Frainer Alexander' ? 'fraineralex' : user?.name
 
   const chats: Chats = []
 
@@ -53,9 +58,9 @@ export function Sidebar () {
     })
 
   return (
-    <div className='flex flex-col border-r'>
-      <nav className='py-4 px-1 space-y-4'>
-        <ul className='space-y-4'>
+    <div className='border-r h-screen'>
+      <nav className='py-4 px-1 space-y-4 h-[90%]'>
+        <ul className='space-y-1'>
           {chats
             .filter(chat => chat.user.name !== loggedUser)
             .map((chat, index) => (
@@ -63,6 +68,7 @@ export function Sidebar () {
             ))}
         </ul>
       </nav>
+      <Profile />
     </div>
   )
 }
