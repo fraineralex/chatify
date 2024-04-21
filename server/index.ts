@@ -12,6 +12,16 @@ import {
   ServerMessageDB
 } from './src/types/chat.js'
 import { SOCKET_EVENTS } from './src/constants/index.js'
+import { userRouter } from './src/router/user.js'
+import { auth, requiredScopes } from 'express-oauth2-jwt-bearer'
+
+const DOMAIN = process.env.AUTH0_DOMAIN ?? ''
+const API_IDENTIFIER = process.env.AUTH0_API_IDENTIFIER ?? ''
+
+const checkJwt = auth({
+  audience: API_IDENTIFIER,
+  issuerBaseURL: DOMAIN,
+});
 
 dotenv.config({ path: '.env.local' })
 const port = process.env.PORT ?? 3000
@@ -147,6 +157,7 @@ app.use(
   })
 )
 app.use(logger('dev'))
+app.use('/users', checkJwt, userRouter)
 
 /* app.use(express.static(path.join(process.cwd(), '../client/dist')))
 app.get('/', (req, res) => {
