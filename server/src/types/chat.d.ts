@@ -25,3 +25,18 @@ export interface MessagesToRead {
   sender_id: string
   receiver_id: string
 }
+
+export interface User {
+  id: string
+  name: string
+  picture: string
+}
+
+export type Users = User[]
+
+export interface Chat {
+  uuid: uuid
+  user1_id: string
+  user2_id: string
+  created_at: string
+}
