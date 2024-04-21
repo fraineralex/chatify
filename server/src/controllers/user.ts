@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Response, Request } from 'express'
 import dotenv from 'dotenv'
+import { Users } from '../types/chat.js'
 
 dotenv.config({ path: '.env.local' })
 
@@ -20,8 +21,14 @@ export class UserController {
     }
 
     const response = await axios.request(config)
-    console.log(JSON.stringify(response.data))
-    res.status(200).json(response.data)
+    const users: Users = response.data.map((user: any) => {
+      return {
+        id: user.user_id,
+        name: user.name,
+        picture: user.picture
+      }
+    })
+    res.status(200).json(users)
   }
 
 }
