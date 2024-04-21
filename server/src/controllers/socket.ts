@@ -1,24 +1,26 @@
+import { Server, Socket } from 'socket.io'
 import {
   MessagesToRead,
   ServerMessage,
   ServerMessageDB
 } from '../types/chat.js'
-import { createClient } from '@libsql/client'
+import { Client } from '@libsql/client'
 import { SOCKET_EVENTS } from '../constants/index.js'
-import { io } from '../../index.js'
-import { Socket } from 'socket.io'
-
-const db = createClient({
-  url: process.env.DB_URL ?? '',
-  authToken: process.env.DB_AUTH_TOKEN ?? ''
-})
 
 export class SocketController {
-  static async disconnect (): Promise<void> {
+  private db: Client
+  private io: Server
+
+  constructor (io: Server, db: Client) {
+    this.io = io
+    this.db = db
+  }
+
+  async disconnect (): Promise<void> {
     console.log('User disconnected')
   }
 
-  static async newMessage (message: ServerMessage): Promise<void> {
+  async newMessage (message: ServerMessage): Promise<void> {
     const uuid = crypto.randomUUID()
     const created_at = new Date().toISOString()
     const createdMessage: ServerMessageDB = {
@@ -28,7 +30,7 @@ export class SocketController {
     }
 
     try {
-      await db.execute({
+      await this.db.execute({
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :created_at)',
         args: {
           uuid,
@@ -41,19 +43,19 @@ export class SocketController {
       return
     }
 
-    io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
+    this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
   }
 
-  static async readMessages (messages: MessagesToRead): Promise<void> {
+  async readMessages (messages: MessagesToRead): Promise<void> {
     let selectResult
     let updateResult
     try {
-      selectResult = await db.execute({
+      selectResult = await this.db.execute({
         sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
 
-      updateResult = await db.execute({
+      updateResult = await this.db.execute({
         sql: 'UPDATE messages SET is_read = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
@@ -66,7 +68,7 @@ export class SocketController {
           const message = {
             ...row
           }
-          io.emit(SOCKET_EVENTS.READ_MESSAGE, message)
+          this.io.emit(SOCKET_EVENTS.READ_MESSAGE, message)
         })
       }
     } catch (error) {
@@ -75,7 +77,7 @@ export class SocketController {
     }
   }
 
-  static async recoverMessages (socket: Socket): Promise<void> {
+  async recoverMessages (socket: Socket): Promise<void> {
     if (socket.recovered) {
       return
     }
@@ -84,7 +86,7 @@ export class SocketController {
     const loggedUserId = socket.handshake.auth.userId ?? ''
 
     try {
-      const results = await db.execute({
+      const results = await this.db.execute({
         sql: `SELECT uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at FROM messages WHERE created_at > :offset AND (sender_id = :loggedUserId OR receiver_id = :loggedUserId) ORDER BY created_at ASC`,
         args: { offset, loggedUserId }
       })
