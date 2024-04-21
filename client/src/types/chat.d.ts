@@ -1,11 +1,14 @@
 import { MESSAGES_TYPES } from '../constants'
 
+type uuid = `${string}-${string}-${string}-${string}-${string}`
+
 export interface Message {
   uuid?: string
   content: string
   createdAt: Date
-  senderId : string
+  senderId: string
   receiverId: string
+  chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
   isRead: boolean
@@ -18,6 +21,7 @@ export interface ServerMessage {
   content: string
   sender_id: string
   receiver_id: string
+  chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resource_url: string | null
   is_read: boolean
@@ -27,7 +31,7 @@ export interface ServerMessage {
 }
 
 export interface ServerMessageDB extends ServerMessage {
-  uuid: string
+  uuid: uuid
   created_at: string
 }
 
@@ -51,6 +55,7 @@ export interface CurrentChat {
 }
 
 export interface MessagesToRead {
+  chat_id: uuid
   sender_id: string
   receiver_id: string
 }
