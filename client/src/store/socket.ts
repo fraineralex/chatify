@@ -1,5 +1,12 @@
 import { create } from 'zustand'
-import { CurrentChat, Message, Messages } from '../types/chat'
+import {
+  Chat,
+  Chats,
+  CurrentChat,
+  Message,
+  Messages,
+  uuid
+} from '../types/chat'
 import { io, Socket } from 'socket.io-client'
 
 const SERVER_DOMAIN =
@@ -12,8 +19,10 @@ type SocketState = {
   messages: Messages
   setMessage: (message: Message) => void
   replaceMessage: (message: Message) => void
-  currentChat: CurrentChat
-  setCurrentChatName: (name: string) => void
+  chats: Chats
+  setChat: (chat: Chat) => void
+  currentChat: CurrentChat | null
+  setCurrentChat: (uuid: uuid) => void
   setCurrentChatDraft: (draft: string) => void
 }
 
@@ -26,7 +35,8 @@ const defaultSocket = io(SERVER_DOMAIN, {
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: defaultSocket,
   messages: [],
-  currentChat: { name: '', draft: '' },
+  chats: [],
+  currentChat: null,
 
   setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: string) => {
@@ -51,14 +61,24 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set({ messages })
   },
 
-  setCurrentChatName: name => {
-    const currentChat = get().currentChat
-    currentChat.name = name
-    currentChat.draft = localStorage.getItem(name) || ''
+  setChat: chat => {
+    const chats = get().chats
+    chats.push(chat)
+    set({ chats })
+  },
+
+  setCurrentChat: uuid => {
+    const draft = localStorage.getItem(uuid) || ''
+    const currentChat = {
+      uuid,
+      draft: draft
+    }
+
     set({ currentChat })
   },
   setCurrentChatDraft: draft => {
     const currentChat = get().currentChat
+    if (!currentChat) return
     currentChat.draft = draft
     set({ currentChat })
   }
