@@ -1,13 +1,13 @@
 interface Props {
   name: string
-  image: string
+  picture: string
 }
 
-export function Header ({ name, image }: Props) {
+export function Header ({ name, picture }: Props) {
   return (
     <header className='flex gap-2 border-b py-3'>
       <img
-        src={image}
+        src={picture}
         width='40'
         height='40'
         alt={`Contact avatar of ${name}`}
