@@ -40,3 +40,25 @@ export interface Chat {
   user2_id: string
   created_at: string
 }
+export interface Message {
+  uuid?: uuid
+  content: string
+  createdAt: Date
+  senderId: string
+  receiverId: string
+  chatId: uuid
+  type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+  resourceUrl: string | null
+  isRead: boolean
+  isEdited: boolean
+  isDeleted: boolean
+  replyToId: uuid | null
+}
+
+export interface ServerChat {
+  uuid: uuid
+  user: User
+  lastMessage?: Message
+  createdAt: Date
+  unreadMessages: number
+}
