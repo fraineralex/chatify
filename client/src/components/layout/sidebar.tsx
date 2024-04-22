@@ -1,19 +1,11 @@
 import { useSocketStore } from '../../store/socket'
-import { Chats } from '../../types/chat'
 import { Profile } from '../auth/profile'
 import { ChatItem } from '../chat/chat-item'
-import { useAuth0 } from '@auth0/auth0-react'
 
 export function Sidebar () {
-  const messages = useSocketStore(state => state.messages)
-  const { user } = useAuth0()
+  const { chats } = useSocketStore()
 
-  const loggedUser =
-    user?.name === 'Frainer Alexander' ? 'fraineralex' : user?.name
-
-  const chats: Chats = []
-
-  messages
+  /*   messages
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .forEach(message => {
       const lastMessage = {
@@ -55,17 +47,15 @@ export function Sidebar () {
           ...lastMessage
         })
       }
-    })
+    }) */
 
   return (
     <div className='border-r h-screen'>
       <nav className='py-4 px-1 space-y-4 h-[90%]'>
         <ul className='space-y-1'>
-          {chats
-            .filter(chat => chat.user.name !== loggedUser)
-            .map((chat, index) => (
-              <ChatItem key={index} {...chat} />
-            ))}
+          {chats.map((chat, index) => (
+            <ChatItem key={index} {...chat} />
+          ))}
         </ul>
       </nav>
       <Profile />
