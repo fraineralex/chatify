@@ -12,6 +12,7 @@ export class ChatRouter {
   init () {
     const router = Router()
 
+    router.get('/', this.chatController.getAllChats.bind(this.chatController))
     router.post('/', this.chatController.createChat.bind(this.chatController))
 
     return router
