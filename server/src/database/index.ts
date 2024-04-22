@@ -29,8 +29,6 @@ export async function createTables (client: Client) {
         uuid TEXT PRIMARY KEY,
         user1_id TEXT NOT NULL,
         user2_id TEXT NOT NULL,
-        last_message_id TEXT,
-        last_message_created_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `)
