@@ -6,13 +6,10 @@ import { useSocketStore } from '../../store/socket'
 import { useRef } from 'react'
 
 export function Chat () {
-  const { messages, currentChat } = useSocketStore()
+  const { messages, currentChat, chats } = useSocketStore()
+  const chat = chats.find(chat => chat.uuid === currentChat?.uuid)
   const currentChatMessages = messages
-    .filter(
-      message =>
-        message.senderId.username === currentChat.name ||
-        message.receiverId.username === currentChat.name
-    )
+    .filter(message => message.chatId === currentChat?.uuid)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -23,9 +20,9 @@ export function Chat () {
 
   return (
     <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-3'>
-      {currentChat.name ? (
+      {chat?.user.name ? (
         <>
-          <Header name={currentChat.name} image={`/${currentChat.name}.webp`} />
+          <Header name={chat?.user.name} picture={`/${chat?.user.name}.webp`} />
           <div
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
             ref={messagesEndRef}

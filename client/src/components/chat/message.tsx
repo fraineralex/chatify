@@ -1,11 +1,13 @@
-import { useSocketStore } from '../../store/socket'
+import { useAuth0 } from '@auth0/auth0-react'
 import { Message as Props } from '../../types/chat'
 import { CheckCheck } from 'lucide-react'
+import { useSocketStore } from '../../store/socket'
 
 export function Message ({ content, createdAt, senderId, isRead }: Props) {
-  const loggedUser = useSocketStore(state => state.loggedUser)
-  const isMe = senderId.username === loggedUser
-
+  const { user: loggedUser } = useAuth0()
+  const { chats } = useSocketStore()
+  const isMe = senderId === loggedUser?.sub
+  const chat = chats.find(chat => chat.user.id === senderId)
 
   const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
@@ -24,10 +26,10 @@ export function Message ({ content, createdAt, senderId, isRead }: Props) {
         }`}
       >
         <img
-          src={senderId.avatar}
+          src={chat?.user.picture}
           width='28'
           height='28'
-          alt={`Avatar of the user ${senderId.username} in the chat`}
+          alt={`Avatar of the user ${chat?.user.name} in the chat`}
           className='rounded-full align-top h-7 w-7 mt-2'
           style={{ aspectRatio: 28 / 28, objectFit: 'initial' }}
         />
