@@ -3,22 +3,24 @@ import { AttachFile, Emoji, Send } from '../general/svg-icons'
 import { ServerMessage } from '../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export function Form () {
-  const { socket, loggedUser, currentChat, setCurrentChatDraft } =
-    useSocketStore()
+  const { socket, currentChat, setCurrentChatDraft } = useSocketStore()
+  const { user: loggedUser } = useAuth0()
 
   const [contentMessage, setContentMessage] = useState<string>(
-    currentChat.draft
+    currentChat?.draft ?? ''
   )
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!contentMessage) return
+    if (!contentMessage || !currentChat) return
     const message: ServerMessage = {
-      content: currentChat.draft,
-      sender_id: loggedUser,
-      receiver_id: currentChat.name!,
+      content: currentChat?.draft,
+      sender_id: loggedUser?.sub || '',
+      receiver_id: currentChat.uuid,
+      chat_id: currentChat.uuid,
       type: MESSAGES_TYPES.TEXT,
       is_deleted: false,
       is_edited: false,
@@ -29,7 +31,7 @@ export function Form () {
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
-    localStorage.removeItem(currentChat.name)
+    localStorage.removeItem(currentChat.uuid)
     setCurrentChatDraft('')
   }
 
@@ -39,7 +41,8 @@ export function Form () {
   }
 
   const handleBlur = () => {
-    localStorage.setItem(currentChat.name, contentMessage)
+    if (!contentMessage || !currentChat) return
+    localStorage.setItem(currentChat.uuid, contentMessage)
   }
 
   return (
@@ -61,7 +64,7 @@ export function Form () {
         name='content'
         autoFocus
         onChange={handleChange}
-        value={currentChat.draft}
+        value={currentChat?.draft ?? ''}
         onBlur={handleBlur}
       />
       <button
