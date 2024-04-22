@@ -8,7 +8,7 @@ export interface Message {
   createdAt: Date
   senderId: string
   receiverId: string
-  chat_id: uuid
+  chatId: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
   isRead: boolean
@@ -37,25 +37,36 @@ export interface ServerMessageDB extends ServerMessage {
 
 export type Messages = Message[]
 
+interface User {
+  id: string
+  name: string
+  picture: string
+}
+
 export interface Chat {
-  user: {
-    name: string
-    avatar: string
-  }
-  lastMessage: string
-  lastMessageDate: string
+  uuid: uuid
+  user: User
+  lastMessage?: Message
+  createdAt: Date
   unreadMessages: number
 }
 
 export type Chats = Chat[]
 
+export interface ChatDB {
+  uuid: uuid
+  user1_id: string
+  user2_id: string
+  created_at: string
+}
+
 export interface CurrentChat {
-  name: string
-  draft: string
+  uuid: uuid
+  draft: string 
 }
 
 export interface MessagesToRead {
   chat_id: uuid
   sender_id: string
-  receiver_id: string
+  receiver_id?: string
 }
