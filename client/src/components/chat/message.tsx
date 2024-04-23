@@ -7,7 +7,9 @@ export function Message ({ content, createdAt, senderId, isRead }: Props) {
   const { user: loggedUser } = useAuth0()
   const { chats } = useSocketStore()
   const isMe = senderId === loggedUser?.sub
-  const chat = chats.find(chat => chat.user.id === senderId)
+  const user = isMe
+    ? loggedUser
+    : chats.find(chat => chat.user.id === senderId)?.user
 
   const time = createdAt.toLocaleTimeString([], {
     hour: '2-digit',
@@ -26,12 +28,12 @@ export function Message ({ content, createdAt, senderId, isRead }: Props) {
         }`}
       >
         <img
-          src={chat?.user.picture}
-          width='28'
-          height='28'
-          alt={`Avatar of the user ${chat?.user.name} in the chat`}
+          src={user?.picture}
+          width='50'
+          height='50'
+          alt={`Avatar of the user ${user?.name} in the chat`}
           className='rounded-full align-top h-7 w-7 mt-2'
-          style={{ aspectRatio: 28 / 28, objectFit: 'initial' }}
+          style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
         />
 
         <span
