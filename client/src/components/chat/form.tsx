@@ -19,7 +19,7 @@ export function Form () {
     const message: ServerMessage = {
       content: currentChat?.draft,
       sender_id: loggedUser?.sub || '',
-      receiver_id: currentChat.uuid,
+      receiver_id: currentChat.user.id,
       chat_id: currentChat.uuid,
       type: MESSAGES_TYPES.TEXT,
       is_deleted: false,
