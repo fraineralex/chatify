@@ -5,15 +5,11 @@ import {
   CurrentChat,
   Message,
   Messages,
-  uuid
 } from '../types/chat'
-import { io, Socket } from 'socket.io-client'
-
-const SERVER_DOMAIN =
-  import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
+import { Socket } from 'socket.io-client'
 
 type SocketState = {
-  socket: Socket
+  socket: Socket | undefined
   setSocket: (socket: Socket) => void
   setServerOffset: (serverOffset: string) => void
   messages: Messages
@@ -22,18 +18,13 @@ type SocketState = {
   chats: Chats
   setChat: (chat: Chat) => void
   currentChat: CurrentChat | null
-  setCurrentChat: (uuid: uuid) => void
+  setCurrentChat: (chat: Chat) => void
+  replaceChat: (chat: Chat) => void
   setCurrentChatDraft: (draft: string) => void
 }
 
-const defaultSocket = io(SERVER_DOMAIN, {
-  auth: {
-    serverOffset: 0
-  }
-})
-
 export const useSocketStore = create<SocketState>((set, get) => ({
-  socket: defaultSocket,
+  socket: undefined,
   messages: [],
   chats: [],
   currentChat: null,
@@ -41,6 +32,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: string) => {
     const newSocket = get().socket
+    if (!newSocket) return
+    
     newSocket.auth = {
       ...newSocket.auth,
       serverOffset
@@ -67,15 +60,23 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set({ chats })
   },
 
-  setCurrentChat: uuid => {
-    const draft = localStorage.getItem(uuid) || ''
-    const currentChat = {
-      uuid,
+  setCurrentChat: chat => {
+    const draft = localStorage.getItem(chat.uuid) || ''
+    const currentChat: CurrentChat = {
+      ...chat,
       draft: draft
     }
 
     set({ currentChat })
   },
+
+  replaceChat: chat => {
+    const chats = get().chats
+    const index = chats.findIndex(c => c.uuid === chat.uuid)
+    chats[index] = chat
+    set({ chats })
+  },
+
   setCurrentChatDraft: draft => {
     const currentChat = get().currentChat
     if (!currentChat) return
