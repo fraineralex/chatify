@@ -60,13 +60,18 @@ export interface ChatDB {
   created_at: string
 }
 
-export interface CurrentChat {
-  uuid: uuid
+export interface CurrentChat extends Chat {
   draft: string 
 }
 
+export interface ChangeChat {
+  uuid: uuid
+  lastMessage?: Message
+}
+
+
 export interface MessagesToRead {
   chat_id: uuid
-  sender_id: string
-  receiver_id?: string
+  sender_id?: string
+  receiver_id: string
 }
