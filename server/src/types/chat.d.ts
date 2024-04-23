@@ -12,7 +12,7 @@ export interface ServerMessage {
   is_read: boolean
   is_edited: boolean
   is_deleted: boolean
-  reply_to_id: string | null
+  replyToId: uuid | null
 }
 
 export interface ServerMessageDB extends ServerMessage {
@@ -22,7 +22,7 @@ export interface ServerMessageDB extends ServerMessage {
 
 export interface MessagesToRead {
   chat_id: uuid
-  sender_id: string
+  sender_id?: string
   receiver_id: string
 }
 
@@ -43,7 +43,7 @@ export interface Chat {
 export interface Message {
   uuid?: uuid
   content: string
-  createdAt: Date
+  createdAt: string
   senderId: string
   receiverId: string
   chatId: uuid
@@ -59,6 +59,11 @@ export interface ServerChat {
   uuid: uuid
   user: User
   lastMessage?: Message
-  createdAt: Date
+  createdAt: string
   unreadMessages: number
+}
+
+export interface ChangeChat {
+  uuid: uuid
+  lastMessage?: Message
 }

@@ -14,9 +14,13 @@ export class SocketRouter {
 
   async init () {
     this.io.on(SOCKET_EVENTS.CONNECTION, async socket => {
-      socket.on(SOCKET_EVENTS.DISCONNECT, this.socketController.disconnect)
-      socket.on(SOCKET_EVENTS.NEW_MESSAGE, this.socketController.newMessage)
-      socket.on(SOCKET_EVENTS.READ_MESSAGE, this.socketController.readMessages)
+      const loggedUser = socket.handshake.auth.userId
+      console.log('a user connected')
+      if (!loggedUser) return
+
+      socket.on(SOCKET_EVENTS.DISCONNECT, this.socketController.disconnect.bind(this.socketController))
+      socket.on(SOCKET_EVENTS.NEW_MESSAGE, this.socketController.newMessage.bind(this.socketController))
+      socket.on(SOCKET_EVENTS.READ_MESSAGE, this.socketController.readMessages.bind(this.socketController))
 
       this.socketController.recoverMessages(socket)
     })
