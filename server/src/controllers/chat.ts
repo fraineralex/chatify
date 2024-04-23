@@ -26,13 +26,14 @@ export class ChatController {
       })
 
       const chats: ServerChat[] = []
-      result.rows.forEach(async chat => {
+      for (const chat of result.rows) {
         const id =
           chat.user1_id === userId
             ? (chat.user2_id as string)
             : (chat.user1_id as string)
 
         const chatUser = await getUserById(id)
+        const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
 
         let lastMessage: Message
         let unreadMessages: number
@@ -46,7 +47,7 @@ export class ChatController {
           uuid: resultMessage.rows[0].uuid as uuid,
           chatId: chat.uuid as uuid,
           content: resultMessage.rows[0].content as string,
-          createdAt: new Date(resultMessage.rows[0].created_at as string),
+          createdAt: resultMessage.rows[0].created_at as string,
           isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
           isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
           isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
@@ -59,7 +60,7 @@ export class ChatController {
         }
 
         const resultUnreadMessages = await this.client.execute({
-          sql: 'SELECT COUNT(*) FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
+          sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
           args: { chat_id: chat.uuid, receiver_id: userId }
         })
 
@@ -67,18 +68,18 @@ export class ChatController {
 
         const newChat: ServerChat = {
           uuid: chat.uuid as uuid,
-          createdAt: new Date(chat.created_at as string),
           user: {
             id,
-            name: chatUser.name,
-            picture: chatUser.picture
+            name,
+            picture: chatUser.picture as string
           },
+          createdAt: chat.created_at as string,
           unreadMessages,
           lastMessage
         }
 
-        chats.push(newChat)
-      })
+       chats.push(newChat)
+      }
 
       res.status(200).json(chats)
     } catch (error) {
