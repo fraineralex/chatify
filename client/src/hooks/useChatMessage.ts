@@ -1,27 +1,39 @@
 /* eslint-disable no-extra-semi */
-import { Chat, Message, ServerMessageDB } from './../types/chat.d'
 import { useEffect } from 'react'
 import { useSocketStore } from '../store/socket'
 import { SOCKET_EVENTS } from '../constants'
 import { useAuth0 } from '@auth0/auth0-react'
+import { io } from 'socket.io-client'
+import { Chat, Message, ServerMessageDB } from '../types/chat'
 
-const API_URL = import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
+const SERVER_DOMAIN = import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
 
 export const useChatMessage = () => {
   const {
     setMessage,
-    socket,
     setServerOffset,
     messages,
     replaceMessage,
-    setChat
+    setChat,
+    setSocket,
+    chats,
+    replaceChat,
   } = useSocketStore()
 
   const { user: loggedUser } = useAuth0()
 
   useEffect(() => {
-    socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message: ServerMessageDB) => {
-      const newMessages: Message = {
+    const newsocket = io(SERVER_DOMAIN, {
+      auth: {
+        serverOffset: 0,
+        userId: loggedUser?.sub
+      }
+    })
+
+    setSocket(newsocket)
+
+    newsocket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message: ServerMessageDB) => {
+      const newMessage: Message = {
         uuid: message.uuid,
         content: message.content,
         createdAt: new Date(message.created_at),
@@ -36,11 +48,28 @@ export const useChatMessage = () => {
         resourceUrl: message.resource_url
       }
 
-      setMessage(newMessages)
+      setMessage(newMessage)
       setServerOffset(message.created_at)
+
+      const chat = chats.find(c => c.uuid === newMessage.chatId)
+      if (!chat) return
+
+      const unreadMessages = loggedUser?.sub === newMessage?.receiverId 
+        ? chat.unreadMessages + 1 
+        : 0
+
+      const newChat: Chat = {
+        uuid: chat.uuid,
+        lastMessage: newMessage,
+        user: chat.user,
+        createdAt: chat.createdAt,
+        unreadMessages
+      }
+
+      replaceChat(newChat)
     })
 
-    socket.on(SOCKET_EVENTS.READ_MESSAGE, (message: ServerMessageDB) => {
+    newsocket.on(SOCKET_EVENTS.READ_MESSAGE, (message: ServerMessageDB) => {
       const newMessage = messages.find(m => m.uuid === message.uuid)
       if (!newMessage) return
       replaceMessage({
@@ -50,15 +79,15 @@ export const useChatMessage = () => {
     })
 
     return () => {
-      socket.off(SOCKET_EVENTS.CHAT_MESSAGE)
-      socket.off(SOCKET_EVENTS.READ_MESSAGE)
+      newsocket.off(SOCKET_EVENTS.CHAT_MESSAGE)
+      newsocket.off(SOCKET_EVENTS.READ_MESSAGE)
     }
-  }, [socket])
+  }, [loggedUser])
 
   useEffect(() => {
     ;(async () => {
       const response = await fetch(
-        `${API_URL}/chats?user_id=${loggedUser?.sub}`
+        `${SERVER_DOMAIN}/chats?user_id=${loggedUser?.sub}`
       )
       const chats: Chat[] = await response.json()
 
@@ -66,5 +95,5 @@ export const useChatMessage = () => {
         setChat(chat)
       })
     })()
-  }, [socket])
+  }, [loggedUser])
 }
