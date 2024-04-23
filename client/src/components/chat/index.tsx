@@ -22,7 +22,7 @@ export function Chat () {
     <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-3'>
       {chat?.user.name ? (
         <>
-          <Header name={chat?.user.name} picture={`/${chat?.user.name}.webp`} />
+          <Header name={chat?.user.name} picture={`${chat?.user.picture}`} />
           <div
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
             ref={messagesEndRef}
