@@ -72,6 +72,12 @@ export interface ChangeChat {
 
 export interface MessagesToRead {
   chat_id: uuid
-  sender_id?: string
-  receiver_id: string
+  sender_id: string
+  receiver_id?: string
+}
+
+export interface User {
+  id: string
+  name: string
+  picture: string
 }
