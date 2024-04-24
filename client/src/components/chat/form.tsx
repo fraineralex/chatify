@@ -1,23 +1,25 @@
 import { useState } from 'react'
-import { AttachFile, Emoji, Send } from '../general/svg-icons'
+import { AttachFile, Emoji, Send } from '../common/svg-icons'
 import { ServerMessage } from '../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useChatStore } from '../../store/currenChat'
 
 export function Form () {
-  const { socket, currentChat, setCurrentChatDraft } = useSocketStore()
+  const { socket } = useSocketStore()
+  const { currentChat, setCurrentChatDraft, currentChatDraft } = useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const [contentMessage, setContentMessage] = useState<string>(
-    currentChat?.draft ?? ''
+    currentChatDraft ?? ''
   )
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!contentMessage || !currentChat) return
     const message: ServerMessage = {
-      content: currentChat?.draft,
+      content: currentChatDraft,
       sender_id: loggedUser?.sub || '',
       receiver_id: currentChat.user.id,
       chat_id: currentChat.uuid,
@@ -64,7 +66,7 @@ export function Form () {
         name='content'
         autoFocus
         onChange={handleChange}
-        value={currentChat?.draft ?? ''}
+        value={currentChatDraft ?? ''}
         onBlur={handleBlur}
       />
       <button
