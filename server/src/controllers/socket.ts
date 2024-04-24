@@ -21,7 +21,7 @@ export class SocketController {
   }
 
   async disconnect (): Promise<void> {
-    console.log('User disconnected')
+    //console.log('User disconnected')
   }
 
   async newMessage (message: ServerMessage): Promise<void> {
@@ -54,26 +54,25 @@ export class SocketController {
   }
 
   async readMessages (messages: MessagesToRead): Promise<void> {
-    let selectResult
-    let updateResult
     try {
-      selectResult = await this.client.execute({
+      const selectResult = await this.client.execute({
         sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
 
-      updateResult = await this.client.execute({
+      if (selectResult.rows.length === 0) return
+
+      const updateResult = await this.client.execute({
         sql: 'UPDATE messages SET is_read = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
 
       if (
-        selectResult.rowsAffected === updateResult.rowsAffected &&
-        selectResult.rows.length > 0
-      ) {
+        selectResult.rows.length === updateResult.rowsAffected) {
         selectResult.rows.forEach(row => {
           const message = {
-            ...row
+            ...row,
+            is_read: 1
           }
 
           this.io.emit(SOCKET_EVENTS.READ_MESSAGE, message)
