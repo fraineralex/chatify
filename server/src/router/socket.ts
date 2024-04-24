@@ -15,7 +15,7 @@ export class SocketRouter {
   async init () {
     this.io.on(SOCKET_EVENTS.CONNECTION, async socket => {
       const loggedUser = socket.handshake.auth.userId
-      console.log('a user connected')
+      //console.log('a user connected')
       if (!loggedUser) return
 
       socket.on(SOCKET_EVENTS.DISCONNECT, this.socketController.disconnect.bind(this.socketController))
