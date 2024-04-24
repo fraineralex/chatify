@@ -7,7 +7,7 @@ function App () {
 
   if (isLoading) return <div>Loading...</div>
 
-  return <>{isAuthenticated && user ? <ChatScreen /> : <Home />}</>
+  return <>{isAuthenticated ? <ChatScreen /> : <Home />}</>
 }
 
 export default App
