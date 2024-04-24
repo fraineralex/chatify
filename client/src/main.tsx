@@ -15,6 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       /* audience: `https://${AUTH0_DOMAIN}/api/v2/`,
       scope: 'read:current_user update:current_user_metadata' */
     }}
+    cacheLocation='localstorage'
   >
     <App />
   </Auth0Provider>
