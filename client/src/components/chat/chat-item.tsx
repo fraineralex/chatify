@@ -3,6 +3,7 @@ import { SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
 import { Chat, MessagesToRead } from '../../types/chat'
 import { CheckCheck } from 'lucide-react'
+import { useChatStore } from '../../store/currenChat'
 
 export function ChatItem ({
   uuid,
@@ -11,7 +12,8 @@ export function ChatItem ({
   unreadMessages,
   createdAt
 }: Chat) {
-  const { currentChat, setCurrentChat, socket } = useSocketStore()
+  const { socket } = useSocketStore()
+  const { currentChat, setCurrentChat, currentChatDraft } = useChatStore()
   const { user: loggedUser } = useAuth0()
   const isCurrentChat = currentChat?.uuid === uuid
   const lastMessageDate = lastMessage?.createdAt || createdAt
@@ -20,31 +22,32 @@ export function ChatItem ({
     if (isCurrentChat || !socket) return
 
     if (currentChat) {
-      localStorage.setItem(currentChat.uuid, currentChat.draft || '')
+      localStorage.setItem(currentChat.uuid, currentChatDraft || '')
     }
 
-    setCurrentChat({
+    const newCurrentChat: Chat = {
       uuid,
       user,
       lastMessage,
       createdAt,
       unreadMessages
-    })
+    }
+    setCurrentChat(newCurrentChat)
 
     if (unreadMessages > 0) {
       const messagesToRead: MessagesToRead = {
         chat_id: uuid,
-        sender_id: loggedUser?.sub,
-        receiver_id: user.id
+        sender_id: user.id,
+        receiver_id: loggedUser?.sub
       }
-
+      console.log(messagesToRead)
       socket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
     }
   }
 
   return (
     <li
-      className={`flex items-center space-x-2  border border-transparent border-b-gray-300 cursor-pointer p-1 py-2 w-full ${
+      className={`flex items-center space-x-2  border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full ${
         isCurrentChat
           ? 'bg-gray-300 rounded-md'
           : 'rounded-sm hover:bg-gray-200 hover:rounded-md'
@@ -82,7 +85,7 @@ export function ChatItem ({
             )}
             {lastMessage?.content || 'No messages yet'}
           </p>
-          {unreadMessages > 0 && currentChat?.uuid !== uuid && (
+          {unreadMessages > 0 && (
             <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full'>
               {unreadMessages}
             </span>
