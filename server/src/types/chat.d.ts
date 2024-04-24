@@ -22,8 +22,8 @@ export interface ServerMessageDB extends ServerMessage {
 
 export interface MessagesToRead {
   chat_id: uuid
-  sender_id?: string
-  receiver_id: string
+  sender_id: string
+  receiver_id?: string
 }
 
 export interface User {
