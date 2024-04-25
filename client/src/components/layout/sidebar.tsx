@@ -13,8 +13,8 @@ export function Sidebar () {
           {chats
             .sort(
               (a, b) =>
-                (b.lastMessage?.createdAt.getTime() || b.createdAt.getTime()) -
-                (a.lastMessage?.createdAt.getTime() || a.createdAt.getTime())
+                new Date(b.lastMessage?.createdAt || b.createdAt).getTime() -
+                new Date(a.lastMessage?.createdAt || a.createdAt).getTime()
             )
             .map((chat, index) => (
               <ChatItem key={index} {...chat} />
