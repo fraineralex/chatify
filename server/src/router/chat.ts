@@ -14,6 +14,7 @@ export class ChatRouter {
 
     router.get('/', this.chatController.getAllChats.bind(this.chatController))
     router.post('/', this.chatController.createChat.bind(this.chatController))
+    router.get('/:chatId', this.chatController.getChatById.bind(this.chatController))
 
     return router
   }

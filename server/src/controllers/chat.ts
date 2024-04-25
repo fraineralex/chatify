@@ -114,4 +114,66 @@ export class ChatController {
       return
     }
   }
+
+  async getChatById (req: Request, res: Response): Promise<void> {
+    const chatId = req.params.chatId
+    const userId = req.query.user_id as string
+
+    if (!chatId) {
+      res.status(400).json({ error: 'Missing chat_id' })
+      return
+    }
+
+    if (!userId) {
+      res.status(400).json({ error: 'Missing user_id' })
+      return
+    }
+
+    try {
+      const result = await this.client.execute({
+        sql: 'SELECT * FROM chats WHERE uuid = :uuid',
+        args: { uuid: chatId }
+      })
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ error: 'Chat not found' })
+        return
+      }
+
+      const chatDB = result.rows[0]
+      const id =
+        chatDB.user1_id === userId
+          ? (chatDB.user2_id as string)
+          : (chatDB.user1_id as string)
+
+      const chatUser = await getUserById(id)
+      const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
+
+      let unreadMessages: number = 0
+
+      const resultUnreadMessages = await this.client.execute({
+        sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
+        args: { chat_id: chatDB.uuid, receiver_id: userId }
+      })
+
+      unreadMessages = resultUnreadMessages.rows[0].count as number ?? 0
+
+      const chat: ServerChat = {
+        uuid: chatDB.uuid as uuid,
+        user: {
+          id,
+          name,
+          picture: chatUser.picture as string
+        },
+        createdAt: chatDB.created_at as string,
+        unreadMessages,
+      }
+
+      res.status(200).json(chat)
+    } catch (error) {
+      console.error(error)
+      throw Error('Failed to fetch record: ' + JSON.stringify(error))
+      return
+    }
+  }
 }
