@@ -35,36 +35,39 @@ export class ChatController {
         const chatUser = await getUserById(id)
         const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
 
-        let lastMessage: Message
-        let unreadMessages: number
+        let lastMessage: Message | undefined = undefined
+        let unreadMessages: number = 0
 
         const resultMessage = await this.client.execute({
           sql: 'SELECT * FROM messages WHERE chat_id = :chat_id ORDER BY created_at DESC LIMIT 1',
           args: { chat_id: chat.uuid }
         })
 
-        lastMessage = {
-          uuid: resultMessage.rows[0].uuid as uuid,
-          chatId: chat.uuid as uuid,
-          content: resultMessage.rows[0].content as string,
-          createdAt: resultMessage.rows[0].created_at as string,
-          isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
-          isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
-          isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
-          receiverId: resultMessage.rows[0].receiver_id as string,
-          replyToId: resultMessage.rows[0].reply_to_id as uuid,
-          resourceUrl: resultMessage.rows[0].resource_url as string,
-          senderId: resultMessage.rows[0].sender_id as string,
-          type: resultMessage.rows[0]
-            .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+        if (resultMessage.rows.length > 0) {
+          lastMessage = {
+            uuid: resultMessage.rows[0].uuid as uuid,
+            chatId: chat.uuid as uuid,
+            content: resultMessage.rows[0].content as string,
+            createdAt: resultMessage.rows[0].created_at as string,
+            isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
+            isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
+            isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
+            receiverId: resultMessage.rows[0].receiver_id as string,
+            replyToId: resultMessage.rows[0].reply_to_id as uuid,
+            resourceUrl: resultMessage.rows[0].resource_url as string,
+            senderId: resultMessage.rows[0].sender_id as string,
+            type: resultMessage.rows[0]
+              .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
         }
-
+        
         const resultUnreadMessages = await this.client.execute({
           sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
           args: { chat_id: chat.uuid, receiver_id: userId }
         })
 
         unreadMessages = resultUnreadMessages.rows[0].count as number
+      }
+
 
         const newChat: ServerChat = {
           uuid: chat.uuid as uuid,
