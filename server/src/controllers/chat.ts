@@ -93,20 +93,19 @@ export class ChatController {
   }
 
   async createChat (req: Request, res: Response): Promise<void> {
-    const { user1_id, user2_id } = req.body
+    const { user1_id, user2_id }: { user1_id: string, user2_id: string }  = req.body
     const uuid = crypto.randomUUID()
     const created_at = new Date().toISOString()
-    const chat: Chat = {
+    const chat: ServerChat = {
       uuid,
-      user1_id,
-      user2_id,
-      created_at
+      createdAt: created_at,
+      unreadMessages: 0
     }
 
     try {
       await this.client.execute({
         sql: 'INSERT INTO chats (uuid, user1_id, user2_id, created_at) VALUES (:uuid, :user1_id, :user2_id, :created_at)',
-        args: { ...chat }
+        args: { uuid, user1_id, user2_id, created_at}
       })
       res.status(201).json(chat)
     } catch (error) {
