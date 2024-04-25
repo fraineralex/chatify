@@ -5,9 +5,16 @@ import './chat.css'
 import { useSocketStore } from '../../store/socket'
 import { useRef } from 'react'
 import { useChatStore } from '../../store/currenChat'
+import { Message as MessageType, uuid } from '../../types/chat'
 
 export function Chat () {
   const { messages } = useSocketStore()
+  const uniqueMessages = Object.values(
+    messages.reduce((acc: { [key: uuid]: MessageType }, message) => {
+      acc[message.uuid] = message
+      return acc
+    }, {})
+  )
   const currentChat = useChatStore(state => state.currentChat)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -27,7 +34,7 @@ export function Chat () {
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
             ref={messagesEndRef}
           >
-            {messages
+            {uniqueMessages
               .filter(message => message.chatId === currentChat?.uuid)
               .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
               .map((message, index) => (
