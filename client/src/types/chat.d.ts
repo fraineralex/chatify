@@ -3,7 +3,7 @@ import { MESSAGES_TYPES } from '../constants'
 type uuid = `${string}-${string}-${string}-${string}-${string}`
 
 export interface Message {
-  uuid?: string
+  uuid: uuid
   content: string
   createdAt: Date
   senderId: string
