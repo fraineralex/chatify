@@ -74,7 +74,7 @@ export const useChatMessage = () => {
 
       const newChat: Chat = {
         uuid: chat.uuid,
-        lastMessage: chat.lastMessage?.createdAt && chat.lastMessage.createdAt.getTime() > newMessage.createdAt.getTime() 
+        lastMessage: chat.lastMessage?.createdAt && new Date(chat.lastMessage.createdAt).getTime() > newMessage.createdAt.getTime() 
           ? chat.lastMessage 
           : newMessage,
         user: chat.user,
