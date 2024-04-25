@@ -6,14 +6,14 @@ const LogoutButton = () => {
 
   return (
     <button
-      className='hover:scale-125 ease-in-out duration-300 text-gray-700 font-semibold text-sm hover:text-gray-900'
+      className='hover:scale-125 ease-in-out duration-300 text-gray-700 font-semibold text-sm px-2'
       title='Log out'
       aria-label='Log out'
       onClick={() =>
         logout({ logoutParams: { returnTo: window.location.origin } })
       }
     >
-      <LogOut />
+      <LogOut className='w-5 h-5' />
     </button>
   )
 }
