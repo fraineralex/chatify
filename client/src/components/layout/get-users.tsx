@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import { User } from '../../types/chat'
 import { ChatItem } from '../chat/chat-item'
 import { useAuth0 } from '@auth0/auth0-react'
+import LogoutButton from '../auth/logout-button'
+import { useNewChatModalStore } from '../../store/newChatModal'
 
 const SERVER_DOMAIN =
   import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
 
 export function GetUsersModal () {
-  const [open, setOpen] = useState(false)
+  const { isOpen, closeModal, openModal } = useNewChatModalStore()
   const [users, setUsers] = useState<User[]>([])
   const loggedUser = useAuth0().user
 
@@ -25,14 +27,15 @@ export function GetUsersModal () {
     <>
       <aside className='flex items-center justify-between px-3 py-2'>
         <button className='px-2 text-gray-700'>
-          <SquarePen className='w-5 h-5' onClick={() => setOpen(!open)} />
+          <SquarePen className='w-5 h-5' onClick={openModal} />
         </button>
+        <LogoutButton />
         <button className='ps-2 text-gray-700'>
           <EllipsisVertical className='w-5 h-5' />
         </button>
       </aside>
 
-      <Modal isOpen={open} onClose={() => setOpen(false)}>
+      <Modal isOpen={isOpen} onClose={closeModal}>
         <article className='fixed left-60 top-0 z-50 mx-2 mt-14 max-w-[400px] flex-col items-center overflow-hidden rounded-md px-4 py-6 shadow-2xl border bg-gray-200 lg:w-3/4 xl:w-2/3 md:max-h-50 max-h-132 flex'>
           <h2 className='font-bold self-start mb-1'>New Chat</h2>
           <div className='relative mb-2 w-full md:mb-4'>
