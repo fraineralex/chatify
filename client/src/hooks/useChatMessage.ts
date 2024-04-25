@@ -20,6 +20,7 @@ export const useChatMessage = () => {
     replaceMessage,
     setChat,
     setSocket,
+    socket,
     chats,
     replaceChat
   } = useSocketStore()
@@ -28,7 +29,7 @@ export const useChatMessage = () => {
   useEffect(() => {
     const newSocket = io(SERVER_DOMAIN, {
       auth: {
-        serverOffset: 0,
+        serverOffset: (socket?.auth as { serverOffset?: number })?.serverOffset ?? 0,
         userId: loggedUser?.sub
       }
     })
@@ -86,22 +87,19 @@ export const useChatMessage = () => {
     })
 
     newSocket.on(SOCKET_EVENTS.READ_MESSAGE, (message: ServerMessageDB) => {
-      const newMessage = messages.find(m => m.uuid === message.uuid)
-      if (!newMessage) return
-      replaceMessage({
-        ...newMessage,
-        isRead: true
-      })
+      const messageToReplace = messages.find(m => m.uuid === message.uuid)
+      if (!messageToReplace) return
+      messageToReplace.isRead = true
+      replaceMessage(messageToReplace)
 
-      const chat = chats.find(c => c.uuid === newMessage.chatId)
-      if (!chat || chat.lastMessage?.uuid !== newMessage.uuid) return
+      const chat = chats.find(c => c.uuid === messageToReplace.chatId)
+      if (!chat || chat.lastMessage?.uuid !== messageToReplace.uuid) return
       
       const newChat: Chat = {
         uuid: chat.uuid,
-        lastMessage: {
-          ...newMessage,
-          isRead: true
-        },
+        lastMessage: messageToReplace.createdAt.getTime() > (chat.lastMessage?.createdAt.getTime() ?? 0)
+          ? messageToReplace 
+          : chat.lastMessage,
         user: chat.user,
         createdAt: chat.createdAt,
         unreadMessages: chat.unreadMessages - 1
