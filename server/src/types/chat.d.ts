@@ -57,7 +57,7 @@ export interface Message {
 
 export interface ServerChat {
   uuid: uuid
-  user: User
+  user?: User
   lastMessage?: Message
   createdAt: string
   unreadMessages: number
