@@ -81,3 +81,13 @@ export interface User {
   name: string
   picture: string
 }
+
+
+export interface ChatItem {
+  uuid?: uuid
+  user: User
+  lastMessage?: Message
+  createdAt?: Date
+  unreadMessages?: number
+  isNewChat?: boolean
+}
