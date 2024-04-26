@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { io } from 'socket.io-client'
 import { Chat, Message, MessagesToRead, ServerMessageDB } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
-import { getChatById } from '../services/chat'
+import { getAllChats, getChatById } from '../services/chat'
 
 const SERVER_DOMAIN = import.meta.env.VITE_SERVER_DOMAIN as string ?? 'http://localhost:3000'
 
@@ -61,10 +61,10 @@ export const useChatMessage = () => {
         let chat = chats.find(c => c.uuid === newMessage.chatId)
         if (!chat) {
           chat = await getChatById(newMessage.chatId, loggedUser?.sub)
+          if (!chat) return
           chat.lastMessage = newMessage
         }
 
-        if (!chat) return
 
         let unreadMessages = 0
         if (loggedUser?.sub === newMessage?.receiverId) {
@@ -125,10 +125,8 @@ export const useChatMessage = () => {
   
   useEffect(() => {
     ;(async () => {
-      const response = await fetch(
-        `${SERVER_DOMAIN}/chats?user_id=${loggedUser?.sub}`
-      )
-      const chats: Chat[] = await response.json()
+      const chats = await getAllChats(loggedUser?.sub)
+      if (!chats) return
 
       chats.forEach(chat => {
         setChat(chat)
