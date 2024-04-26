@@ -32,7 +32,7 @@ export function ChatItem ({
       className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full ${
         isCurrentChat
           ? 'bg-gray-300 rounded-md'
-          : 'rounded-sm hover:bg-gray-200 hover:rounded-md'
+          : 'rounded-sm hover:bg-gray-200 hover:rounded-md bg-transparent'
       }`}
       onClick={chatExists ? openChat : createChat}
     >
