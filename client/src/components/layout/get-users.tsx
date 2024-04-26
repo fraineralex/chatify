@@ -6,9 +6,7 @@ import { ChatItem } from '../chat/chat-item'
 import { useAuth0 } from '@auth0/auth0-react'
 import LogoutButton from '../auth/logout-button'
 import { useNewChatModalStore } from '../../store/newChatModal'
-
-const SERVER_DOMAIN =
-  import.meta.env.VITE_SERVER_DOMAIN ?? 'http://localhost:3000'
+import { getAllUsers } from '../../services/user'
 
 export function GetUsersModal () {
   const { isOpen, closeModal, openModal } = useNewChatModalStore()
@@ -18,8 +16,8 @@ export function GetUsersModal () {
   useEffect(() => {
     if (!open) return
     ;(async () => {
-      const response = await fetch(`${SERVER_DOMAIN}/users`)
-      setUsers(await response.json())
+      const users = await getAllUsers()
+      setUsers(users ?? [])
     })()
   }, [open])
 
