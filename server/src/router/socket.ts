@@ -18,11 +18,27 @@ export class SocketRouter {
       //console.log('a user connected')
       if (!loggedUser) return
 
-      socket.on(SOCKET_EVENTS.DISCONNECT, this.socketController.disconnect.bind(this.socketController))
-      socket.on(SOCKET_EVENTS.NEW_MESSAGE, this.socketController.newMessage.bind(this.socketController))
-      socket.on(SOCKET_EVENTS.READ_MESSAGE, this.socketController.readMessages.bind(this.socketController))
+      socket.on(
+        SOCKET_EVENTS.DISCONNECT,
+        this.socketController.disconnect.bind(this.socketController)
+      )
+      socket.on(
+        SOCKET_EVENTS.NEW_MESSAGE,
+        this.socketController.newMessage.bind(this.socketController)
+      )
+      socket.on(
+        SOCKET_EVENTS.READ_MESSAGE,
+        this.socketController.readMessages.bind(this.socketController)
+      )
 
-      this.socketController.recoverMessages(socket)
+      socket.on(
+        SOCKET_EVENTS.RECOVER_MESSAGES,
+        this.socketController.recoverMessages(socket)
+      )
+
+      /* if (socket.recovered) {
+        this.socketController.recoverMessages(socket)()
+      } */
     })
   }
 }
