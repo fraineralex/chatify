@@ -8,8 +8,6 @@ import {
 } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { SOCKET_EVENTS } from '../constants/index.js'
-import { getUserById } from '../utils/user.js'
-import { error } from 'console'
 
 export class SocketController {
   private client: Client
@@ -43,14 +41,11 @@ export class SocketController {
         }
       })
 
-
       this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
-      
     } catch (error) {
       console.error(error)
       return
     }
-
   }
 
   async readMessages (messages: MessagesToRead): Promise<void> {
@@ -67,8 +62,7 @@ export class SocketController {
         args: { ...messages }
       })
 
-      if (
-        selectResult.rows.length === updateResult.rowsAffected) {
+      if (selectResult.rows.length === updateResult.rowsAffected) {
         selectResult.rows.forEach(row => {
           const message = {
             ...row,
@@ -84,8 +78,8 @@ export class SocketController {
     }
   }
 
-  async recoverMessages (socket: Socket): Promise<void> {
-    if (socket.recovered) return
+  recoverMessages = (socket: Socket) => async (): Promise<void> => {
+    console.log('Recovering messages')
 
     const offset = socket.handshake.auth.serverOffset ?? 0
     const loggedUserId = socket.handshake.auth.userId
@@ -108,37 +102,37 @@ export class SocketController {
     }
   }
 
-  private async updateChat(message: ServerMessageDB): Promise<ChangeChat | undefined>  {
+  private async updateChat (
+    message: ServerMessageDB
+  ): Promise<ChangeChat | undefined> {
     try {
-
       const result = await this.client.execute({
         sql: 'SELECT * FROM chats WHERE uuid = :chat_id LIMIT 1',
-      args: { chat_id: message.chat_id }
-    })
-  
-  const chat: ChangeChat = {
-    uuid: result.rows[0].uuid as uuid,
-    lastMessage: {
-      uuid: message.uuid,
-      chatId: message.chat_id,
-      content: message.content,
-      createdAt: message.created_at,
-      isDeleted: message.is_deleted,
-      isEdited: message.is_edited,
-      isRead: message.is_read,
-        receiverId: message.receiver_id,
-        replyToId: message.replyToId,
-        resourceUrl: message.resource_url,
-        senderId: message.sender_id,
-        type: message.type
-      }
-    }
+        args: { chat_id: message.chat_id }
+      })
 
-    return chat
-  } catch (error) {
-    console.error(error)
-    return
-  }
+      const chat: ChangeChat = {
+        uuid: result.rows[0].uuid as uuid,
+        lastMessage: {
+          uuid: message.uuid,
+          chatId: message.chat_id,
+          content: message.content,
+          createdAt: message.created_at,
+          isDeleted: message.is_deleted,
+          isEdited: message.is_edited,
+          isRead: message.is_read,
+          receiverId: message.receiver_id,
+          replyToId: message.replyToId,
+          resourceUrl: message.resource_url,
+          senderId: message.sender_id,
+          type: message.type
+        }
+      }
+
+      return chat
+    } catch (error) {
+      console.error(error)
+      return
+    }
   }
 }
-
