@@ -61,14 +61,13 @@ export interface ChatDB {
 }
 
 export interface CurrentChat extends Chat {
-  draft: string 
+  draft: string
 }
 
 export interface ChangeChat {
   uuid: uuid
   lastMessage?: Message
 }
-
 
 export interface MessagesToRead {
   chat_id: uuid
@@ -81,7 +80,6 @@ export interface User {
   name: string
   picture: string
 }
-
 
 export interface ChatItem {
   uuid?: uuid
