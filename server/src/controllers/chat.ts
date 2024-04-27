@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Chat, Message, ServerChat, uuid } from '../types/chat.js'
+import { Message, ServerChat, uuid } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { getUserById } from '../utils/user.js'
 import { MESSAGES_TYPES } from '../constants/index.js'
@@ -58,16 +58,15 @@ export class ChatController {
             senderId: resultMessage.rows[0].sender_id as string,
             type: resultMessage.rows[0]
               .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+          }
+
+          const resultUnreadMessages = await this.client.execute({
+            sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
+            args: { chat_id: chat.uuid, receiver_id: userId }
+          })
+
+          unreadMessages = resultUnreadMessages.rows[0].count as number
         }
-        
-        const resultUnreadMessages = await this.client.execute({
-          sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
-          args: { chat_id: chat.uuid, receiver_id: userId }
-        })
-
-        unreadMessages = resultUnreadMessages.rows[0].count as number
-      }
-
 
         const newChat: ServerChat = {
           uuid: chat.uuid as uuid,
@@ -81,7 +80,7 @@ export class ChatController {
           lastMessage
         }
 
-       chats.push(newChat)
+        chats.push(newChat)
       }
 
       res.status(200).json(chats)
@@ -93,8 +92,11 @@ export class ChatController {
   }
 
   async createChat (req: Request, res: Response): Promise<void> {
-    const { user1_id, user2_id }: { user1_id: string, user2_id: string }  = req.body
-    const uuid = crypto.randomUUID()
+    const {
+      uuid,
+      user1_id,
+      user2_id
+    }: { uuid: uuid; user1_id: string; user2_id: string } = req.body
     const created_at = new Date().toISOString()
     const chat: ServerChat = {
       uuid,
@@ -105,7 +107,7 @@ export class ChatController {
     try {
       await this.client.execute({
         sql: 'INSERT INTO chats (uuid, user1_id, user2_id, created_at) VALUES (:uuid, :user1_id, :user2_id, :created_at)',
-        args: { uuid, user1_id, user2_id, created_at}
+        args: { uuid, user1_id, user2_id, created_at }
       })
       res.status(201).json(chat)
     } catch (error) {
@@ -156,7 +158,7 @@ export class ChatController {
         args: { chat_id: chatDB.uuid, receiver_id: userId }
       })
 
-      unreadMessages = resultUnreadMessages.rows[0].count as number ?? 0
+      unreadMessages = (resultUnreadMessages.rows[0].count as number) ?? 0
 
       const chat: ServerChat = {
         uuid: chatDB.uuid as uuid,
@@ -166,7 +168,7 @@ export class ChatController {
           picture: chatUser.picture as string
         },
         createdAt: chatDB.created_at as string,
-        unreadMessages,
+        unreadMessages
       }
 
       res.status(200).json(chat)
