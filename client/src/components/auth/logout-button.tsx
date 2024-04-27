@@ -6,7 +6,7 @@ const LogoutButton = () => {
 
   return (
     <button
-      className='hover:scale-125 ease-in-out duration-300 text-gray-700 font-semibold text-sm px-2'
+      className='hover:scale-110 hover:contrast-200 text-gray-700 font-semibold text-sm px-2'
       title='Log out'
       aria-label='Log out'
       onClick={() =>
