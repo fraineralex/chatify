@@ -1,23 +1,16 @@
 import { useSocketStore } from '../../store/socket'
-import { Chat, uuid } from '../../types/chat'
 import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
 
-export function Sidebar () {
+export function Sidebar ({ areChatsLoaded }: { areChatsLoaded: boolean }) {
   const { chats } = useSocketStore()
-  const uniqueChats = Object.values(
-    chats.reduce((acc: { [key: uuid]: Chat }, chat) => {
-      acc[chat.uuid] = chat
-      return acc
-    }, {})
-  )
 
   return (
     <div className='border-r h-screen'>
       <Header />
       <nav className='py-4 px-1 space-y-4 h-[90%]'>
         <ul className='space-y-1'>
-          {uniqueChats
+          {chats
             .sort(
               (a, b) =>
                 new Date(b.lastMessage?.createdAt || b.createdAt).getTime() -
@@ -26,6 +19,13 @@ export function Sidebar () {
             .map((chat, index) => (
               <ChatItem key={index} {...chat} />
             ))}
+          {chats.length === 0 && (
+            <p className='text-center font-medium'>
+              {areChatsLoaded
+                ? "🚨 You don't have any chat yet"
+                : 'Loading chats...'}
+            </p>
+          )}
         </ul>
       </nav>
     </div>
