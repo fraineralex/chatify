@@ -7,7 +7,7 @@ type SocketState = {
   setSocket: (socket: Socket) => void
   setServerOffset: (serverOffset: Date) => void
   messages: Messages
-  addMessage: (message: Message) => void
+  addMessage: (message: Message) => Promise<void>
   replaceMessage: (message: Message) => void
   chats: Chats
   addChat: (chat: Chat) => void
@@ -32,7 +32,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set({ socket: newSocket })
   },
 
-  addMessage: message => {
+  addMessage: async message => {
     const messages = get().messages
     if (messages.some(m => m.uuid === message.uuid)) return
     messages.push(message)

@@ -1,8 +1,10 @@
+import { useChatMessage } from '../../hooks/useChatMessage'
 import { useSocketStore } from '../../store/socket'
 import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
 
-export function Sidebar ({ areChatsLoaded }: { areChatsLoaded: boolean }) {
+export function Sidebar () {
+  const { areChatsLoaded } = useChatMessage()
   const { chats } = useSocketStore()
 
   return (

@@ -22,16 +22,14 @@ export function useChatItem ({
   const chatExists = chats.some(chat => chat.user.id === user.id)
   const closeModal = useNewChatModalStore(state => state.closeModal)
 
-  const handleOpenChat = () => {
+  const handleOpenChat = async () => {
     if (isCurrentChat || !socket) return
 
     if (currentChat)
       localStorage.setItem(currentChat.uuid, currentChatDraft || '')
     const newCurrentChat = chats.find(chat => chat.user.id === user.id)
     if (!newCurrentChat) return
-    console.log('Antes de actualizar:', currentChat)
     setCurrentChat(newCurrentChat)
-    console.log('Después de actualizar:', newCurrentChat)
 
     if (isNewChat) closeModal()
 

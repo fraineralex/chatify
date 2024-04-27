@@ -12,7 +12,7 @@ const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
 
 export const useChatMessage = () => {
-  const { currentChat } = useChatStore()
+  const { getCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const {
@@ -105,8 +105,7 @@ export const useChatMessage = () => {
 
           let unreadMessages = 0
           if (loggedUser?.sub === newMessage?.receiverId) {
-            console.log('currentChat', currentChat)
-            if (currentChat?.uuid === chat.uuid) {
+            if (getCurrentChat()?.uuid === chat.uuid) {
               const messagesToRead: MessagesToRead = {
                 chat_id: chat.uuid,
                 sender_id: newMessage.senderId,
@@ -170,7 +169,7 @@ export const useChatMessage = () => {
         socket.off(SOCKET_EVENTS.READ_MESSAGE)
       }
     })()
-  }, [currentChat, areChatsLoaded])
+  }, [areChatsLoaded])
 
   useEffect(() => {
     if (!socket || !areChatsLoaded) return
