@@ -7,11 +7,13 @@ import { useAuth0 } from '@auth0/auth0-react'
 import LogoutButton from '../auth/logout-button'
 import { useNewChatModalStore } from '../../store/newChatModal'
 import { getAllUsers } from '../../services/user'
+import { useSocketStore } from '../../store/socket'
 
 export function GetUsersModal () {
   const { isOpen, closeModal, openModal } = useNewChatModalStore()
   const [users, setUsers] = useState<User[]>([])
   const loggedUser = useAuth0().user
+  const chats = useSocketStore(state => state.chats)
 
   useEffect(() => {
     if (!open) return
@@ -24,11 +26,17 @@ export function GetUsersModal () {
   return (
     <>
       <aside className='flex items-center justify-between px-3 py-2'>
-        <button className='px-2 text-gray-700'>
+        <button
+          className={`px-2 hover:scale-110 hover:contrast-200 ${
+            chats.length === 0
+              ? 'text-blue-700 animate-pulse duration-300 ease-in-out'
+              : 'text-gray-700'
+          }`}
+        >
           <SquarePen className='w-5 h-5' onClick={openModal} />
         </button>
         <LogoutButton />
-        <button className='ps-2 text-gray-700'>
+        <button className='ps-2 text-gray-700 hover:scale-110 hover:contrast-200'>
           <EllipsisVertical className='w-5 h-5' />
         </button>
       </aside>
