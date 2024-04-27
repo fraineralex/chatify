@@ -51,7 +51,7 @@ export class SocketController {
   async readMessages (messages: MessagesToRead): Promise<void> {
     try {
       const selectResult = await this.client.execute({
-        sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
+        sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE ORDER BY created_at ASC',
         args: { ...messages }
       })
 
@@ -63,14 +63,10 @@ export class SocketController {
       })
 
       if (selectResult.rows.length === updateResult.rowsAffected) {
-        selectResult.rows.forEach(row => {
-          const message = {
-            ...row,
-            is_read: 1
-          }
+        const messages: uuid[] = []
+        selectResult.rows.forEach(row => messages.push(row.uuid as uuid))
 
-          this.io.emit(SOCKET_EVENTS.READ_MESSAGE, message)
-        })
+        this.io.emit(SOCKET_EVENTS.READ_MESSAGE, messages)
       }
     } catch (error) {
       console.error(error)

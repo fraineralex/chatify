@@ -4,7 +4,13 @@ import { useSocketStore } from '../store/socket'
 import { SOCKET_EVENTS } from '../constants'
 import { useAuth0 } from '@auth0/auth0-react'
 import { io } from 'socket.io-client'
-import { Chat, Message, MessagesToRead, ServerMessageDB } from '../types/chat'
+import {
+  Chat,
+  Message,
+  MessagesToRead,
+  ServerMessageDB,
+  uuid
+} from '../types/chat'
 import { useChatStore } from '../store/currenChat'
 import { getAllChats, getChatById } from '../services/chat'
 
@@ -132,10 +138,10 @@ export const useChatMessage = () => {
         }
       )
 
-      socket.on(
-        SOCKET_EVENTS.READ_MESSAGE,
-        async (message: ServerMessageDB) => {
-          const messageToReplace = messages.find(m => m.uuid === message.uuid)
+      socket.on(SOCKET_EVENTS.READ_MESSAGE, async (messagesUuid: uuid[]) => {
+        if (messagesUuid.length === 0) return
+        messagesUuid.forEach(async uuid => {
+          const messageToReplace = messages.find(m => m.uuid === uuid)
           if (!messageToReplace) return
           messageToReplace.isRead = true
           replaceMessage(messageToReplace)
@@ -161,8 +167,8 @@ export const useChatMessage = () => {
           }
 
           replaceChat(newChat)
-        }
-      )
+        })
+      })
 
       return () => {
         socket.off(SOCKET_EVENTS.CHAT_MESSAGE)
