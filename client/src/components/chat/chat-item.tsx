@@ -8,22 +8,18 @@ export function ChatItem ({
   user,
   lastMessage,
   unreadMessages,
-  createdAt,
   isNewChat
 }: Props) {
   const {
     openChat,
     isCurrentChat,
-    lastMessageDate,
     loggedUser,
     chatExists,
     createChat
   } = useChatItem({
     uuid,
     user,
-    lastMessage,
     unreadMessages,
-    createdAt,
     isNewChat
   })
 
@@ -49,8 +45,8 @@ export function ChatItem ({
           <h2 className='text-base font-medium inline-flex overflow-hidden items-center'>
             {user.name}
           </h2>
-          {!isNewChat && lastMessageDate && (
-            <LastMessageTime createdAt={lastMessageDate} />
+          {!isNewChat && lastMessage?.createdAt && (
+            <LastMessageTime createdAt={lastMessage.createdAt} />
           )}
         </div>
         {!isNewChat && (
