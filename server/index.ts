@@ -25,13 +25,16 @@ const app = express()
 const server = createServer(app)
 const io = new Server(server, {
   cors: { origin: clientDomain },
-  connectionStateRecovery: {}
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: true
+  }
 })
 const socketRouter = new SocketRouter(io, client)
 const chatRouter = new ChatRouter(client)
 
 socketRouter.init()
-app.use(express.json());
+app.use(express.json())
 app.use(cors({ origin: clientDomain }))
 app.use(logger('dev'))
 app.use('/users', userRouter)
@@ -45,4 +48,3 @@ app.get('/', (req, res) => {
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`)
 })
-
