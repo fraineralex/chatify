@@ -3,6 +3,7 @@ import { MESSAGES_TYPES } from '../constants/index.ts'
 type uuid = `${string}-${string}-${string}-${string}-${string}`
 
 export interface ServerMessage {
+  uuid: uuid
   content: string
   sender_id: string
   receiver_id: string
@@ -13,10 +14,6 @@ export interface ServerMessage {
   is_edited: boolean
   is_deleted: boolean
   replyToId: uuid | null
-}
-
-export interface ServerMessageDB extends ServerMessage {
-  uuid: uuid
   created_at: string
 }
 

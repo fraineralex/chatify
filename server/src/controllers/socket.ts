@@ -3,7 +3,6 @@ import {
   ChangeChat,
   MessagesToRead,
   ServerMessage,
-  ServerMessageDB,
   uuid
 } from '../types/chat.js'
 import { Client } from '@libsql/client'
@@ -23,21 +22,15 @@ export class SocketController {
   }
 
   async newMessage (message: ServerMessage): Promise<void> {
-    const uuid = crypto.randomUUID()
-    const created_at = new Date().toISOString()
-    const createdMessage: ServerMessageDB = {
-      uuid,
-      ...message,
-      created_at
+    const createdMessage: ServerMessage = {
+      ...message
     }
 
     try {
       await this.client.execute({
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :created_at)',
         args: {
-          uuid,
-          ...message,
-          created_at
+          ...message
         }
       })
 
@@ -99,7 +92,7 @@ export class SocketController {
   }
 
   private async updateChat (
-    message: ServerMessageDB
+    message: ServerMessage
   ): Promise<ChangeChat | undefined> {
     try {
       const result = await this.client.execute({
