@@ -1,9 +1,15 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { Message as Props } from '../../types/chat'
-import { CheckCheck } from 'lucide-react'
+import { Check, CheckCheck } from 'lucide-react'
 import { useSocketStore } from '../../store/socket'
 
-export function Message ({ content, createdAt, senderId, isRead }: Props) {
+export function Message ({
+  content,
+  createdAt,
+  senderId,
+  isRead,
+  isSent
+}: Props) {
   const { user: loggedUser } = useAuth0()
   const { chats } = useSocketStore()
   const isMe = senderId === loggedUser?.sub
@@ -47,13 +53,16 @@ export function Message ({ content, createdAt, senderId, isRead }: Props) {
           >
             {time}
           </time>
-          {isMe && (
-            <CheckCheck
-              className={`w-4 h-4 float-end align-bottom text-[10px] mt-4 ms-2 inline ${
-                isRead ? 'text-blue-500' : 'text-gray-500'
-              }`}
-            />
-          )}
+          {isMe &&
+            (isSent ? (
+              <CheckCheck
+                className={`w-4 h-4 float-end align-bottom text-[10px] mt-4 ms-2 inline ${
+                  isRead ? 'text-blue-500' : 'text-gray-500'
+                }`}
+              />
+            ) : (
+              <Check className='w-4 h-4 float-end align-bottom text-[10px] mt-4 ms-2 inline text-gray-500' />
+            ))}
         </span>
       </aside>
     </article>
