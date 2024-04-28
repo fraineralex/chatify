@@ -12,12 +12,14 @@ export interface Message {
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
   isRead: boolean
+  isSent: boolean
   isEdited: boolean
   isDeleted: boolean
   replyToId: string | null
 }
 
 export interface ServerMessage {
+  uuid: uuid
   content: string
   sender_id: string
   receiver_id: string
@@ -28,10 +30,6 @@ export interface ServerMessage {
   is_edited: boolean
   is_deleted: boolean
   reply_to_id: string | null
-}
-
-export interface ServerMessageDB extends ServerMessage {
-  uuid: uuid
   created_at: string
 }
 
