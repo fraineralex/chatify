@@ -1,4 +1,4 @@
-import { CheckCheck } from 'lucide-react'
+import { Check, CheckCheck } from 'lucide-react'
 import { User } from '@auth0/auth0-react'
 import { Message } from '../../types/chat'
 
@@ -16,13 +16,16 @@ export function LastMessage ({
   return (
     <aside className='flex items-center text-left overflow-hidden flex-grow w-full justify-between'>
       <p className='text-sm text-gray-500 inline-flex overflow-hidden items-center'>
-        {loggedUser?.sub === lastMessage?.senderId && (
-          <CheckCheck
-            className={`w-4 h-4 text-[10px] ms-1 me-1 inline ${
-              lastMessage?.isRead ? 'text-blue-500' : 'text-gray-500'
-            }`}
-          />
-        )}
+        {loggedUser?.sub === lastMessage?.senderId &&
+          (lastMessage?.isSent ? (
+            <CheckCheck
+              className={`w-4 h-4 text-[10px] ms-1 me-1 inline ${
+                lastMessage?.isRead ? 'text-blue-500' : 'text-gray-500'
+              }`}
+            />
+          ) : (
+            <Check className='w-4 h-4 text-[10px] ms-1 me-1 inline text-gray-500' />
+          ))}
         {lastMessage?.content || 'No messages yet'}
       </p>
       {unreadMessages > 0 && (
