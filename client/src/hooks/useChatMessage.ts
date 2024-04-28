@@ -1,14 +1,15 @@
 /* eslint-disable no-extra-semi */
 import { useEffect, useState } from 'react'
+import { io } from 'socket.io-client'
+import { useAuth0 } from '@auth0/auth0-react'
 import { useSocketStore } from '../store/socket'
 import { SOCKET_EVENTS } from '../constants'
-import { useAuth0 } from '@auth0/auth0-react'
-import { io } from 'socket.io-client'
 import {
   Chat,
+  Chats,
   Message,
   MessagesToRead,
-  ServerMessageDB,
+  ServerMessage,
   uuid
 } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
@@ -26,56 +27,55 @@ export const useChatMessage = () => {
     setServerOffset,
     messages,
     replaceMessage,
-    addChat: setChat,
-    setSocket,
-    socket,
     chats,
+    addChat,
+    setSocket,
     replaceChat
   } = useSocketStore()
 
   const [areChatsLoaded, setAreChatsLoaded] = useState(false)
-  const [isSocketConnected, setIsSocketConnected] = useState(false)
+  const serverOffset =
+    messages.sort((a, b) => b.createdAt?.getTime() - a.createdAt?.getTime())[0]
+      ?.createdAt ?? 0
 
   useEffect(() => {
-    const newSocket = io(SERVER_DOMAIN, {
-      auth: {
-        serverOffset:
-          (socket?.auth as { serverOffset?: number })?.serverOffset ?? 0,
-        userId: loggedUser?.sub
-      }
-    })
-
-    setSocket(newSocket)
-    setIsSocketConnected(true)
     ;(async () => {
-      const chats = await getAllChats(loggedUser?.sub)
-      if (!chats) return
-
-      chats.forEach(chat => {
-        if (chat.lastMessage) {
-          chat.lastMessage = {
-            ...chat.lastMessage,
-            createdAt: new Date(chat.lastMessage.createdAt)
-          }
+      const newSocket = io(SERVER_DOMAIN, {
+        auth: {
+          serverOffset,
+          userId: loggedUser?.sub
         }
-        setChat({
-          ...chat,
-          createdAt: new Date(chat.createdAt)
-        })
       })
 
-      setAreChatsLoaded(true)
-    })()
-  }, [loggedUser])
+      setSocket(newSocket)
+      let loadedChats: Chats | undefined = chats
 
-  useEffect(() => {
-    if (!areChatsLoaded || !isSocketConnected || !socket) return
-    console.log('use Effect executed')
-    ;(async () => {
-      socket.on(
+      if (loadedChats.length === 0) {
+        loadedChats = await getAllChats(loggedUser?.sub)
+        if (!loadedChats) return
+
+        loadedChats.forEach(chat => {
+          if (chat.lastMessage) {
+            chat.lastMessage = {
+              ...chat.lastMessage,
+              createdAt: new Date(chat.lastMessage.createdAt)
+            }
+          }
+
+          addChat({
+            ...chat,
+            createdAt: new Date(chat.createdAt)
+          })
+        })
+
+        setAreChatsLoaded(true)
+      }
+
+      newSocket.on(
         SOCKET_EVENTS.CHAT_MESSAGE,
-        async (message: ServerMessageDB) => {
-          if (messages.find(m => m.uuid === message.uuid)) return
+        async (message: ServerMessage) => {
+          if (messages.find(m => m.uuid === message.uuid && m.isSent)) return
+
           const newMessage: Message = {
             uuid: message.uuid,
             content: message.content,
@@ -87,6 +87,7 @@ export const useChatMessage = () => {
             isDeleted: !!message.is_deleted,
             isEdited: !!message.is_edited,
             isRead: !!message.is_read,
+            isSent: true,
             replyToId: message.reply_to_id,
             resourceUrl: message.resource_url
           }
@@ -94,7 +95,7 @@ export const useChatMessage = () => {
           addMessage(newMessage)
           setServerOffset(new Date(message.created_at))
 
-          let chat = chats.find(c => c.uuid === newMessage.chatId)
+          let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
           if (!chat) {
             chat = await getChatById(newMessage.chatId, loggedUser?.sub)
             if (!chat) return
@@ -102,7 +103,7 @@ export const useChatMessage = () => {
 
           const lastMessage =
             chat.lastMessage &&
-            chat.lastMessage.createdAt.getTime() >
+            chat.lastMessage.createdAt.getTime() >=
               newMessage.createdAt.getTime()
               ? chat.lastMessage
               : newMessage
@@ -118,7 +119,7 @@ export const useChatMessage = () => {
                 receiver_id: newMessage.receiverId
               }
 
-              socket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
+              newSocket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
             } else {
               unreadMessages = !newMessage.isRead
                 ? chat.unreadMessages + 1
@@ -138,7 +139,7 @@ export const useChatMessage = () => {
         }
       )
 
-      socket.on(SOCKET_EVENTS.READ_MESSAGE, async (messagesUuid: uuid[]) => {
+      newSocket.on(SOCKET_EVENTS.READ_MESSAGE, async (messagesUuid: uuid[]) => {
         if (messagesUuid.length === 0) return
         messagesUuid.forEach(async uuid => {
           const messageToReplace = messages.find(m => m.uuid === uuid)
@@ -146,7 +147,7 @@ export const useChatMessage = () => {
           messageToReplace.isRead = true
           replaceMessage(messageToReplace)
 
-          let chat = chats.find(c => c.uuid === messageToReplace.chatId)
+          let chat = loadedChats.find(c => c.uuid === messageToReplace.chatId)
           if (!chat) {
             chat = await getChatById(messageToReplace.chatId, loggedUser?.sub)
           }
@@ -170,18 +171,16 @@ export const useChatMessage = () => {
         })
       })
 
+      if (loadedChats.length > 0 && messages.length === 0) {
+        newSocket?.emit(SOCKET_EVENTS.RECOVER_MESSAGES)
+      }
+
       return () => {
-        socket.off(SOCKET_EVENTS.CHAT_MESSAGE)
-        socket.off(SOCKET_EVENTS.READ_MESSAGE)
+        newSocket.off(SOCKET_EVENTS.CHAT_MESSAGE)
+        newSocket.off(SOCKET_EVENTS.READ_MESSAGE)
       }
     })()
-  }, [areChatsLoaded])
-
-  useEffect(() => {
-    if (!socket || !areChatsLoaded) return
-
-    socket.emit(SOCKET_EVENTS.RECOVER_MESSAGES)
-  }, [areChatsLoaded])
+  }, [loggedUser])
 
   return { areChatsLoaded }
 }
