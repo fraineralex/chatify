@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { AttachFile, Emoji, Send } from '../common/svg-icons'
-import { ServerMessage } from '../../types/chat'
+import { Message, ServerMessage } from '../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../../store/currenChat'
 
 export function Form () {
-  const { socket } = useSocketStore()
-  const { currentChat, setCurrentChatDraft, currentChatDraft } = useChatStore()
+  const { socket, addMessage, replaceChat } = useSocketStore()
+  const { currentChat, setCurrentChatDraft, currentChatDraft, setCurrentChat } =
+    useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const [contentMessage, setContentMessage] = useState<string>(
@@ -19,6 +20,7 @@ export function Form () {
     event.preventDefault()
     if (!contentMessage || !currentChat) return
     const message: ServerMessage = {
+      uuid: crypto.randomUUID(),
       content: currentChatDraft,
       sender_id: loggedUser?.sub || '',
       receiver_id: currentChat.user.id,
@@ -28,8 +30,29 @@ export function Form () {
       is_edited: false,
       is_read: false,
       reply_to_id: null,
-      resource_url: null
+      resource_url: null,
+      created_at: new Date().toISOString()
     }
+    const newMessage: Message = {
+      uuid: message.uuid,
+      content: message.content,
+      createdAt: new Date(),
+      senderId: message.sender_id,
+      receiverId: message.receiver_id,
+      chatId: message.chat_id,
+      type: message.type,
+      isDeleted: message.is_deleted,
+      isEdited: message.is_edited,
+      isRead: message.is_read,
+      isSent: false,
+      replyToId: message.reply_to_id,
+      resourceUrl: message.resource_url
+    }
+
+    addMessage(newMessage)
+    const chatUpdated = { ...currentChat, lastMessage: newMessage }
+    replaceChat(chatUpdated)
+    setCurrentChat(chatUpdated)
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
