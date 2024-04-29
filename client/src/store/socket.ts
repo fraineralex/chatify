@@ -67,7 +67,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   replaceChat: async chat => {
     const chats = get().chats
     const index = chats.findIndex(c => c.uuid === chat.uuid)
-    if (index === -1) return
+    if (index === -1) get().addChat(chat)
     chats[index] = chat
     await db.chats.put(chat)
     set({ chats })
