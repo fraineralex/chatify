@@ -8,12 +8,11 @@ import { useChatStore } from '../../store/currenChat'
 
 export function Form () {
   const { socket, addMessage, replaceChat } = useSocketStore()
-  const { currentChat, setCurrentChatDraft, currentChatDraft, setCurrentChat } =
-    useChatStore()
+  const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const [contentMessage, setContentMessage] = useState<string>(
-    currentChatDraft ?? ''
+    currentChat?.draft ?? ''
   )
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -21,13 +20,14 @@ export function Form () {
     if (!contentMessage || !currentChat) return
     const message: ServerMessage = {
       uuid: crypto.randomUUID(),
-      content: currentChatDraft,
+      content: currentChat.draft || '',
       sender_id: loggedUser?.sub || '',
       receiver_id: currentChat.user.id,
       chat_id: currentChat.uuid,
       type: MESSAGES_TYPES.TEXT,
       is_deleted: false,
       is_edited: false,
+      is_delivered: false,
       is_read: false,
       reply_to_id: null,
       resource_url: null,
@@ -43,8 +43,9 @@ export function Form () {
       type: message.type,
       isDeleted: message.is_deleted,
       isEdited: message.is_edited,
-      isRead: message.is_read,
       isSent: false,
+      isDelivered: message.is_delivered,
+      isRead: message.is_read,
       replyToId: message.reply_to_id,
       resourceUrl: message.resource_url
     }
@@ -57,17 +58,21 @@ export function Form () {
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
     localStorage.removeItem(currentChat.uuid)
-    setCurrentChatDraft('')
+    setCurrentChat({ ...currentChat, draft: '' })
+    replaceChat({ ...currentChat, draft: '' })
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContentMessage(event.target.value)
-    setCurrentChatDraft(event.target.value)
+    if (!currentChat) return
+    setCurrentChat({ ...currentChat, draft: event.target.value })
+    replaceChat({ ...currentChat, draft: event.target.value })
   }
 
   const handleBlur = () => {
     if (!contentMessage || !currentChat) return
-    localStorage.setItem(currentChat.uuid, contentMessage)
+    replaceChat({ ...currentChat, draft: contentMessage })
+    setCurrentChat({ ...currentChat, draft: contentMessage })
   }
 
   return (
@@ -89,7 +94,7 @@ export function Form () {
         name='content'
         autoFocus
         onChange={handleChange}
-        value={currentChatDraft ?? ''}
+        value={currentChat?.draft ?? ''}
         onBlur={handleBlur}
       />
       <button
