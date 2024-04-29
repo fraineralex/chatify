@@ -11,8 +11,9 @@ export interface Message {
   chatId: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
-  isRead: boolean
   isSent: boolean
+  isDelivered: boolean
+  isRead: boolean
   isEdited: boolean
   isDeleted: boolean
   replyToId: string | null
@@ -26,6 +27,7 @@ export interface ServerMessage {
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resource_url: string | null
+  is_delivered: boolean
   is_read: boolean
   is_edited: boolean
   is_deleted: boolean
@@ -47,6 +49,7 @@ export interface Chat {
   lastMessage?: Message
   createdAt: Date
   unreadMessages: number
+  draft?: string
 }
 
 export type Chats = Chat[]
@@ -67,7 +70,7 @@ export interface ChangeChat {
   lastMessage?: Message
 }
 
-export interface MessagesToRead {
+export interface MessagesToUpdate {
   chat_id: uuid
   sender_id: string
   receiver_id?: string
