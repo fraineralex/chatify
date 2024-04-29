@@ -32,6 +32,11 @@ export class SocketRouter {
       )
 
       socket.on(
+        SOCKET_EVENTS.DELIVERED_MESSAGE,
+        this.socketController.deliverMessages.bind(this.socketController)
+      )
+
+      socket.on(
         SOCKET_EVENTS.RECOVER_MESSAGES,
         this.socketController.recoverMessages(socket)
       )

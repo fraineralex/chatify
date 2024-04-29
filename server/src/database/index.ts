@@ -10,6 +10,7 @@ export async function createTables (client: Client) {
         sender_id TEXT NOT NULL,
         receiver_id TEXT NOT NULL,
         chat_id TEXT NOT NULL,
+        is_delivered BOOLEAN DEFAULT FALSE,
         is_read BOOLEAN DEFAULT FALSE,
         is_edited BOOLEAN DEFAULT FALSE,
         is_deleted BOOLEAN DEFAULT FALSE,

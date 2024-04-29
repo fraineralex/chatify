@@ -10,6 +10,7 @@ export interface ServerMessage {
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resource_url: string | null
+  is_delivered: boolean
   is_read: boolean
   is_edited: boolean
   is_deleted: boolean
@@ -17,7 +18,7 @@ export interface ServerMessage {
   created_at: string
 }
 
-export interface MessagesToRead {
+export interface MessagesToUpdate {
   chat_id: uuid
   sender_id: string
   receiver_id?: string
@@ -46,6 +47,7 @@ export interface Message {
   chatId: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
   resourceUrl: string | null
+  isDelivered: boolean
   isRead: boolean
   isEdited: boolean
   isDeleted: boolean

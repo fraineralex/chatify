@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import {
   ChangeChat,
-  MessagesToRead,
+  MessagesToUpdate,
   ServerMessage,
   uuid
 } from '../types/chat.js'
@@ -28,7 +28,7 @@ export class SocketController {
 
     try {
       await this.client.execute({
-        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :created_at)',
+        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :created_at)',
         args: {
           ...message
         }
@@ -41,7 +41,7 @@ export class SocketController {
     }
   }
 
-  async readMessages (messages: MessagesToRead): Promise<void> {
+  async readMessages (messages: MessagesToUpdate): Promise<void> {
     try {
       const selectResult = await this.client.execute({
         sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE ORDER BY created_at ASC',
@@ -51,7 +51,7 @@ export class SocketController {
       if (selectResult.rows.length === 0) return
 
       const updateResult = await this.client.execute({
-        sql: 'UPDATE messages SET is_read = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
+        sql: 'UPDATE messages SET is_read = TRUE, is_delivered = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
 
@@ -67,6 +67,32 @@ export class SocketController {
     }
   }
 
+  async deliverMessages (messages: MessagesToUpdate): Promise<void> {
+    try {
+      const selectResult = await this.client.execute({
+        sql: 'SELECT * FROM messages WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_delivered = FALSE ORDER BY created_at ASC',
+        args: { ...messages }
+      })
+
+      if (selectResult.rows.length === 0) return
+
+      const updateResult = await this.client.execute({
+        sql: 'UPDATE messages SET is_delivered = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_delivered = FALSE',
+        args: { ...messages }
+      })
+
+      if (selectResult.rows.length === updateResult.rowsAffected) {
+        const messages: uuid[] = []
+        selectResult.rows.forEach(row => messages.push(row.uuid as uuid))
+
+        this.io.emit(SOCKET_EVENTS.DELIVERED_MESSAGE, messages)
+      }
+    } catch (error) {
+      console.error(error)
+      return
+    }
+  }
+
   recoverMessages = (socket: Socket) => async (): Promise<void> => {
     console.log('Recovering messages')
 
@@ -75,7 +101,7 @@ export class SocketController {
 
     try {
       const results = await this.client.execute({
-        sql: `SELECT uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at FROM messages WHERE created_at > :offset AND (sender_id = :loggedUserId OR receiver_id = :loggedUserId) ORDER BY created_at ASC`,
+        sql: `SELECT uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at FROM messages WHERE created_at > :offset AND (sender_id = :loggedUserId OR receiver_id = :loggedUserId) ORDER BY created_at ASC`,
         args: { offset, loggedUserId }
       })
 
@@ -109,6 +135,7 @@ export class SocketController {
           createdAt: message.created_at,
           isDeleted: message.is_deleted,
           isEdited: message.is_edited,
+          isDelivered: message.is_delivered,
           isRead: message.is_read,
           receiverId: message.receiver_id,
           replyToId: message.replyToId,
