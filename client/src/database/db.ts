@@ -10,8 +10,8 @@ export class DB extends Dexie {
 
     this.version(1).stores({
       messages:
-        '&uuid, content, sender_id, receiver_id, is_read, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at',
-      chats: '&uuid, user, lastMessage, createdAt, unreadMessages'
+        '&uuid, content, createdAt, senderId, receiverId, chatId, type, resourceUrl, isSent, isDelivered, isRead, isEdited, isDeleted, replyToId',
+      chats: '&uuid, user, lastMessage, createdAt, unreadMessages, draft'
     })
 
     this.messages = this.table('messages')
