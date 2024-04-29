@@ -2,7 +2,7 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../store/currenChat'
 import { useSocketStore } from '../store/socket'
-import { Chat, ChatItem, MessagesToRead } from '../types/chat'
+import { Chat, ChatItem, MessagesToUpdate } from '../types/chat'
 import { SOCKET_EVENTS } from '../constants'
 import { useNewChatModalStore } from '../store/newChatModal'
 import { createChat } from '../services/chat'
@@ -14,7 +14,7 @@ export function useChatItem ({
   isNewChat
 }: ChatItem) {
   const { socket, addChat: setChat, chats, removeChat } = useSocketStore()
-  const { currentChat, setCurrentChat, currentChatDraft } = useChatStore()
+  const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
   const isCurrentChat =
     currentChat?.uuid === uuid ||
@@ -24,9 +24,6 @@ export function useChatItem ({
 
   const handleOpenChat = async () => {
     if (isCurrentChat || !socket) return
-
-    if (currentChat)
-      localStorage.setItem(currentChat.uuid, currentChatDraft || '')
     const newCurrentChat = chats.find(chat => chat.user.id === user.id)
     if (!newCurrentChat) return
     setCurrentChat(newCurrentChat)
@@ -34,7 +31,7 @@ export function useChatItem ({
     if (isNewChat) closeModal()
 
     if (unreadMessages !== undefined && unreadMessages > 0) {
-      const messagesToRead: MessagesToRead = {
+      const messagesToRead: MessagesToUpdate = {
         chat_id: newCurrentChat.uuid,
         sender_id: user.id,
         receiver_id: loggedUser?.sub
@@ -67,10 +64,10 @@ export function useChatItem ({
   }
 
   return {
-    openChat: handleOpenChat,
+    handleOpenChat,
     isCurrentChat,
     loggedUser,
     chatExists,
-    createChat: handleCreateChat
+    handleCreateChat
   }
 }
