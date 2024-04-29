@@ -11,11 +11,11 @@ export function ChatItem ({
   isNewChat
 }: Props) {
   const {
-    openChat,
+    handleOpenChat,
     isCurrentChat,
     loggedUser,
     chatExists,
-    createChat
+    handleCreateChat
   } = useChatItem({
     uuid,
     user,
@@ -30,7 +30,7 @@ export function ChatItem ({
           ? 'bg-gray-300 rounded-md'
           : 'rounded-sm hover:bg-gray-200 hover:rounded-md bg-transparent'
       }`}
-      onClick={chatExists ? openChat : createChat}
+      onClick={chatExists ? handleOpenChat : handleCreateChat}
     >
       <img
         src={user.picture}
@@ -53,7 +53,7 @@ export function ChatItem ({
           <LastMessage
             loggedUser={loggedUser}
             lastMessage={lastMessage}
-            unreadMessages={unreadMessages ?? 0}
+            unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
           />
         )}
       </article>
