@@ -1,4 +1,5 @@
-import { Chat, uuid } from '../types/chat'
+import { User } from '@auth0/auth0-react'
+import { Chat, Message, uuid } from '../types/chat'
 
 const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
@@ -51,4 +52,31 @@ export async function getAllChats (
     console.log(error)
     return
   }
+}
+
+export async function updateChatLastMessage (
+  chats: Chat[],
+  message: Message,
+  loggedUser: User | undefined
+) {
+  let chat = chats.find(c => c.uuid === message.chatId)
+  if (!chat) {
+    chat = await getChatById(message.chatId, loggedUser?.sub)
+  }
+
+  if (!chat || chat.lastMessage?.uuid !== message.uuid) return
+
+  const updatedChat: Chat = {
+    uuid: chat.uuid,
+    lastMessage:
+      chat.lastMessage &&
+      chat.lastMessage.createdAt.getTime() > message.createdAt.getTime()
+        ? chat.lastMessage
+        : message,
+    user: chat.user,
+    createdAt: chat.createdAt,
+    unreadMessages: chat.unreadMessages
+  }
+
+  return updatedChat
 }
