@@ -8,18 +8,22 @@ import {
   Chat,
   Chats,
   Message,
-  MessagesToRead,
+  MessagesToUpdate,
   ServerMessage,
   uuid
 } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
-import { getAllChats, getChatById } from '../services/chat'
+import {
+  getAllChats,
+  getChatById,
+  updateChatLastMessage
+} from '../services/chat'
 
 const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
 
 export const useChatMessage = () => {
-  const { getCurrentChat } = useChatStore()
+  const { getCurrentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const {
@@ -86,8 +90,9 @@ export const useChatMessage = () => {
             type: message.type,
             isDeleted: !!message.is_deleted,
             isEdited: !!message.is_edited,
-            isRead: !!message.is_read,
             isSent: true,
+            isDelivered: !!message.is_delivered,
+            isRead: !!message.is_read,
             replyToId: message.reply_to_id,
             resourceUrl: message.resource_url
           }
@@ -103,7 +108,7 @@ export const useChatMessage = () => {
 
           const lastMessage =
             chat.lastMessage &&
-            chat.lastMessage.createdAt.getTime() >=
+            chat.lastMessage.createdAt.getTime() >
               newMessage.createdAt.getTime()
               ? chat.lastMessage
               : newMessage
@@ -112,18 +117,21 @@ export const useChatMessage = () => {
 
           let unreadMessages = 0
           if (loggedUser?.sub === newMessage?.receiverId) {
+            const messagesToUpdate: MessagesToUpdate = {
+              chat_id: chat.uuid,
+              sender_id: newMessage.senderId,
+              receiver_id: newMessage.receiverId
+            }
             if (getCurrentChat()?.uuid === chat.uuid) {
-              const messagesToRead: MessagesToRead = {
-                chat_id: chat.uuid,
-                sender_id: newMessage.senderId,
-                receiver_id: newMessage.receiverId
-              }
-
-              newSocket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
+              newSocket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)
             } else {
-              unreadMessages = !newMessage.isRead
-                ? chat.unreadMessages + 1
-                : unreadMessages
+              unreadMessages = messages.filter(
+                message =>
+                  message.chatId === chat.uuid &&
+                  !message.isRead &&
+                  message.receiverId === loggedUser?.sub
+              ).length
+              newSocket.emit(SOCKET_EVENTS.DELIVERED_MESSAGE, messagesToUpdate)
             }
           }
 
@@ -136,42 +144,69 @@ export const useChatMessage = () => {
           }
 
           replaceChat(newChat)
+          if (newChat.uuid === getCurrentChat()?.uuid) setCurrentChat(newChat)
         }
       )
 
       newSocket.on(SOCKET_EVENTS.READ_MESSAGE, async (messagesUuid: uuid[]) => {
         if (messagesUuid.length === 0) return
         messagesUuid.forEach(async uuid => {
-          const messageToReplace = messages.find(m => m.uuid === uuid)
-          if (!messageToReplace) return
-          messageToReplace.isRead = true
-          replaceMessage(messageToReplace)
+          const message = messages.find(m => m.uuid === uuid)
+          if (!message) return
+          replaceMessage({
+            ...message,
+            isDelivered: true,
+            isRead: true
+          })
 
-          let chat = loadedChats.find(c => c.uuid === messageToReplace.chatId)
-          if (!chat) {
-            chat = await getChatById(messageToReplace.chatId, loggedUser?.sub)
-          }
+          const updatedChat = await updateChatLastMessage(
+            loadedChats,
+            message,
+            loggedUser
+          )
+          if (!updatedChat) return
+          const unreadMessages = messages.filter(
+            message =>
+              message.chatId === updatedChat.uuid &&
+              !message.isRead &&
+              message.receiverId === loggedUser?.sub &&
+              !messagesUuid.includes(message.uuid)
+          ).length
 
-          if (!chat || chat.lastMessage?.uuid !== messageToReplace.uuid) return
-
-          const newChat: Chat = {
-            uuid: chat.uuid,
-            lastMessage:
-              chat.lastMessage &&
-              chat.lastMessage.createdAt.getTime() >
-                messageToReplace.createdAt.getTime()
-                ? chat.lastMessage
-                : messageToReplace,
-            user: chat.user,
-            createdAt: chat.createdAt,
-            unreadMessages: chat.unreadMessages - 1
-          }
-
-          replaceChat(newChat)
+          updatedChat.unreadMessages = unreadMessages
+          replaceChat(updatedChat)
+          if (updatedChat.uuid === getCurrentChat()?.uuid)
+            setCurrentChat(updatedChat)
         })
       })
 
-      if (loadedChats.length > 0 && messages.length === 0) {
+      newSocket.on(
+        SOCKET_EVENTS.DELIVERED_MESSAGE,
+        async (messagesUuid: uuid[]) => {
+          if (messagesUuid.length === 0) return
+          messagesUuid.forEach(async uuid => {
+            const message = messages.find(m => m.uuid === uuid)
+            if (!message) return
+            message.isDelivered = true
+            replaceMessage(message)
+
+            const updatedChat = await updateChatLastMessage(
+              loadedChats,
+              message,
+              loggedUser
+            )
+            if (!updatedChat) return
+            replaceChat(updatedChat)
+            if (updatedChat.uuid === getCurrentChat()?.uuid)
+              setCurrentChat(updatedChat)
+          })
+        }
+      )
+
+      if (
+        loadedChats.length > 0 &&
+        (messages.length === 0 || serverOffset < new Date())
+      ) {
         newSocket?.emit(SOCKET_EVENTS.RECOVER_MESSAGES)
       }
 
