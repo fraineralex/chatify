@@ -9,10 +9,10 @@ import { ReplyingMessage } from './replying-message'
 
 export function Form ({
   replyingMessage,
-  setReplyingMessage
+  handleReplyMessage
 }: {
   replyingMessage: ReplyMessage | null
-  setReplyingMessage: (message: ReplyMessage | null) => void
+  handleReplyMessage: (message: ReplyMessage | null) => void
 }) {
   const { socket, addMessage, replaceChat } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
@@ -67,6 +67,8 @@ export function Form ({
     localStorage.removeItem(currentChat.uuid)
     setCurrentChat({ ...currentChat, draft: '' })
     replaceChat({ ...currentChat, draft: '' })
+
+    if (replyingMessage) handleReplyMessage(null)
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +88,7 @@ export function Form ({
     <form className='p-2 border-t w-full' onSubmit={handleSubmit}>
       <ReplyingMessage
         replyingMessage={replyingMessage}
-        setReplyingMessage={setReplyingMessage}
+        handleReplyMessage={handleReplyMessage}
       />
       <aside className='flex items-center'>
         <button className='inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground p-4 rounded-full'>
@@ -105,6 +107,13 @@ export function Form ({
           onChange={handleChange}
           value={currentChat?.draft ?? ''}
           onBlur={handleBlur}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              const form = e.currentTarget.form
+              if (form) form.requestSubmit()
+            }
+          }}
         />
         <button
           type='submit'
