@@ -14,8 +14,8 @@ export function LastMessage ({
   unreadMessages
 }: Props) {
   return (
-    <aside className='flex items-center text-left overflow-hidden flex-grow w-full justify-between'>
-      <p className='text-sm text-gray-500 inline-flex overflow-hidden items-center'>
+    <aside className='flex items-center text-left  flex-grow w-full justify-between'>
+      <p className='text-sm text-gray-500 items-center truncate  max-w-full inline-block'>
         {lastMessage && loggedUser?.sub === lastMessage?.senderId && (
           <MessageState
             isDelivered={lastMessage.isDelivered}
