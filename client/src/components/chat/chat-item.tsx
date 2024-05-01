@@ -40,9 +40,9 @@ export function ChatItem ({
         className={`rounded-full ${isNewChat ? 'w-9 h-9' : 'w-12 h-12'}`}
         style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
       />
-      <article className='items-center text-left w-full'>
-        <div className='flex overflow-hidden text-left flex-grow w-full justify-between'>
-          <h2 className='text-base font-medium inline-flex overflow-hidden items-center'>
+      <article className='items-center text-left w-full overflow-hidden'>
+        <div className='flex text-left flex-grow w-full justify-between'>
+          <h2 className='text-base font-medium inline-flex items-center'>
             {user.name}
           </h2>
           {!isNewChat && lastMessage?.createdAt && (
