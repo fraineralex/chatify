@@ -52,6 +52,8 @@ export class ChatController {
             isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
             isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
             isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
+            isDelivered: !!resultMessage.rows[0]
+              .is_delivered as unknown as boolean,
             receiverId: resultMessage.rows[0].receiver_id as string,
             replyToId: resultMessage.rows[0].reply_to_id as uuid,
             resourceUrl: resultMessage.rows[0].resource_url as string,
