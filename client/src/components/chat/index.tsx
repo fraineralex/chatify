@@ -3,20 +3,27 @@ import { Header } from './header'
 import { Message } from './message'
 import './chat.css'
 import { useSocketStore } from '../../store/socket'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/currenChat'
 import { ReplyMessage } from '../../types/chat'
 
 export function Chat () {
   const { messages } = useSocketStore()
   const currentChat = useChatStore(state => state.currentChat)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messageListRef = useRef<HTMLUListElement>(null)
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(
     null
   )
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight
+      messageListRef.current.nextElementSibling?.querySelector('input')?.focus()
+    }
+  }, [messages, currentChat])
 
-  if (messagesEndRef.current) {
-    messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight
+  const handleReplyMessage = (replyingMessage: ReplyMessage | null) => {
+    setReplyingMessage(replyingMessage)
+    messageListRef.current?.nextElementSibling?.querySelector('input')?.focus()
   }
 
   return (
@@ -27,9 +34,9 @@ export function Chat () {
             name={currentChat.user.name}
             picture={`${currentChat.user.picture}`}
           />
-          <div
+          <ul
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
-            ref={messagesEndRef}
+            ref={messageListRef}
           >
             {messages
               .filter(message => message.chatId === currentChat?.uuid)
@@ -39,12 +46,13 @@ export function Chat () {
                   key={message.uuid ?? index}
                   {...message}
                   setReplyingMessage={setReplyingMessage}
+                  messageListRef={messageListRef}
                 />
               ))}
-          </div>
+          </ul>
           <Form
             replyingMessage={replyingMessage}
-            setReplyingMessage={setReplyingMessage}
+            handleReplyMessage={handleReplyMessage}
           />
         </>
       ) : (
