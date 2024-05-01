@@ -3,13 +3,17 @@ import { Header } from './header'
 import { Message } from './message'
 import './chat.css'
 import { useSocketStore } from '../../store/socket'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useChatStore } from '../../store/currenChat'
+import { ReplyMessage } from '../../types/chat'
 
 export function Chat () {
   const { messages } = useSocketStore()
   const currentChat = useChatStore(state => state.currentChat)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(
+    null
+  )
 
   if (messagesEndRef.current) {
     messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight
@@ -31,10 +35,17 @@ export function Chat () {
               .filter(message => message.chatId === currentChat?.uuid)
               .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
               .map((message, index) => (
-                <Message key={message.uuid ?? index} {...message} />
+                <Message
+                  key={message.uuid ?? index}
+                  {...message}
+                  setReplyingMessage={setReplyingMessage}
+                />
               ))}
           </div>
-          <Form />
+          <Form
+            replyingMessage={replyingMessage}
+            setReplyingMessage={setReplyingMessage}
+          />
         </>
       ) : (
         <div className='flex-1 flex items-center justify-center'>
