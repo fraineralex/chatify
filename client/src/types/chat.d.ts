@@ -19,6 +19,14 @@ export interface Message {
   replyToId: string | null
 }
 
+export interface ReplyMessage {
+  uuid: uuid
+  content: string
+  type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+  resourceUrl: string | null
+  user: User
+}
+
 export interface ServerMessage {
   uuid: uuid
   content: string
