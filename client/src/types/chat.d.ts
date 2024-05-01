@@ -16,7 +16,7 @@ export interface Message {
   isRead: boolean
   isEdited: boolean
   isDeleted: boolean
-  replyToId: string | null
+  replyToId: uuid | null
 }
 
 export interface ReplyMessage {
@@ -39,7 +39,7 @@ export interface ServerMessage {
   is_read: boolean
   is_edited: boolean
   is_deleted: boolean
-  reply_to_id: string | null
+  reply_to_id: uuid | null
   created_at: string
 }
 
