@@ -1,43 +1,35 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { Message as MessageType, ReplyMessage, User } from '../../types/chat'
 import { useSocketStore } from '../../store/socket'
-import { MessageState } from './message-state'
-import { Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
-import { QuotedMessage } from './quoted-message'
 
-interface Props extends MessageType {
+import { Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
+
+import { useState } from 'react'
+import { UpdateMessageModal } from './update-message-modal'
+import { MessageArticle } from './message-article'
+
+interface Props {
+  message: MessageType
   setReplyingMessage: (message: ReplyMessage) => void
   messageListRef?: React.RefObject<HTMLUListElement>
 }
 
 export function Message ({
-  uuid,
-  content,
-  createdAt,
-  senderId,
-  isSent,
-  isDelivered,
-  isRead,
-  resourceUrl,
-  type,
-  replyToId,
+  setReplyingMessage,
   messageListRef,
-  setReplyingMessage
+  message
 }: Props) {
   const { user: loggedUser } = useAuth0()
   if (!loggedUser) return null
-  const { chats } = useSocketStore()
+  const { uuid, content, senderId, resourceUrl, type, isDeleted } = message
+  const { chats, replaceMessage } = useSocketStore()
   const isMe = senderId === loggedUser?.sub
   const user = isMe
     ? loggedUser
     : chats.find(chat => chat.user.id === senderId)?.user
+  const [openUpdateModal, setOpenUpdateModal] = useState(false)
 
   if (!user) return null
-
-  const time = createdAt.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
 
   const handleReplyMessage = () => {
     let senderUser = user
@@ -55,6 +47,10 @@ export function Message ({
       type,
       user: senderUser as User
     })
+  }
+
+  const handleDeleteMessage = () => {
+    replaceMessage({ ...message, isDeleted: true })
   }
 
   return (
@@ -82,53 +78,44 @@ export function Message ({
             isMe ? 'place-content-start' : 'place-content-end'
           }`}
         >
-          <article
-            className={`items-center rounded-lg pt-1 px-1 ps-2 max-w-3xl whitespace-normal break-words border border-transparent ${
-              isMe ? 'bg-gray-300' : 'bg-gray-100'
-            }`}
-          >
-            {replyToId && (
-              <QuotedMessage
-                quotedMessageId={replyToId}
-                messageListRef={messageListRef}
-              />
-            )}
+          <MessageArticle
+            message={message}
+            messageListRef={messageListRef}
+            isMe={isMe}
+          />
 
-            <p className={`text-sm w-100 inline`}>{content}</p>
-
-            {isMe && (
-              <MessageState
-                isSent={isSent}
-                isDelivered={isDelivered}
-                isRead={isRead}
-              />
-            )}
-            <time
-              className={`text-gray-500 float-end align-bottom text-[10px] mt-4 ms-5 inline`}
-            >
-              {time}
-            </time>
-          </article>
-
-          <span className='absolute -top-11 invisible group-hover:visible ease-in-out duration-150 backdrop-blur-3xl border-1 rounded-md p-2 flex items-center space-x-2'>
-            <button className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'>
-              <SmilePlus className='w-4 h-4' />
-            </button>
-            <button
-              className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'
-              onClick={handleReplyMessage}
-            >
-              <Reply className='w-4 h-4' />
-            </button>
-            <button className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'>
-              <Pencil className='w-4 h-4' />
-            </button>
-            <button className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-red-500'>
-              <Trash2 className='w-4 h-4' />
-            </button>
-          </span>
+          {!isDeleted && (
+            <span className='absolute -top-11 invisible group-hover:visible ease-in-out duration-150 backdrop-blur-3xl border-1 rounded-md p-2 flex items-center space-x-2'>
+              <button className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'>
+                <SmilePlus className='w-4 h-4' />
+              </button>
+              <button
+                className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'
+                onClick={handleReplyMessage}
+              >
+                <Reply className='w-5 h-5' />
+              </button>
+              <button
+                className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'
+                onClick={() => setOpenUpdateModal(true)}
+              >
+                <Pencil className='w-4 h-4' />
+              </button>
+              <button
+                className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-red-500'
+                onClick={handleDeleteMessage}
+              >
+                <Trash2 className='w-4 h-4' />
+              </button>
+            </span>
+          )}
         </aside>
       </div>
+      <UpdateMessageModal
+        isOpen={openUpdateModal}
+        closeModal={() => setOpenUpdateModal(false)}
+        message={message}
+      />
     </li>
   )
 }
