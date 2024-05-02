@@ -53,6 +53,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     if (index === -1) return
     messages[index] = message
     await db.messages.put(message)
+    const chat = get().chats.find(c => c.uuid === message.chatId)
+    if (chat?.lastMessage?.uuid === message.uuid) {
+      chat.lastMessage = message
+      get().replaceChat(chat)
+    }
     set({ messages })
   },
 
