@@ -1,11 +1,19 @@
-import { useState } from 'react'
-import { AttachFile, Emoji, Send } from '../common/svg-icons'
-import { Message, ReplyMessage, ServerMessage } from '../../types/chat'
+import { useEffect, useRef, useState } from 'react'
+import { AttachFile, Emoji } from '../common/svg-icons'
+import {
+  EmojiEvent,
+  Message,
+  ReplyMessage,
+  ServerMessage
+} from '../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
 import { useSocketStore } from '../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+import { SendHorizontal } from 'lucide-react'
 
 export function Form ({
   replyingMessage,
@@ -17,10 +25,35 @@ export function Form ({
   const { socket, addMessage, replaceChat } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
-
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const showEmojiPickerRef = useRef(showEmojiPicker)
+  const formRef = useRef<HTMLFormElement>(null)
   const [contentMessage, setContentMessage] = useState<string>(
     currentChat?.draft ?? ''
   )
+
+  useEffect(() => {
+    showEmojiPickerRef.current = showEmojiPicker
+  }, [showEmojiPicker])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (
+        showEmojiPickerRef.current &&
+        !target.closest('div[id="emoji-mart"]') &&
+        !target.closest('button[name="emoji"]')
+      ) {
+        setShowEmojiPicker(false)
+      }
+    }
+
+    window.addEventListener('click', handleClickOutside)
+
+    return () => {
+      window.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -75,29 +108,62 @@ export function Form ({
     replaceChat({ ...currentChat, draft: event.target.value })
   }
 
+  const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
+    const unicodeSymbols = emojiEvent.unified.split('_')
+    const codePoints: number[] = []
+    unicodeSymbols.forEach(symbol => codePoints.push(parseInt('0x' + symbol)))
+    const emojiChar = String.fromCodePoint(...codePoints)
+
+    const updatedContentMessage = contentMessage + emojiChar
+    setContentMessage(updatedContentMessage)
+    if (!currentChat) return
+    setCurrentChat({ ...currentChat, draft: updatedContentMessage })
+    replaceChat({ ...currentChat, draft: updatedContentMessage })
+  }
+
   const handleBlur = () => {
     if (!contentMessage || !currentChat) return
     replaceChat({ ...currentChat, draft: contentMessage })
     setCurrentChat({ ...currentChat, draft: contentMessage })
   }
 
+  const handleEmojiClick = () => {
+    setShowEmojiPicker(!showEmojiPicker)
+    formRef.current?.querySelector('input')?.focus()
+  }
+
   return (
-    <form className='p-2 border-t w-full' onSubmit={handleSubmit}>
+    <form className='p-2 border-t w-full' onSubmit={handleSubmit} ref={formRef}>
       <ReplyingMessage
         replyingMessage={replyingMessage}
         handleReplyMessage={handleReplyMessage}
       />
-      <aside className='flex items-center'>
-        <button className='inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground p-4 rounded-full'>
-          <Emoji className='w-4 h-4' />
+      <aside className='flex items-center space-x-3 text-gray-600'>
+        {showEmojiPicker && (
+          <div id='emoji-mart' className='fixed bottom-20'>
+            <Picker
+              theme='light'
+              data={data}
+              onEmojiSelect={handleEmojiSelect}
+            />
+          </div>
+        )}
+        <button
+          name='emoji'
+          className={`hover:scale-125 ease-out duration-100 ${
+            showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
+          }`}
+          onClick={handleEmojiClick}
+        >
+          <Emoji className='w-6 h-6' />
           <span className='sr-only'>Insert emoji</span>
         </button>
-        <button className='inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground p-4 rounded-full mx-2'>
-          <AttachFile className='w-4 h-4' />
+        <button className='hover:scale-125 ease-out duration-100 hover:text-gray-700'>
+          <AttachFile className='w-6 h-6' />
           <span className='sr-only'>Attach file</span>
         </button>
         <input
-          className='flex h-10 w-full border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
+          className='flex h-10 w-full border-input bg-background px-3 mx-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
           placeholder='Type a message'
           name='content'
           autoFocus
@@ -114,9 +180,9 @@ export function Form ({
         />
         <button
           type='submit'
-          className='ms-2 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-full w-6 h-6'
+          className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
         >
-          <Send className='w-5 h-5' />
+          <SendHorizontal className='w-6 h-6' />
           <span className='sr-only'>Send</span>
         </button>
       </aside>

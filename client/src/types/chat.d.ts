@@ -98,3 +98,7 @@ export interface ChatItem {
   unreadMessages?: number
   isNewChat?: boolean
 }
+
+export type EmojiEvent = {
+  unified: string
+}
