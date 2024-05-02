@@ -44,7 +44,7 @@ export function Chat () {
               .map((message, index) => (
                 <Message
                   key={message.uuid ?? index}
-                  {...message}
+                  message={message}
                   setReplyingMessage={setReplyingMessage}
                   messageListRef={messageListRef}
                 />
