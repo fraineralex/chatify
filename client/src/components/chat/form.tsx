@@ -58,15 +58,12 @@ export function Form ({
     }
 
     addMessage(newMessage)
-    const chatUpdated = { ...currentChat, lastMessage: newMessage }
+    const chatUpdated = { ...currentChat, lastMessage: newMessage, draft: '' }
     replaceChat(chatUpdated)
     setCurrentChat(chatUpdated)
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
-    localStorage.removeItem(currentChat.uuid)
-    setCurrentChat({ ...currentChat, draft: '' })
-    replaceChat({ ...currentChat, draft: '' })
 
     if (replyingMessage) handleReplyMessage(null)
   }
