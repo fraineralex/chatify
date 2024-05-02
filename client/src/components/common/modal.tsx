@@ -5,16 +5,22 @@ interface ModalProps {
   isOpen: boolean
   onClose: () => void
   children: ReactNode
+  className?: string
 }
 
-export default function Modal ({ isOpen, onClose, children }: ModalProps) {
+export default function Modal ({
+  isOpen,
+  onClose,
+  children,
+  className
+}: ModalProps) {
   if (!isOpen) {
     return null
   }
 
   return createPortal(
     <>
-      <div className='fixed inset-0 z-50' onClick={onClose} />
+      <div className={`fixed inset-0 z-50 ${className}`} onClick={onClose} />
       {children}
     </>,
     document.body
