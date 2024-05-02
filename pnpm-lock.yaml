@@ -35,12 +35,21 @@ importers:
       '@auth0/auth0-react':
         specifier: 2.2.4
         version: 2.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@emoji-mart/data':
+        specifier: 1.2.1
+        version: 1.2.1
+      '@emoji-mart/react':
+        specifier: 1.1.1
+        version: 1.1.1(emoji-mart@5.6.0)(react@18.2.0)
       dexie:
         specifier: 4.0.4
         version: 4.0.4
       dexie-react-hooks:
         specifier: 1.1.7
         version: 1.1.7(@types/react@18.2.66)(dexie@4.0.4)(react@18.2.0)
+      emoji-mart:
+        specifier: 5.6.0
+        version: 5.6.0
       lucide-react:
         specifier: 0.370.0
         version: 0.370.0(react@18.2.0)
@@ -147,6 +156,15 @@ packages:
   '@babel/runtime@7.24.4':
     resolution: {integrity: sha512-dkxf7+hn8mFBwKjs9bvBlArzLVxVbS8usaPUDd5p2a9JCL9tB8OaOVN1isD4+Xyk4ns89/xeOmbQvgdK7IIVdA==}
     engines: {node: '>=6.9.0'}
+
+  '@emoji-mart/data@1.2.1':
+    resolution: {integrity: sha512-no2pQMWiBy6gpBEiqGeU77/bFejDqUTRY7KX+0+iur13op3bqUsXdnwoZs6Xb1zbv0gAj5VvS1PWoUUckSr5Dw==}
+
+  '@emoji-mart/react@1.1.1':
+    resolution: {integrity: sha512-NMlFNeWgv1//uPsvLxvGQoIerPuVdXwK/EUek8OOkJ6wVOWPUizRBJU0hDqWZCOROVpfBgCemaC3m6jDOXi03g==}
+    peerDependencies:
+      emoji-mart: ^5.2
+      react: ^16.8 || ^17 || ^18
 
   '@esbuild/aix-ppc64@0.20.2':
     resolution: {integrity: sha512-D+EBOJHXdNZcLJRBkhENNG8Wji2kgc9AZ9KiPr1JuZjsNtyHzrsfLRrY0tk2H2aoFu6RANO1y1iPPUCDYWkb5g==}
@@ -1097,6 +1115,9 @@ packages:
 
   electron-to-chromium@1.4.729:
     resolution: {integrity: sha512-bx7+5Saea/qu14kmPTDHQxkp2UnziG3iajUQu3BxFvCOnpAJdDbMV4rSl+EqFDkkpNNVUFlR1kDfpL59xfy1HA==}
+
+  emoji-mart@5.6.0:
+    resolution: {integrity: sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -2661,6 +2682,13 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
+  '@emoji-mart/data@1.2.1': {}
+
+  '@emoji-mart/react@1.1.1(emoji-mart@5.6.0)(react@18.2.0)':
+    dependencies:
+      emoji-mart: 5.6.0
+      react: 18.2.0
+
   '@esbuild/aix-ppc64@0.20.2':
     optional: true
 
@@ -3598,6 +3626,8 @@ snapshots:
   ee-first@1.1.1: {}
 
   electron-to-chromium@1.4.729: {}
+
+  emoji-mart@5.6.0: {}
 
   emoji-regex@8.0.0: {}
 
