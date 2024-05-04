@@ -37,6 +37,16 @@ export class SocketRouter {
       )
 
       socket.on(
+        SOCKET_EVENTS.EDIT_MESSAGE,
+        this.socketController.editMessage.bind(this.socketController)
+      )
+
+      socket.on(
+        SOCKET_EVENTS.DELETE_MESSAGE,
+        this.socketController.deleteMessage.bind(this.socketController)
+      )
+
+      socket.on(
         SOCKET_EVENTS.RECOVER_MESSAGES,
         this.socketController.recoverMessages(socket)
       )
