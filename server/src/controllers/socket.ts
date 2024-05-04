@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import {
   ChangeChat,
+  Message,
   MessagesToUpdate,
   ServerMessage,
   uuid
@@ -93,9 +94,39 @@ export class SocketController {
     }
   }
 
-  recoverMessages = (socket: Socket) => async (): Promise<void> => {
-    console.log('Recovering messages')
+  async editMessage (message: Message) {
+    try {
+      const updateResult = await this.client.execute({
+        sql: 'UPDATE messages SET is_edited = TRUE, content = :content WHERE uuid = :uuid;',
+        args: { content: message.content, uuid: message.uuid! }
+      })
 
+      if (updateResult.rowsAffected === 1) {
+        this.io.emit(SOCKET_EVENTS.UPDATE_MESSAGE, message)
+      }
+    } catch (error) {
+      console.error(error)
+      return
+    }
+  }
+
+  async deleteMessage (message: Message) {
+    try {
+      const updateResult = await this.client.execute({
+        sql: 'UPDATE messages SET is_deleted = TRUE WHERE uuid = :uuid;',
+        args: { uuid: message.uuid! }
+      })
+
+      if (updateResult.rowsAffected === 1) {
+        this.io.emit(SOCKET_EVENTS.UPDATE_MESSAGE, message)
+      }
+    } catch (error) {
+      console.error(error)
+      return
+    }
+  }
+
+  recoverMessages = (socket: Socket) => async (): Promise<void> => {
     const offset = socket.handshake.auth.serverOffset ?? 0
     const loggedUserId = socket.handshake.auth.userId
 
