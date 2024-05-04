@@ -14,6 +14,7 @@ export function MessageArticle ({
   messageListRef,
   isMe = true
 }: Props) {
+  console.log(message.content.length)
   return (
     <article
       className={`items-center rounded-lg pt-1 px-1 ps-2 max-w-3xl whitespace-normal break-words border border-transparent ${
@@ -32,7 +33,7 @@ export function MessageArticle ({
       )}
       {message.isDeleted && (
         <p className='text-sm font-light w-100 inline text-gray-400 italic'>
-          <Ban className='w-4 h-4 text-gray-400 inline me-2' />
+          <Ban className='w-4 h-4 text-gray-400 inline me-2 align-middle' />
           {isMe ? 'You deleted this message.' : 'This message was deleted.'}
         </p>
       )}
@@ -44,14 +45,17 @@ export function MessageArticle ({
           isRead={message.isRead}
         />
       )}
-      <time
-        className={`text-gray-400 float-end align-bottom text-[10px] mt-4 ms-5 inline`}
-      >
-        {message.createdAt.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}
-      </time>
+      <span className='text-gray-500 float-end align-bottom mt-4 ms-2 flex space-x-1'>
+        {message.isEdited && !message.isDeleted && (
+          <small className='italic text-[10px]'>Edited</small>
+        )}
+        <time className='text-[10px]'>
+          {message.createdAt.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </time>
+      </span>
     </article>
   )
 }
