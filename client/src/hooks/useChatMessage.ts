@@ -180,6 +180,10 @@ export const useChatMessage = () => {
         })
       })
 
+      newSocket.on(SOCKET_EVENTS.UPDATE_MESSAGE, async (message: Message) => {
+        if (message.receiverId === loggedUser?.sub) replaceMessage(message)
+      })
+
       newSocket.on(
         SOCKET_EVENTS.DELIVERED_MESSAGE,
         async (messagesUuid: uuid[]) => {
@@ -213,6 +217,8 @@ export const useChatMessage = () => {
       return () => {
         newSocket.off(SOCKET_EVENTS.CHAT_MESSAGE)
         newSocket.off(SOCKET_EVENTS.READ_MESSAGE)
+        newSocket.off(SOCKET_EVENTS.UPDATE_MESSAGE)
+        newSocket.off(SOCKET_EVENTS.DELIVERED_MESSAGE)
       }
     })()
   }, [loggedUser])
