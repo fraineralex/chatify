@@ -6,6 +6,7 @@ export const SOCKET_EVENTS = {
   EDIT_MESSAGE: 'edit_message',
   DELETE_MESSAGE: 'delete_message',
   READ_MESSAGE: 'read_message',
+  UPDATE_MESSAGE: 'update_message',
   CHANGE_CHAT: 'change_chat',
   RECOVER_MESSAGES: 'recover_messages',
   DELIVERED_MESSAGE: 'delivered_message'
