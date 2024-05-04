@@ -7,6 +7,7 @@ import { Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { UpdateMessageModal } from './update-message-modal'
 import { MessageArticle } from './message-article'
+import { SOCKET_EVENTS } from '../../constants'
 
 interface Props {
   message: MessageType
@@ -22,7 +23,7 @@ export function Message ({
   const { user: loggedUser } = useAuth0()
   if (!loggedUser) return null
   const { uuid, content, senderId, resourceUrl, type, isDeleted } = message
-  const { chats, replaceMessage } = useSocketStore()
+  const { chats, replaceMessage, socket } = useSocketStore()
   const isMe = senderId === loggedUser?.sub
   const user = isMe
     ? loggedUser
@@ -50,7 +51,9 @@ export function Message ({
   }
 
   const handleDeleteMessage = () => {
-    replaceMessage({ ...message, isDeleted: true })
+    const newMessage = { ...message, isDeleted: true }
+    replaceMessage(newMessage)
+    socket?.emit(SOCKET_EVENTS.DELETE_MESSAGE, newMessage)
   }
 
   return (
