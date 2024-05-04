@@ -5,6 +5,7 @@ import { MessageArticle } from './message-article'
 import { Emoji } from '../common/svg-icons'
 import { useSocketStore } from '../../store/socket'
 import { useState } from 'react'
+import { SOCKET_EVENTS } from '../../constants'
 
 interface Props {
   isOpen: boolean
@@ -13,12 +14,14 @@ interface Props {
 }
 
 export function UpdateMessageModal ({ isOpen, closeModal, message }: Props) {
-  const { replaceMessage } = useSocketStore()
+  const { replaceMessage, socket } = useSocketStore()
   const [newContent, setNewContent] = useState<string>(message.content)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    replaceMessage({ ...message, content: newContent })
+    const newMessage = { ...message, content: newContent, isEdited: true }
+    replaceMessage(newMessage)
+    socket?.emit(SOCKET_EVENTS.EDIT_MESSAGE, newMessage)
     closeModal()
   }
 
