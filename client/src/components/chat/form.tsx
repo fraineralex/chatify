@@ -132,6 +132,14 @@ export function Form ({
     formRef.current?.querySelector('input')?.focus()
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      const form = event.currentTarget.form
+      if (form) form.requestSubmit()
+    }
+  }
+
   return (
     <form className='p-2 border-t w-full' onSubmit={handleSubmit} ref={formRef}>
       <ReplyingMessage
@@ -170,13 +178,7 @@ export function Form ({
           onChange={handleChange}
           value={currentChat?.draft ?? ''}
           onBlur={handleBlur}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              const form = e.currentTarget.form
-              if (form) form.requestSubmit()
-            }
-          }}
+          onKeyDown={handleKeyDown}
         />
         <button
           type='submit'
