@@ -14,10 +14,11 @@ export function LastMessage ({
   lastMessage,
   unreadMessages
 }: Props) {
+  const isMe = loggedUser?.sub === lastMessage?.senderId
   return (
     <aside className='flex items-center text-left  flex-grow w-full justify-between'>
       <p className='text-sm text-gray-500 truncate max-w-full inline-block'>
-        {lastMessage && loggedUser?.sub === lastMessage?.senderId && (
+        {lastMessage && isMe && (
           <MessageState
             isDelivered={lastMessage.isDelivered}
             isSent={lastMessage.isSent}
@@ -30,9 +31,7 @@ export function LastMessage ({
           <>
             <Ban className='w-4 h-4 inline me-1 align-middle' />
             <span className='align-middle'>
-              {loggedUser?.sub === lastMessage?.senderId
-                ? 'You deleted this message.'
-                : 'This message was deleted.'}
+              {isMe ? 'You deleted this message.' : 'This message was deleted.'}
             </span>
           </>
         )}
