@@ -14,7 +14,6 @@ export function MessageArticle ({
   messageListRef,
   isMe = true
 }: Props) {
-  console.log(message.content.length)
   return (
     <article
       className={`items-center rounded-lg pt-1 px-1 ps-2 max-w-3xl whitespace-normal break-words border border-transparent ${
