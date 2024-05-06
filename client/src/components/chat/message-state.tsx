@@ -14,7 +14,7 @@ export function MessageState ({
   let className = `w-4 h-4 inline ${isRead ? 'text-blue-500' : 'text-gray-500'}`
 
   if (isChatItem) className += ' text-[10px] ms-1 me-1'
-  else className += ' float-end align-bottom text-[10px] mt-4 ms-2'
+  else className += ' text-[10px]'
 
   return (
     <>
