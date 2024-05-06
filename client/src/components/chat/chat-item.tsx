@@ -25,7 +25,7 @@ export function ChatItem ({
 
   return (
     <li
-      className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full ${
+      className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full group ${
         isCurrentChat
           ? 'bg-gray-300 rounded-md'
           : 'rounded-sm hover:bg-gray-200 hover:rounded-md bg-transparent'
@@ -54,6 +54,7 @@ export function ChatItem ({
             loggedUser={loggedUser}
             lastMessage={lastMessage}
             unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
+            uuid={uuid}
           />
         )}
       </article>
