@@ -29,7 +29,11 @@ export function MessageArticle ({
         />
       )}
 
-      <div className={`${isAnEmoji ? '' : 'flex justify-between h-full'}  `}>
+      <div
+        className={`${
+          !isAnEmoji ? 'flex justify-between h-full' : undefined
+        }  `}
+      >
         {!message.isDeleted && (
           <p
             className={`w-100 inline align-middle ${
