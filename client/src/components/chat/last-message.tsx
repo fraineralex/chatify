@@ -1,23 +1,27 @@
 import { User } from '@auth0/auth0-react'
-import { Message } from '../../types/chat'
+import { Message, uuid } from '../../types/chat'
 import { MessageState } from './message-state'
 import { Ban } from 'lucide-react'
+import { ChatDropdown } from './chat-dropdown'
 
 interface Props {
   loggedUser: User | undefined
   lastMessage?: Message
   unreadMessages: number
+  uuid?: uuid
 }
 
 export function LastMessage ({
   loggedUser,
   lastMessage,
-  unreadMessages
+  unreadMessages,
+  uuid
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
+
   return (
-    <aside className='flex items-center text-left  flex-grow w-full justify-between'>
-      <p className='text-sm text-gray-500 truncate max-w-full inline-block'>
+    <aside className='flex items-center text-left  flex-grow w-full justify-between text-gray-500'>
+      <p className='text-sm truncate max-w-full inline-block'>
         {lastMessage && isMe && (
           <MessageState
             isDelivered={lastMessage.isDelivered}
@@ -36,11 +40,14 @@ export function LastMessage ({
           </>
         )}
       </p>
-      {unreadMessages > 0 && (
-        <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full'>
-          {unreadMessages}
-        </span>
-      )}
+      <span className='flex space-x-2'>
+        {unreadMessages > 0 && (
+          <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
+            {unreadMessages}
+          </span>
+        )}
+        {uuid && <ChatDropdown uuid={uuid} />}
+      </span>
     </aside>
   )
 }
