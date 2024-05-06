@@ -54,10 +54,18 @@ export function UpdateMessageModal ({ isOpen, closeModal, message }: Props) {
               onChange={e => setNewContent(e.target.value)}
               autoFocus
             />
-            <button type='submit' className='hover:scale-110'>
+            <button
+              type='submit'
+              className={`${
+                newContent === message.content
+                  ? 'opacity-50'
+                  : 'hover:scale-110'
+              }`}
+              disabled={newContent === message.content}
+            >
               <CircleCheck
                 className='w-10 h-10 text-gray-200'
-                fill='blue'
+                fill={`${newContent === message.content ? 'gray' : 'blue'}`}
                 strokeWidth='1.5px'
               />
               <span className='sr-only'>Send</span>
