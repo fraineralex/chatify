@@ -3,10 +3,12 @@ import { useState, useEffect, useRef } from 'react'
 
 export function Dropdown ({
   children,
-  Icon
+  Icon,
+  buttonClassName
 }: {
   children: React.ReactNode
   Icon: React.ReactNode
+  buttonClassName?: string
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -32,9 +34,12 @@ export function Dropdown ({
           event.stopPropagation()
           setDropdownOpen(!dropdownOpen)
         }}
-        className={`${
-          dropdownOpen ? 'inline' : 'hidden'
-        } group-hover:inline-block ease-in-out duration-100 hover:scale-125`}
+        className={
+          buttonClassName ??
+          `${
+            dropdownOpen ? 'inline' : 'hidden'
+          } group-hover:inline-block ease-in-out duration-100 hover:scale-125`
+        }
       >
         {Icon}
       </button>
