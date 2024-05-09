@@ -30,6 +30,7 @@ export async function createTables (client: Client) {
         uuid TEXT PRIMARY KEY,
         user1_id TEXT NOT NULL,
         user2_id TEXT NOT NULL,
+        blocked_by TEXT DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `)
