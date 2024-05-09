@@ -18,6 +18,7 @@ import {
   getChatById,
   updateChatLastMessage
 } from '../services/chat'
+import { useUserMetadata } from './useUserMetadata'
 
 const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
@@ -25,6 +26,7 @@ const SERVER_DOMAIN =
 export const useChatMessage = () => {
   const { getCurrentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
+  const { userMetadata } = useUserMetadata()
 
   const {
     addMessage,
@@ -104,6 +106,22 @@ export const useChatMessage = () => {
           if (!chat) {
             chat = await getChatById(newMessage.chatId, loggedUser?.sub)
             if (!chat) return
+            chat = {
+              ...chat,
+              isArchived: userMetadata?.chat_preferences.archived?.includes(
+                chat.uuid
+              ),
+              isDeleted: userMetadata?.chat_preferences.deleted?.includes(
+                chat.uuid
+              ),
+              isMuted: userMetadata?.chat_preferences.muted?.includes(
+                chat.uuid
+              ),
+              isPinned: userMetadata?.chat_preferences.pinned?.includes(
+                chat.uuid
+              ),
+              cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
+            }
           }
 
           const lastMessage =
@@ -140,7 +158,18 @@ export const useChatMessage = () => {
             lastMessage,
             user: chat.user,
             createdAt: chat.createdAt,
-            unreadMessages
+            unreadMessages,
+            isArchived: userMetadata?.chat_preferences.archived?.includes(
+              chat.uuid
+            ),
+            isDeleted: userMetadata?.chat_preferences.deleted?.includes(
+              chat.uuid
+            ),
+            isMuted: userMetadata?.chat_preferences.muted?.includes(chat.uuid),
+            isPinned: userMetadata?.chat_preferences.pinned?.includes(
+              chat.uuid
+            ),
+            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
           }
 
           replaceChat(newChat)
@@ -221,7 +250,7 @@ export const useChatMessage = () => {
         newSocket.off(SOCKET_EVENTS.DELIVERED_MESSAGE)
       }
     })()
-  }, [loggedUser])
+  }, [loggedUser, userMetadata])
 
   return { areChatsLoaded }
 }
