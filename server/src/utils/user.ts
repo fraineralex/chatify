@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { User } from '../types/user.js'
 
 const DOMAIN = process.env.AUTH0_DOMAIN ?? ''
 const API_ACCESS_TOKEN = process.env.AUTH0_MGMT_API_TOKEN ?? ''
@@ -13,5 +14,5 @@ export async function getUserById (id: string) {
   }
 
   const response = await axios.request(config)
-  return response.data
+  return response.data as User
 }
