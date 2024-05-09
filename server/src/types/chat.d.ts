@@ -36,6 +36,7 @@ export interface Chat {
   uuid: uuid
   user1_id: string
   user2_id: string
+  blocked_by?: string | null
   created_at: string
 }
 export interface Message {
@@ -60,6 +61,12 @@ export interface ServerChat {
   lastMessage?: Message
   createdAt: string
   unreadMessages: number
+  isMuted?: boolean
+  isDeleted?: boolean
+  isArchived?: boolean
+  isPinned?: boolean
+  cleaned?: string | null
+  blockedBy?: string | null
 }
 
 export interface ChangeChat {
