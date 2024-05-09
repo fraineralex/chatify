@@ -26,6 +26,7 @@ export class ChatController {
       })
 
       const chats: ServerChat[] = []
+      const loggedUser = await getUserById(userId)
       for (const chat of result.rows) {
         const id =
           chat.user1_id === userId
@@ -79,7 +80,26 @@ export class ChatController {
           },
           createdAt: chat.created_at as string,
           unreadMessages,
-          lastMessage
+          lastMessage,
+          blockedBy: (chat.blocked_by as string) ?? null,
+          isArchived:
+            loggedUser.user_metadata?.chat_preferences.archived.includes(
+              chat.uuid as uuid
+            ),
+          isDeleted:
+            loggedUser.user_metadata?.chat_preferences.deleted.includes(
+              chat.uuid as uuid
+            ),
+          isMuted: loggedUser.user_metadata?.chat_preferences.muted.includes(
+            chat.uuid as uuid
+          ),
+          isPinned: loggedUser.user_metadata?.chat_preferences.pinned.includes(
+            chat.uuid as uuid
+          ),
+          cleaned:
+            (loggedUser.user_metadata?.chat_preferences.cleaned[
+              chat.uuid as uuid
+            ] as string) ?? null
         }
 
         chats.push(newChat)
@@ -103,7 +123,8 @@ export class ChatController {
     const chat: ServerChat = {
       uuid,
       createdAt: created_at,
-      unreadMessages: 0
+      unreadMessages: 0,
+      blockedBy: null
     }
 
     try {
@@ -170,7 +191,8 @@ export class ChatController {
           picture: chatUser.picture as string
         },
         createdAt: chatDB.created_at as string,
-        unreadMessages
+        unreadMessages,
+        blockedBy: (chatDB.blocked_by as string) ?? null
       }
 
       res.status(200).json(chat)
