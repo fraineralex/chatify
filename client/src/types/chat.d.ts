@@ -58,6 +58,12 @@ export interface Chat {
   createdAt: Date
   unreadMessages: number
   draft?: string
+  isMuted?: boolean
+  isDeleted?: boolean
+  isArchived?: boolean
+  isPinned?: boolean
+  cleaned?: string | null
+  blokedBy?: string | null
 }
 
 export type Chats = Chat[]
@@ -66,6 +72,7 @@ export interface ChatDB {
   uuid: uuid
   user1_id: string
   user2_id: string
+  blocked_by: string | null
   created_at: string
 }
 
@@ -97,6 +104,7 @@ export interface ChatItem {
   createdAt?: Date
   unreadMessages?: number
   isNewChat?: boolean
+  isPinned?: boolean
 }
 
 export type EmojiEvent = {
