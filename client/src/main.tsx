@@ -11,9 +11,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     domain={AUTH0_DOMAIN}
     clientId={AUTH0_CLIENT_ID}
     authorizationParams={{
-      redirect_uri: window.location.origin
-      /* audience: `https://${AUTH0_DOMAIN}/api/v2/`,
-      scope: 'read:current_user update:current_user_metadata' */
+      redirect_uri: window.location.origin,
+      audience: `https://${AUTH0_DOMAIN}/api/v2/`,
+      scope: 'read:current_user update:current_user_metadata'
     }}
     cacheLocation='localstorage'
   >
