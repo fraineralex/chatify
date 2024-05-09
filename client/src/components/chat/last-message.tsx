@@ -1,7 +1,7 @@
 import { User } from '@auth0/auth0-react'
 import { Message, uuid } from '../../types/chat'
 import { MessageState } from './message-state'
-import { Ban } from 'lucide-react'
+import { Ban, Pin } from 'lucide-react'
 import { ChatDropdown } from './chat-dropdown'
 
 interface Props {
@@ -9,13 +9,15 @@ interface Props {
   lastMessage?: Message
   unreadMessages: number
   uuid?: uuid
+  isPinned?: boolean
 }
 
 export function LastMessage ({
   loggedUser,
   lastMessage,
   unreadMessages,
-  uuid
+  uuid,
+  isPinned
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
 
@@ -41,6 +43,7 @@ export function LastMessage ({
         )}
       </p>
       <span className='flex space-x-2'>
+        {isPinned && <Pin className='w-4 h-4 rotate-45' />}
         {unreadMessages > 0 && (
           <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
             {unreadMessages}
