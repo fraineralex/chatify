@@ -8,7 +8,8 @@ export function ChatItem ({
   user,
   lastMessage,
   unreadMessages,
-  isNewChat
+  isNewChat,
+  isPinned
 }: Props) {
   const {
     handleOpenChat,
@@ -55,6 +56,7 @@ export function ChatItem ({
             lastMessage={lastMessage}
             unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
             uuid={uuid}
+            isPinned={isPinned}
           />
         )}
       </article>
