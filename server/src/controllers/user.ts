@@ -38,7 +38,7 @@ export class UserController {
     const { metadata } = req.body as { metadata: metadata }
 
     if (!metadata) {
-      res.status(400).json({ message: 'Metadata is required' })
+      res.status(400).json({ statusText: 'Metadata is required', status: 400 })
       return
     }
 
@@ -57,10 +57,12 @@ export class UserController {
     try {
       const data = await axios.request(config)
       if (data.status !== 200) {
-        return res.status(data.status).json({ message: data.statusText })
+        return res
+          .status(data.status)
+          .json({ statusText: data.statusText, status: data.status })
       }
 
-      res.status(200).json({ message: data.statusText })
+      res.status(200).json({ statusText: data.statusText, status: data.status })
     } catch (error) {
       console.error(error)
     }
