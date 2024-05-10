@@ -15,7 +15,7 @@ export class ChatController {
     const userId = req.query.user_id as string
 
     if (!userId) {
-      res.status(400).json({ error: 'Missing user_id' })
+      res.status(400).json({ statusText: 'Missing user_id', status: 400 })
       return
     }
 
@@ -143,14 +143,15 @@ export class ChatController {
   async getChatById (req: Request, res: Response): Promise<void> {
     const chatId = req.params.chatId
     const userId = req.query.user_id as string
+    console.log(chatId)
 
     if (!chatId) {
-      res.status(400).json({ error: 'Missing chat_id' })
+      res.status(400).json({ statusText: 'Missing chat_id', status: 400 })
       return
     }
 
     if (!userId) {
-      res.status(400).json({ error: 'Missing user_id' })
+      res.status(400).json({ statusText: 'Missing user_id', status: 400 })
       return
     }
 
@@ -161,7 +162,7 @@ export class ChatController {
       })
 
       if (result.rows.length === 0) {
-        res.status(404).json({ error: 'Chat not found' })
+        res.status(404).json({ statusText: 'Chat not found', status: 404 })
         return
       }
 
@@ -178,7 +179,7 @@ export class ChatController {
 
       const resultUnreadMessages = await this.client.execute({
         sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
-        args: { chat_id: chatDB.uuid, receiver_id: userId }
+        args: { chat_id: chatId, receiver_id: userId }
       })
 
       unreadMessages = (resultUnreadMessages.rows[0].count as number) ?? 0
@@ -199,6 +200,46 @@ export class ChatController {
     } catch (error) {
       console.error(error)
       throw Error('Failed to fetch record: ' + JSON.stringify(error))
+      return
+    }
+  }
+
+  async updateChat (req: Request, res: Response): Promise<void> {
+    const chatId = req.params.chatId
+    const { blocked_by } = req.body
+
+    if (!chatId) {
+      res.status(400).json({ statusText: 'Missing chat_id', status: 400 })
+      return
+    }
+
+    if (blocked_by === undefined) {
+      res
+        .status(400)
+        .json({ statusText: 'Missing blocked_by field', status: 400 })
+      return
+    }
+
+    try {
+      const result = await this.client.execute({
+        sql: 'SELECT * FROM chats WHERE uuid = :uuid',
+        args: { uuid: chatId }
+      })
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ statusText: 'Chat not found', status: 404 })
+        return
+      }
+
+      await this.client.execute({
+        sql: 'UPDATE chats SET blocked_by = :blocked_by WHERE uuid = :uuid',
+        args: { blocked_by, uuid: chatId }
+      })
+
+      res.status(200).json({ statusText: 'OK', status: 200 })
+    } catch (error) {
+      console.error(error)
+      throw Error('Failed to update record: ' + JSON.stringify(error))
       return
     }
   }
