@@ -63,7 +63,7 @@ export interface Chat {
   isArchived?: boolean
   isPinned?: boolean
   cleaned?: string | null
-  blokedBy?: string | null
+  blockedBy?: string | null
 }
 
 export type Chats = Chat[]
