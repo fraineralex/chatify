@@ -61,6 +61,8 @@ export function useUserMetadata () {
     if (data.status === 200) {
       setUserMetadata(metadata)
     }
+
+    return data
   }
 
   return { userMetadata, updateUserMetadata }
