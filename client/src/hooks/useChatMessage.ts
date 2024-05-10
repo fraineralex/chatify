@@ -122,6 +122,7 @@ export const useChatMessage = () => {
               ),
               cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
             }
+            addChat(chat)
           }
 
           const lastMessage =
