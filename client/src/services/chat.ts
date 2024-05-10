@@ -54,6 +54,25 @@ export async function getAllChats (
   }
 }
 
+export async function toggleChatBlock (
+  chatId: uuid,
+  userId: string | undefined
+) {
+  try {
+    const response = await fetch(`${SERVER_DOMAIN}/chats/${chatId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ blocked_by: userId ?? null })
+    })
+    return await response.json()
+  } catch (error) {
+    console.log(error)
+    return
+  }
+}
+
 export async function updateChatLastMessage (
   chats: Chat[],
   message: Message,
