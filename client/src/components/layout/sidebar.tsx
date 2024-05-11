@@ -1,11 +1,11 @@
 import { useChatMessage } from '../../hooks/useChatMessage'
-import { useSocketStore } from '../../store/socket'
+import { useFilterChats } from '../../hooks/useFilterChats'
 import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
 
 export function Sidebar () {
   const { areChatsLoaded } = useChatMessage()
-  const { chats } = useSocketStore()
+  const { filteredChats: chats } = useFilterChats()
 
   return (
     <div className='border-r h-screen'>
