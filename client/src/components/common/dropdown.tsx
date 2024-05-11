@@ -30,6 +30,8 @@ export function Dropdown ({
   return (
     <div ref={dropdownRef}>
       <button
+        title='Options'
+        aria-label='Options'
         onClick={event => {
           event.stopPropagation()
           setDropdownOpen(!dropdownOpen)
