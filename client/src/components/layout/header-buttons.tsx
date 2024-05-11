@@ -1,11 +1,12 @@
 import {
-  Archive,
   EllipsisVertical,
   MegaphoneOff,
   MessageSquareDot,
   SquarePlus,
   LogOut,
-  Settings
+  Settings,
+  EyeOff,
+  Lock
 } from 'lucide-react'
 import Modal from '../common/modal'
 import { useEffect, useState } from 'react'
@@ -43,21 +44,38 @@ export function HeaderButtons () {
             aria-labelledby='dropdownDefaultButton'
           >
             <li>
-              <button className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'>
-                <Settings className='w-5 h-5 inline me-2' /> Settings
+              <button
+                className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                title='Blocked Chats'
+                aria-label='Blocked Chats'
+              >
+                <Lock className='w-5 h-5 inline me-2' /> Blocked Chats
               </button>
             </li>
             <li>
               <button
+                title='Log out'
+                aria-label='Log out'
                 className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
                 onClick={() => logout()}
               >
                 <LogOut className='w-5 h-5 inline me-2' /> Log out
               </button>
             </li>
+            <li>
+              <button
+                title='Settings'
+                aria-label='Settings'
+                className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+              >
+                <Settings className='w-5 h-5 inline me-2' /> Settings
+              </button>
+            </li>
           </ul>
         </Dropdown>
         <button
+          title='New Chat'
+          aria-label='New Chat'
           className={`hover:scale-110 hover:contrast-200 ${
             chats.length === 0
               ? 'text-blue-700 animate-pulse duration-300 ease-in-out'
@@ -66,13 +84,25 @@ export function HeaderButtons () {
         >
           <SquarePlus className='w-5 h-5' onClick={openModal} />
         </button>
-        <button className='hover:scale-110 hover:contrast-200'>
+        <button
+          className='hover:scale-110 hover:contrast-200'
+          title='Unread Chats'
+          aria-label='Unread Chats'
+        >
           <MessageSquareDot className='w-5 h-5' />
         </button>
-        <button className='hover:scale-110 hover:contrast-200'>
-          <Archive className='w-5 h-5' />
+        <button
+          className='hover:scale-110 hover:contrast-200'
+          title='Hidden Chats'
+          aria-label='Hidden Chats'
+        >
+          <EyeOff className='w-5 h-5' />
         </button>
-        <button className='hover:scale-110 hover:contrast-200'>
+        <button
+          className='hover:scale-110 hover:contrast-200'
+          title='Muted Chats'
+          aria-label='Muted Chats'
+        >
           <MegaphoneOff className='w-5 h-5' />
         </button>
       </aside>
