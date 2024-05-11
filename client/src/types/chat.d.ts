@@ -64,6 +64,7 @@ export interface Chat {
   isPinned?: boolean
   cleaned?: string | null
   blockedBy?: string | null
+  isUnread?: boolean
 }
 
 export type Chats = Chat[]
@@ -105,6 +106,7 @@ export interface ChatItem {
   unreadMessages?: number
   isNewChat?: boolean
   isPinned?: boolean
+  isUnread?: boolean
 }
 
 export type EmojiEvent = {
