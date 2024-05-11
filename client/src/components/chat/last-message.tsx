@@ -1,6 +1,6 @@
 import { User } from '@auth0/auth0-react'
 import { Message, uuid } from '../../types/chat'
-import { MessageState } from './message-state'
+import { MessageState } from './message/message-state'
 import { Ban, Pin } from 'lucide-react'
 import { ChatDropdown } from './chat-dropdown'
 

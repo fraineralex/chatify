@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { ReplyMessage } from '../../types/chat'
+import { ReplyMessage } from '../../../types/chat'
 import { X } from 'lucide-react'
 
 export function ReplyingMessage ({

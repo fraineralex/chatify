@@ -1,11 +1,11 @@
 import { CircleCheck, X } from 'lucide-react'
-import { Message } from '../../types/chat'
-import Modal from '../common/modal'
+import { Message } from '../../../types/chat'
+import Modal from '../../common/modal'
 import { MessageArticle } from './message-article'
-import { Emoji } from '../common/svg-icons'
-import { useSocketStore } from '../../store/socket'
+import { Emoji } from '../../common/svg-icons'
+import { useSocketStore } from '../../../store/socket'
 import { useState } from 'react'
-import { SOCKET_EVENTS } from '../../constants'
+import { SOCKET_EVENTS } from '../../../constants'
 
 interface Props {
   isOpen: boolean

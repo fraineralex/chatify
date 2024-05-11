@@ -1,8 +1,8 @@
 import { Ban } from 'lucide-react'
-import { Message } from '../../types/chat'
+import { Message } from '../../../types/chat'
 import { MessageState } from './message-state'
 import { QuotedMessage } from './quoted-message'
-import { isOnlyOneEmoji } from '../../utils/isOneEmoji'
+import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
 
 interface Props {
   message: Message

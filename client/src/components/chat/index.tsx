@@ -1,6 +1,6 @@
-import { Form } from './form'
+import { Form } from './message/form'
 import { Header } from './header'
-import { Message } from './message'
+import { Message } from './message/message'
 import './chat.css'
 import { useSocketStore } from '../../store/socket'
 import { useEffect, useRef, useState } from 'react'

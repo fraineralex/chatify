@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { AttachFile, Emoji } from '../common/svg-icons'
+import { AttachFile, Emoji } from '../../common/svg-icons'
 import {
   EmojiEvent,
   Message,
   ReplyMessage,
   ServerMessage
-} from '../../types/chat'
-import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../constants'
-import { useSocketStore } from '../../store/socket'
+} from '../../../types/chat'
+import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../../constants'
+import { useSocketStore } from '../../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
-import { useChatStore } from '../../store/currenChat'
+import { useChatStore } from '../../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'

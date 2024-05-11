@@ -1,13 +1,13 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { Message as MessageType, ReplyMessage, User } from '../../types/chat'
-import { useSocketStore } from '../../store/socket'
+import { Message as MessageType, ReplyMessage, User } from '../../../types/chat'
+import { useSocketStore } from '../../../store/socket'
 
 import { Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
 
 import { useState } from 'react'
 import { UpdateMessageModal } from './update-message-modal'
 import { MessageArticle } from './message-article'
-import { SOCKET_EVENTS } from '../../constants'
+import { SOCKET_EVENTS } from '../../../constants'
 
 interface Props {
   message: MessageType

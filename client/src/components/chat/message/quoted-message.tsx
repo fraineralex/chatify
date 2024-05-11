@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useSocketStore } from '../../store/socket'
-import { uuid } from '../../types/chat'
+import { useSocketStore } from '../../../store/socket'
+import { uuid } from '../../../types/chat'
 
 export function QuotedMessage ({
   quotedMessageId,
