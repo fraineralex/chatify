@@ -12,7 +12,7 @@ export class DB extends Dexie {
       messages:
         '&uuid, content, createdAt, senderId, receiverId, chatId, type, resourceUrl, isSent, isDelivered, isRead, isEdited, isDeleted, replyToId',
       chats:
-        '&uuid, user, lastMessage, createdAt, unreadMessages, draft, isMuted, isDeleted, isArchived, isPinned, blockedBy, cleaned'
+        '&uuid, user, lastMessage, createdAt, unreadMessages, draft, isMuted, isDeleted, isArchived, isPinned, blockedBy, cleaned, isUnread'
     })
 
     this.messages = this.table('messages')
