@@ -10,6 +10,7 @@ interface Props {
   unreadMessages: number
   uuid?: uuid
   isPinned?: boolean
+  isUnread?: boolean
 }
 
 export function LastMessage ({
@@ -17,7 +18,8 @@ export function LastMessage ({
   lastMessage,
   unreadMessages,
   uuid,
-  isPinned
+  isPinned,
+  isUnread
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
 
@@ -44,11 +46,12 @@ export function LastMessage ({
       </p>
       <span className='flex space-x-2'>
         {isPinned && <Pin className='w-4 h-4 rotate-45' />}
-        {unreadMessages > 0 && (
-          <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
-            {unreadMessages}
-          </span>
-        )}
+        {unreadMessages > 0 ||
+          (isUnread && (
+            <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
+              {isUnread ? undefined : unreadMessages}
+            </span>
+          ))}
         {uuid && <ChatDropdown uuid={uuid} />}
       </span>
     </aside>
