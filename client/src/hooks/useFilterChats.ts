@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSocketStore } from '../store/socket'
+import { Chat } from '../types/chat'
 
 export function useFilterChats () {
   const { chats } = useSocketStore()
-  const [filteredChats, setFilteredChats] = useState(
-    chats.filter(chat => !chat.isDeleted && !chat.blockedBy && !chat.isArchived)
-  )
+  const [filteredChats, setFilteredChats] = useState<Array<Chat>>([])
+
+  useEffect(() => {
+    setFilteredChats(
+      chats.filter(
+        chat => !chat.isDeleted && !chat.blockedBy && !chat.isArchived
+      )
+    )
+  }, [chats])
 
   const showBlockedChats = () => {
     setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.blockedBy))
