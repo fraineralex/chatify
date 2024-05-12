@@ -17,12 +17,19 @@ import { useNewChatModalStore } from '../../store/newChatModal'
 import { getAllUsers } from '../../services/user'
 import { useSocketStore } from '../../store/socket'
 import { Dropdown } from '../common/dropdown'
+import { useFilterChats } from '../../hooks/useFilterChats'
 
 export function HeaderButtons () {
   const { isOpen, closeModal, openModal } = useNewChatModalStore()
   const [users, setUsers] = useState<User[]>([])
   const { user: loggedUser, logout } = useAuth0()
   const chats = useSocketStore(state => state.chats)
+  const {
+    showArchivedChats,
+    showBlockedChats,
+    showMutedChats,
+    showUnreadChats
+  } = useFilterChats()
 
   useEffect(() => {
     if (!open) return
@@ -48,6 +55,7 @@ export function HeaderButtons () {
                 className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
                 title='Blocked Chats'
                 aria-label='Blocked Chats'
+                onClick={showBlockedChats}
               >
                 <Lock className='w-5 h-5 inline me-2' /> Blocked Chats
               </button>
@@ -88,6 +96,7 @@ export function HeaderButtons () {
           className='hover:scale-110 hover:contrast-200'
           title='Unread Chats'
           aria-label='Unread Chats'
+          onClick={showUnreadChats}
         >
           <MessageSquareDot className='w-5 h-5' />
         </button>
@@ -95,6 +104,7 @@ export function HeaderButtons () {
           className='hover:scale-110 hover:contrast-200'
           title='Hidden Chats'
           aria-label='Hidden Chats'
+          onClick={showArchivedChats}
         >
           <EyeOff className='w-5 h-5' />
         </button>
@@ -102,6 +112,7 @@ export function HeaderButtons () {
           className='hover:scale-110 hover:contrast-200'
           title='Muted Chats'
           aria-label='Muted Chats'
+          onClick={showMutedChats}
         >
           <MegaphoneOff className='w-5 h-5' />
         </button>
