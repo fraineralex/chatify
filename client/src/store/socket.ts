@@ -1,5 +1,12 @@
 import { create } from 'zustand'
-import { Chat, Chats, Message, Messages, uuid } from '../types/chat'
+import {
+  Chat,
+  ChatFilterState,
+  Chats,
+  Message,
+  Messages,
+  uuid
+} from '../types/chat'
 import { Socket } from 'socket.io-client'
 import { db } from '../database/db'
 
@@ -14,6 +21,8 @@ type SocketState = {
   addChat: (chat: Chat) => void
   replaceChat: (chat: Chat) => void
   removeChat: (chatUuid: uuid) => void
+  chatFilterState: ChatFilterState
+  setChatFilterState: (state: ChatFilterState) => void
 }
 
 const initialMessages = (await db.messages.toArray()) ?? []
@@ -23,6 +32,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   socket: undefined,
   messages: initialMessages,
   chats: initialChats,
+  chatFilterState: 'all',
 
   setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: Date) => {
@@ -85,5 +95,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     chats.splice(index, 1)
     await db.chats.delete(chatUuid)
     set({ chats })
-  }
+  },
+
+  setChatFilterState: state => set({ chatFilterState: state })
 }))
