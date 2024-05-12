@@ -112,3 +112,11 @@ export interface ChatItem {
 export type EmojiEvent = {
   unified: string
 }
+
+export type ChatFilterState =
+  | 'all'
+  | 'blocked'
+  | 'archived'
+  | 'muted'
+  | 'unread'
+  | { search: string }
