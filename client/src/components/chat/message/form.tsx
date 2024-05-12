@@ -127,7 +127,10 @@ export function Form ({
     setCurrentChat({ ...currentChat, draft: contentMessage })
   }
 
-  const handleEmojiClick = () => {
+  const handleEmojiClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault()
     setShowEmojiPicker(!showEmojiPicker)
     formRef.current?.querySelector('input')?.focus()
   }
@@ -166,7 +169,12 @@ export function Form ({
           <Emoji className='w-6 h-6' />
           <span className='sr-only'>Insert emoji</span>
         </button>
-        <button className='hover:scale-125 ease-out duration-100 hover:text-gray-700'>
+        <button
+          className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
+          onClick={event => {
+            event.preventDefault()
+          }}
+        >
           <AttachFile className='w-6 h-6' />
           <span className='sr-only'>Attach file</span>
         </button>
