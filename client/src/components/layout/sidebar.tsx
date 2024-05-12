@@ -12,7 +12,7 @@ export function Sidebar () {
       <Header />
       <nav className='py-4 px-1 space-y-4 h-[90%]'>
         <ul className='space-y-1'>
-          {[...chats]
+          {chats
             .sort(
               (a, b) =>
                 new Date(b.lastMessage?.createdAt || b.createdAt).getTime() -
