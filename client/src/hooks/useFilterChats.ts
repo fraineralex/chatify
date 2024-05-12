@@ -3,51 +3,30 @@ import { useSocketStore } from '../store/socket'
 import { Chat } from '../types/chat'
 
 export function useFilterChats () {
-  const { chats } = useSocketStore()
-  const [filteredChats, setFilteredChats] = useState<Array<Chat>>([])
+  const { chats, chatFilterState } = useSocketStore()
+  const [filteredChats, setFilteredChats] = useState<Chat[]>([])
 
   useEffect(() => {
-    setFilteredChats(
-      chats.filter(
-        chat => !chat.isDeleted && !chat.blockedBy && !chat.isArchived
-      )
-    )
-  }, [chats])
+    console.log('render')
+    switch (chatFilterState) {
+      case 'all':
+        setFilteredChats(chats)
+        break
+      case 'blocked':
+        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.blockedBy))
+        break
+      case 'archived':
+        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isArchived))
+        break
+      case 'muted':
+        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isMuted))
+        console.log(chats.filter(chat => !chat.isDeleted && chat.isMuted))
+        break
+      case 'unread':
+        setFilteredChats(chats.filter(chat => !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)))
+        break
+    }
+  }, [chats, chatFilterState])
 
-  const showBlockedChats = () => {
-    setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.blockedBy))
-  }
-
-  const showArchivedChats = () => {
-    setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isArchived))
-  }
-
-  const showMutedChats = () => {
-    setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isMuted))
-  }
-
-  const showUnreadChats = () => {
-    setFilteredChats(
-      chats.filter(
-        chat => !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)
-      )
-    )
-  }
-
-  const showAllChats = () => {
-    setFilteredChats(
-      chats.filter(
-        chat => !chat.isDeleted && !chat.isArchived && !chat.blockedBy
-      )
-    )
-  }
-
-  return {
-    filteredChats,
-    showBlockedChats,
-    showArchivedChats,
-    showMutedChats,
-    showUnreadChats,
-    showAllChats
-  }
+  return { filteredChats }
 }
