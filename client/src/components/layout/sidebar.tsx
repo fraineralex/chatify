@@ -1,15 +1,38 @@
 import { useChatMessage } from '../../hooks/useChatMessage'
 import { useFilterChats } from '../../hooks/useFilterChats'
+import { useSocketStore } from '../../store/socket'
 import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
 
 export function Sidebar () {
   const { areChatsLoaded } = useChatMessage()
+  const { chatFilterState, setChatFilterState } = useSocketStore()
   const { filteredChats } = useFilterChats()
 
   return (
-    <div className='border-r h-screen'>
+    <div className='border-r h-screen col-span-2'>
       <Header />
+      <div className='relative mb-2 w-full px-3 mt-2'>
+        <input
+          autoFocus
+          type='text'
+          className='w-full placeholder-gray-700 bg-gray-200 outline-none text-sm text-gray-800 focus:border-gray-300 rounded-lg px-2 py-2'
+          placeholder='Search'
+        />
+        {chatFilterState !== 'all' && chatFilterState !== 'search' && (
+          <span className='flex place-content-center space-x-4 mt-2 text-gray-800'>
+            <button
+              className='bg-gray-200 py-2 px-3 rounded-full text-xs hover:bg-gray-300'
+              onClick={() => setChatFilterState('all')}
+            >
+              Show all chats
+            </button>
+            <span className='bg-blue-200 py-2 px-3 rounded-full text-xs text-blue-800'>
+              Showing {chatFilterState} chats
+            </span>
+          </span>
+        )}
+      </div>
       <nav className='py-4 px-1 space-y-4 h-[90%]'>
         <ul className='space-y-1'>
           {filteredChats
@@ -25,7 +48,7 @@ export function Sidebar () {
             ))}
           {filteredChats.length === 0 && (
             <p className='text-center font-medium'>
-              {areChatsLoaded
+              {areChatsLoaded || chatFilterState !== 'all'
                 ? "🚨 You don't have any chat yet"
                 : 'Loading chats...'}
             </p>
