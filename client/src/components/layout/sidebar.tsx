@@ -9,6 +9,13 @@ export function Sidebar () {
   const { chatFilterState, setChatFilterState } = useSocketStore()
   const { filteredChats } = useFilterChats()
 
+  let notChatsText =
+    chatFilterState === 'all'
+      ? "🚨 You don't have any chat yet"
+      : `🚨 You don't have ${chatFilterState} chat yet`
+
+  if (chatFilterState === 'search') notChatsText = 'No chat found'
+
   return (
     <div className='border-r h-screen col-span-2'>
       <Header />
@@ -33,8 +40,8 @@ export function Sidebar () {
           </span>
         )}
       </div>
-      <nav className='py-4 px-1 space-y-4 h-[90%]'>
-        <ul className='space-y-1'>
+      <nav className='pb-2 px-1 space-y-4 h-[90%]'>
+        <ul>
           {filteredChats
             .sort(
               (a, b) =>
@@ -48,9 +55,7 @@ export function Sidebar () {
             ))}
           {filteredChats.length === 0 && (
             <p className='text-center font-medium'>
-              {areChatsLoaded || chatFilterState !== 'all'
-                ? "🚨 You don't have any chat yet"
-                : 'Loading chats...'}
+              {areChatsLoaded ? notChatsText : 'Loading chats...'}
             </p>
           )}
         </ul>
