@@ -27,7 +27,7 @@ export function Chat () {
   }
 
   return (
-    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-3'>
+    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-5'>
       {currentChat ? (
         <>
           <Header
