@@ -121,7 +121,9 @@ export function HeaderButtons () {
           <MessageSquareDot className='w-5 h-5' />
         </button>
         <button
-          className='hover:scale-110 hover:contrast-200'
+          className={`hover:scale-110 hover:contrast-200 ${
+            chatFilterState === 'archived' ? 'text-blue-700' : 'text-gray-700'
+          }`}
           title='Hidden Chats'
           aria-label='Hidden Chats'
           onClick={toggleArchivedChats}
@@ -129,7 +131,9 @@ export function HeaderButtons () {
           <EyeOff className='w-5 h-5' />
         </button>
         <button
-          className='hover:scale-110 hover:contrast-200'
+          className={`hover:scale-110 hover:contrast-200 ${
+            chatFilterState === 'muted' ? 'text-blue-700' : 'text-gray-700'
+          }`}
           title='Muted Chats'
           aria-label='Muted Chats'
           onClick={toggleMutedChats}
