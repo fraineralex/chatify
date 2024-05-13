@@ -6,6 +6,7 @@ import { Chat, ChatItem, MessagesToUpdate } from '../types/chat'
 import { SOCKET_EVENTS } from '../constants'
 import { useNewChatModalStore } from '../store/newChatModal'
 import { createChat } from '../services/chat'
+import { useUserMetadata } from './useUserMetadata'
 
 export function useChatItem ({
   uuid,
@@ -13,7 +14,14 @@ export function useChatItem ({
   unreadMessages,
   isNewChat
 }: ChatItem) {
-  const { socket, addChat: setChat, chats, removeChat } = useSocketStore()
+  const { userMetadata, updateUserMetadata } = useUserMetadata()
+  const {
+    socket,
+    addChat: setChat,
+    chats,
+    removeChat,
+    replaceChat
+  } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
   const isCurrentChat =
@@ -26,6 +34,31 @@ export function useChatItem ({
     if (isCurrentChat || !socket) return
     const newCurrentChat = chats.find(chat => chat.user.id === user.id)
     if (!newCurrentChat) return
+
+    if (newCurrentChat.isDeleted) {
+      newCurrentChat.isDeleted = false
+      replaceChat(newCurrentChat)
+      setCurrentChat(newCurrentChat)
+      const deleteChats = userMetadata.chat_preferences.deleted.filter(
+        uuid => uuid !== newCurrentChat.uuid
+      )
+
+      const newChatPreferences = {
+        ...userMetadata.chat_preferences,
+        deleted: deleteChats
+      }
+
+      const response = await updateUserMetadata({
+        chat_preferences: newChatPreferences
+      })
+
+      if (response.status !== 200) {
+        replaceChat({ ...newCurrentChat, isDeleted: true })
+        console.log(response.statusText)
+      }
+      return
+    }
+
     setCurrentChat(newCurrentChat)
 
     if (isNewChat) closeModal()
@@ -43,6 +76,7 @@ export function useChatItem ({
 
   const handleCreateChat = async () => {
     if (!isNewChat || chatExists) return
+
     const newChat: Chat = {
       uuid: crypto.randomUUID(),
       user,
