@@ -73,9 +73,9 @@ export const useChatMessage = () => {
             createdAt: new Date(chat.createdAt)
           })
         })
-
-        setAreChatsLoaded(true)
       }
+
+      setAreChatsLoaded(true)
 
       newSocket.on(
         SOCKET_EVENTS.CHAT_MESSAGE,
