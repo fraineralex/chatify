@@ -7,23 +7,35 @@ export function useFilterChats () {
   const [filteredChats, setFilteredChats] = useState<Chat[]>([])
 
   useEffect(() => {
-    console.log('render')
     switch (chatFilterState) {
       case 'all':
-        setFilteredChats(chats)
+        setFilteredChats(
+          chats.filter(
+            chat => !chat.isDeleted && !chat.isArchived && !chat.blockedBy
+          )
+        )
         break
       case 'blocked':
-        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.blockedBy))
+        setFilteredChats(
+          chats.filter(chat => !chat.isDeleted && chat.blockedBy)
+        )
         break
       case 'archived':
-        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isArchived))
+        setFilteredChats(
+          chats.filter(chat => !chat.isDeleted && chat.isArchived)
+        )
         break
       case 'muted':
         setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isMuted))
         console.log(chats.filter(chat => !chat.isDeleted && chat.isMuted))
         break
       case 'unread':
-        setFilteredChats(chats.filter(chat => !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)))
+        setFilteredChats(
+          chats.filter(
+            chat =>
+              !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)
+          )
+        )
         break
     }
   }, [chats, chatFilterState])
