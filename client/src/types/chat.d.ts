@@ -119,4 +119,4 @@ export type ChatFilterState =
   | 'archived'
   | 'muted'
   | 'unread'
-  | { search: string }
+  | 'search'
