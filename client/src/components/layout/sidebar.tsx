@@ -43,13 +43,24 @@ export function Sidebar () {
       <nav className='pb-2 px-1 space-y-4 h-[90%]'>
         <ul>
           {filteredChats
-            .sort(
-              (a, b) =>
-                new Date(b.lastMessage?.createdAt || b.createdAt).getTime() -
-                (b.isPinned ? Number.MAX_SAFE_INTEGER : 0) -
-                new Date(a.lastMessage?.createdAt || a.createdAt).getTime() -
-                (a.isPinned ? Number.MAX_SAFE_INTEGER : 0)
-            )
+            .sort((a, b) => {
+              const dateA = a.lastMessage
+                ? new Date(a.lastMessage.createdAt)
+                : new Date(a.createdAt)
+              const dateB = b.lastMessage
+                ? new Date(b.lastMessage.createdAt)
+                : new Date(b.createdAt)
+
+              if (a.isPinned !== b.isPinned) {
+                return b.isPinned ? 1 : -1
+              }
+
+              if (a.isPinned && b.isPinned) {
+                return dateB.getTime() - dateA.getTime()
+              }
+
+              return dateB.getTime() - dateA.getTime()
+            })
             .map((chat, index) => (
               <ChatItem key={index} {...chat} />
             ))}
