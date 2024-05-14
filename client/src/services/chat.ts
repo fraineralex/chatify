@@ -85,17 +85,11 @@ export async function updateChatLastMessage (
 
   if (!chat || chat.lastMessage?.uuid !== message.uuid) return
 
-  const updatedChat: Chat = {
-    uuid: chat.uuid,
-    lastMessage:
-      chat.lastMessage &&
-      chat.lastMessage.createdAt.getTime() > message.createdAt.getTime()
-        ? chat.lastMessage
-        : message,
-    user: chat.user,
-    createdAt: chat.createdAt,
-    unreadMessages: chat.unreadMessages
-  }
+  chat.lastMessage =
+    chat.lastMessage &&
+    chat.lastMessage.createdAt.getTime() > message.createdAt.getTime()
+      ? chat.lastMessage
+      : message
 
-  return updatedChat
+  return chat
 }
