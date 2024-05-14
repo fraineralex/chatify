@@ -67,10 +67,21 @@ export const useChatMessage = () => {
               createdAt: new Date(chat.lastMessage.createdAt)
             }
           }
-
+          
           addChat({
             ...chat,
-            createdAt: new Date(chat.createdAt)
+            createdAt: new Date(chat.createdAt),
+            isArchived: userMetadata?.chat_preferences.archived?.includes(
+              chat.uuid
+            ),
+            isDeleted: userMetadata?.chat_preferences.deleted?.includes(
+              chat.uuid
+            ),
+            isMuted: userMetadata?.chat_preferences.muted?.includes(chat.uuid),
+            isPinned: userMetadata?.chat_preferences.pinned?.includes(
+              chat.uuid
+            ),
+            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
           })
         })
       }
