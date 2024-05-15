@@ -21,11 +21,12 @@ import React from 'react'
 import { toggleChatBlock } from '../../services/chat'
 import { useAuth0 } from '@auth0/auth0-react'
 import { SOCKET_EVENTS } from '../../constants'
+import { updateUserMetadata } from '../../services/user'
 
 export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   const { chats, replaceChat, socket } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
-  const { userMetadata, updateUserMetadata } = useUserMetadata()
+  const { userMetadata, setUserMetadata } = useUserMetadata()
   const { user } = useAuth0()
   const chat = chats.find(chat => chat.uuid === uuid)
   if (!chat) return null
@@ -60,11 +61,19 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
             [chat.uuid]: new Date().toISOString()
           }
         }
-    const response = await updateUserMetadata({
+
+    setUserMetadata({
       chat_preferences: newChatPreferences
     })
+    const response = await updateUserMetadata(
+      {
+        chat_preferences: newChatPreferences
+      },
+      user?.sub
+    )
 
     if (response.status !== 200) {
+      setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
@@ -86,14 +95,25 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       ? userMetadata.chat_preferences.pinned.filter(uuid => uuid !== chat.uuid)
       : [...userMetadata.chat_preferences.pinned, chat.uuid]
 
-    const response = await updateUserMetadata({
+    setUserMetadata({
       chat_preferences: {
         ...userMetadata.chat_preferences,
         pinned: pinnedChats
       }
     })
 
+    const response = await updateUserMetadata(
+      {
+        chat_preferences: {
+          ...userMetadata.chat_preferences,
+          pinned: pinnedChats
+        }
+      },
+      user?.sub
+    )
+
     if (response.status !== 200) {
+      setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
@@ -105,7 +125,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.stopPropagation()
-
     replaceChat({
       ...chat,
       isArchived: !chat.isArchived
@@ -117,14 +136,25 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
         )
       : [...userMetadata.chat_preferences.archived, chat.uuid]
 
-    const response = await updateUserMetadata({
+    setUserMetadata({
       chat_preferences: {
         ...userMetadata.chat_preferences,
         archived: hiddenChats
       }
     })
 
+    const response = await updateUserMetadata(
+      {
+        chat_preferences: {
+          ...userMetadata.chat_preferences,
+          archived: hiddenChats
+        }
+      },
+      user?.sub
+    )
+
     if (response.status !== 200) {
+      setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
@@ -146,14 +176,25 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       ? userMetadata.chat_preferences.muted.filter(uuid => uuid !== chat.uuid)
       : [...userMetadata.chat_preferences.muted, chat.uuid]
 
-    const response = await updateUserMetadata({
+    setUserMetadata({
       chat_preferences: {
         ...userMetadata.chat_preferences,
         muted: muttedChats
       }
     })
 
+    const response = await updateUserMetadata(
+      {
+        chat_preferences: {
+          ...userMetadata.chat_preferences,
+          muted: muttedChats
+        }
+      },
+      user?.sub
+    )
+
     if (response.status !== 200) {
+      setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
@@ -179,7 +220,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     )
 
     if (response.status !== 200) {
-      console.log(response)
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
