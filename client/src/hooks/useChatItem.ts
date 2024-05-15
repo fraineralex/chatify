@@ -7,6 +7,7 @@ import { SOCKET_EVENTS } from '../constants'
 import { useNewChatModalStore } from '../store/newChatModal'
 import { createChat } from '../services/chat'
 import { useUserMetadata } from './useUserMetadata'
+import { updateUserMetadata } from '../services/user'
 
 export function useChatItem ({
   uuid,
@@ -14,7 +15,7 @@ export function useChatItem ({
   unreadMessages,
   isNewChat
 }: ChatItem) {
-  const { userMetadata, updateUserMetadata } = useUserMetadata()
+  const { userMetadata } = useUserMetadata()
   const {
     socket,
     addChat: setChat,
@@ -48,9 +49,12 @@ export function useChatItem ({
         deleted: deleteChats
       }
 
-      const response = await updateUserMetadata({
-        chat_preferences: newChatPreferences
-      })
+      const response = await updateUserMetadata(
+        {
+          chat_preferences: newChatPreferences
+        },
+        loggedUser?.sub
+      )
 
       if (response.status !== 200) {
         replaceChat({ ...newCurrentChat, isDeleted: true })
