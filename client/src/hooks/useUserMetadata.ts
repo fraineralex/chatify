@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { metadata } from '../types/user'
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN ?? ''
-const SERVER_DOMAIN = import.meta.env.VITE_SERVER_DOMAIN ?? ''
 
 const initialUserMetadata: metadata = {
   chat_preferences: {
@@ -49,21 +48,5 @@ export function useUserMetadata () {
     getUserMetadata()
   }, [getAccessTokenSilently, user?.sub])
 
-  const updateUserMetadata = async (metadata: metadata) => {
-    const data = await fetch(`${SERVER_DOMAIN}/users/${user?.sub}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ metadata })
-    })
-
-    if (data.status === 200) {
-      setUserMetadata(metadata)
-    }
-
-    return data
-  }
-
-  return { userMetadata, updateUserMetadata }
+  return { userMetadata, setUserMetadata }
 }
