@@ -1,42 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useSocketStore } from '../store/socket'
-import { Chat } from '../types/chat'
+import { Chat, Chats } from '../types/chat'
 
 export function useFilterChats () {
   const { chats, chatFilterState } = useSocketStore()
-  const [filteredChats, setFilteredChats] = useState<Chat[]>([])
+  const [filteredChats, setFilteredChats] = useState<Chats>([])
 
   useEffect(() => {
-    switch (chatFilterState) {
-      case 'all':
-        setFilteredChats(
-          chats.filter(
-            chat => !chat.isDeleted && !chat.isArchived && !chat.blockedBy
-          )
-        )
-        break
-      case 'blocked':
-        setFilteredChats(
-          chats.filter(chat => !chat.isDeleted && chat.blockedBy)
-        )
-        break
-      case 'archived':
-        setFilteredChats(
-          chats.filter(chat => !chat.isDeleted && chat.isArchived)
-        )
-        break
-      case 'muted':
-        setFilteredChats(chats.filter(chat => !chat.isDeleted && chat.isMuted))
-        console.log(chats.filter(chat => !chat.isDeleted && chat.isMuted))
-        break
-      case 'unread':
-        setFilteredChats(
-          chats.filter(
-            chat =>
-              !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)
-          )
-        )
-        break
+    const filters: {
+      [key: string]: (chat: Chat) => boolean | string | undefined | null
+    } = {
+      all: chat => !chat.isDeleted && !chat.isArchived && !chat.blockedBy,
+      blocked: chat => !chat.isDeleted && chat.blockedBy,
+      archived: chat => !chat.isDeleted && chat.isArchived,
+      muted: chat => !chat.isDeleted && chat.isMuted,
+      unread: chat =>
+        !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)
+    }
+
+    if (filters[chatFilterState]) {
+      setFilteredChats(chats.filter(filters[chatFilterState]))
     }
   }, [chats, chatFilterState])
 
