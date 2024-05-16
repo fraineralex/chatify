@@ -33,6 +33,32 @@ export class UserController {
     res.status(200).json(users)
   }
 
+  static async getUserMetadata (req: Request, res: Response) {
+    const { userId } = req.params
+
+    const config = {
+      method: 'GET',
+      url: `https://${DOMAIN}/api/v2/users/${userId}`,
+      headers: {
+        authorization: `Bearer ${API_ACCESS_TOKEN}`,
+        Accept: 'application/json'
+      }
+    }
+
+    try {
+      const data = await axios.request(config)
+      if (data.status !== 200) {
+        return res
+          .status(data.status)
+          .json({ statusText: data.statusText, status: data.status })
+      }
+
+      res.status(200).json(data.data.user_metadata)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   static async updateMetadata (req: Request, res: Response) {
     const { userId } = req.params
     const { metadata } = req.body as { metadata: metadata }
