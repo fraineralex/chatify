@@ -18,7 +18,7 @@ export const updateUserMetadata = async (
   metadata: metadata,
   userSub: string | undefined
 ) => {
-  const data = await fetch(`${SERVER_DOMAIN}/users/${userSub}`, {
+  const data = await fetch(`${SERVER_DOMAIN}/users/metadata/${userSub}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
