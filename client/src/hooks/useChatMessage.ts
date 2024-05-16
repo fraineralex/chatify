@@ -44,6 +44,7 @@ export const useChatMessage = () => {
       ?.createdAt ?? 0
 
   useEffect(() => {
+    if (!userMetadata) return
     ;(async () => {
       const newSocket = io(SERVER_DOMAIN, {
         auth: {
@@ -60,13 +61,16 @@ export const useChatMessage = () => {
         if (!loadedChats) return
 
         loadedChats.forEach(chat => {
+          chat.uuid === '9bb26d78-c775-4b52-a613-db9a8785ee0c'
+            ? console.log(userMetadata?.chat_preferences.cleaned[chat.uuid])
+            : undefined
           if (chat.lastMessage) {
             chat.lastMessage = {
               ...chat.lastMessage,
               createdAt: new Date(chat.lastMessage.createdAt)
             }
           }
-          
+
           addChat({
             ...chat,
             createdAt: new Date(chat.createdAt),
@@ -80,7 +84,9 @@ export const useChatMessage = () => {
             isPinned: userMetadata?.chat_preferences.pinned?.includes(
               chat.uuid
             ),
-            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
+            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
+              ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ?? 0
+              : null
           })
         })
       }
@@ -130,7 +136,10 @@ export const useChatMessage = () => {
               isPinned: userMetadata?.chat_preferences.pinned?.includes(
                 chat.uuid
               ),
-              cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
+              cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
+                ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ??
+                  0
+                : null
             }
             addChat(chat)
           }
@@ -180,7 +189,9 @@ export const useChatMessage = () => {
             isPinned: userMetadata?.chat_preferences.pinned?.includes(
               chat.uuid
             ),
-            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid] ?? null
+            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
+              ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ?? 0
+              : null
           }
 
           replaceChat(newChat)

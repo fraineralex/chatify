@@ -24,29 +24,19 @@ type SocketState = {
   removeChat: (chatUuid: uuid) => void
   chatFilterState: ChatFilterState
   setChatFilterState: (state: ChatFilterState) => void
-  userMetadata: metadata
+  userMetadata: metadata | null
   setUserMetadata: (metadata: metadata) => void
 }
 
 const initialMessages = (await db.messages.toArray()) ?? []
 const initialChats = (await db.chats.toArray()) ?? []
 
-const initialUserMetadata: metadata = {
-  chat_preferences: {
-    archived: [],
-    cleaned: {},
-    deleted: [],
-    muted: [],
-    pinned: []
-  }
-}
-
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: undefined,
   messages: initialMessages,
   chats: initialChats,
   chatFilterState: 'all',
-  userMetadata: initialUserMetadata,
+  userMetadata: null,
 
   setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: Date) => {

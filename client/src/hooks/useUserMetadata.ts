@@ -10,7 +10,6 @@ export function useUserMetadata () {
 
   useEffect(() => {
     const getUserMetadata = async () => {
-      console.log('Fetching user metadata')
       try {
         const response = await fetch(`${domain}/users/metadata/${user?.sub}`)
         if (response.status !== 200) {

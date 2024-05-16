@@ -28,17 +28,16 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   const { currentChat, setCurrentChat } = useChatStore()
   const { user } = useAuth0()
   const chat = chats.find(chat => chat.uuid === uuid)
-  if (!chat) return null
+  if (!chat || !userMetadata) return null
 
   const handleDeleteChat = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.stopPropagation()
-
     replaceChat({
       ...chat,
       isDeleted: !chat.isDeleted,
-      cleaned: new Date().toISOString(),
+      cleaned: new Date(),
       isPinned: false,
       isMuted: false,
       isArchived: false,
@@ -51,19 +50,14 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       ? userMetadata.chat_preferences.deleted.filter(uuid => uuid !== chat.uuid)
       : [...userMetadata.chat_preferences.deleted, chat.uuid]
 
-    const newChatPreferences = chat.isDeleted
-      ? {
-          ...userMetadata.chat_preferences,
-          deleted: deleteChats
-        }
-      : {
-          ...userMetadata.chat_preferences,
-          deleted: deleteChats,
-          cleaned: {
-            ...userMetadata.chat_preferences.cleaned,
-            [chat.uuid]: new Date().toISOString()
-          }
-        }
+    const newChatPreferences = {
+      ...userMetadata.chat_preferences,
+      deleted: deleteChats,
+      cleaned: {
+        ...userMetadata.chat_preferences.cleaned,
+        [chat.uuid]: new Date().toISOString()
+      }
+    }
 
     setUserMetadata({
       chat_preferences: newChatPreferences

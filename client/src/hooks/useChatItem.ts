@@ -25,14 +25,18 @@ export function useChatItem ({
   const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
   const isCurrentChat =
-    currentChat?.uuid === uuid ||
-    (isNewChat && currentChat?.user.id === user.id)
+    currentChat &&
+    (currentChat.uuid === uuid ||
+      (isNewChat && currentChat.user.id === user.id))
+      ? true
+      : false
   const chatExists = chats.some(chat => chat.user.id === user.id)
   const closeModal = useNewChatModalStore(state => state.closeModal)
 
   const handleOpenChat = async () => {
-    if (isCurrentChat || !socket) return
+    if (isCurrentChat || !socket || !userMetadata) return
     const newCurrentChat = chats.find(chat => chat.user.id === user.id)
+    console.log(newCurrentChat)
     if (!newCurrentChat) return
 
     if (newCurrentChat.isDeleted) {
@@ -60,9 +64,7 @@ export function useChatItem ({
         console.log(response.statusText)
       }
       return
-    }
-
-    setCurrentChat(newCurrentChat)
+    } else setCurrentChat(newCurrentChat)
 
     if (isNewChat) closeModal()
 

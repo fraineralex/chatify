@@ -62,7 +62,7 @@ export interface Chat {
   isDeleted?: boolean
   isArchived?: boolean
   isPinned?: boolean
-  cleaned?: string | null
+  cleaned?: Date | null
   blockedBy?: string | null
   isUnread?: boolean
 }
