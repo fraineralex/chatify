@@ -18,7 +18,6 @@ import {
   getChatById,
   updateChatLastMessage
 } from '../services/chat'
-import { useUserMetadata } from './useUserMetadata'
 
 const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
@@ -26,7 +25,6 @@ const SERVER_DOMAIN =
 export const useChatMessage = () => {
   const { getCurrentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
-  const { userMetadata } = useUserMetadata()
 
   const {
     addMessage,
@@ -36,7 +34,8 @@ export const useChatMessage = () => {
     chats,
     addChat,
     setSocket,
-    replaceChat
+    replaceChat,
+    userMetadata
   } = useSocketStore()
 
   const [areChatsLoaded, setAreChatsLoaded] = useState(false)
