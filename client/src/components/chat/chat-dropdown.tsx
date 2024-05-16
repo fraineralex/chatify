@@ -38,7 +38,11 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     replaceChat({
       ...chat,
       isDeleted: !chat.isDeleted,
-      cleaned: new Date().toISOString()
+      cleaned: new Date().toISOString(),
+      isPinned: false,
+      isMuted: false,
+      isArchived: false,
+      isUnread: false
     })
 
     if (currentChat?.uuid === uuid) setCurrentChat(null)
@@ -208,7 +212,12 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
 
     replaceChat({
       ...chat,
-      blockedBy: chat.blockedBy ? null : user?.sub
+      blockedBy: chat.blockedBy ? null : user?.sub,
+      isMuted: false,
+      isArchived: false,
+      isPinned: false,
+      isUnread: false,
+      isDeleted: false
     })
 
     if (currentChat?.uuid === uuid) setCurrentChat(null)

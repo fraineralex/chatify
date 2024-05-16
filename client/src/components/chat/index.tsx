@@ -50,6 +50,7 @@ export function Chat () {
                 />
               ))}
           </ul>
+
           <Form
             replyingMessage={replyingMessage}
             handleReplyMessage={handleReplyMessage}

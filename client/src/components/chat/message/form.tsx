@@ -13,7 +13,8 @@ import { useChatStore } from '../../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
-import { SendHorizontal } from 'lucide-react'
+import { LockKeyholeOpen, SendHorizontal } from 'lucide-react'
+import { toggleChatBlock } from '../../../services/chat'
 
 export function Form ({
   replyingMessage,
@@ -31,6 +32,8 @@ export function Form ({
   const [contentMessage, setContentMessage] = useState<string>(
     currentChat?.draft ?? ''
   )
+
+  if (!currentChat) return null
 
   useEffect(() => {
     showEmojiPickerRef.current = showEmojiPicker
@@ -143,59 +146,120 @@ export function Form ({
     }
   }
 
+  const handleUnblockChat = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.stopPropagation()
+
+    replaceChat({
+      ...currentChat,
+      blockedBy: null
+    })
+
+    setCurrentChat({
+      ...currentChat,
+      blockedBy: null
+    })
+
+    const response = await toggleChatBlock(currentChat.uuid, undefined)
+
+    if (response.status !== 200) {
+      replaceChat({ ...currentChat })
+      setCurrentChat(currentChat)
+
+      return console.error(response.statusText)
+    }
+  }
+
   return (
     <form className='p-2 border-t w-full' onSubmit={handleSubmit} ref={formRef}>
-      <ReplyingMessage
-        replyingMessage={replyingMessage}
-        handleReplyMessage={handleReplyMessage}
-      />
-      <aside className='flex items-center space-x-3 text-gray-600'>
-        {showEmojiPicker && (
-          <div id='emoji-mart' className='fixed bottom-20'>
-            <Picker
-              theme='light'
-              data={data}
-              onEmojiSelect={handleEmojiSelect}
+      {!currentChat?.blockedBy && (
+        <>
+          <ReplyingMessage
+            replyingMessage={replyingMessage}
+            handleReplyMessage={handleReplyMessage}
+          />
+          <aside className='flex items-center space-x-3 text-gray-600'>
+            {showEmojiPicker && (
+              <div id='emoji-mart' className='fixed bottom-20'>
+                <Picker
+                  theme='light'
+                  data={data}
+                  onEmojiSelect={handleEmojiSelect}
+                />
+              </div>
+            )}
+            <button
+              name='emoji'
+              className={`hover:scale-125 ease-out duration-100 ${
+                showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
+              }`}
+              onClick={handleEmojiClick}
+            >
+              <Emoji className='w-6 h-6' />
+              <span className='sr-only'>Insert emoji</span>
+            </button>
+            <button
+              className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
+              onClick={event => {
+                event.preventDefault()
+              }}
+            >
+              <AttachFile className='w-6 h-6' />
+              <span className='sr-only'>Attach file</span>
+            </button>
+            <input
+              className='flex h-10 w-full border-input bg-background px-3 mx-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
+              placeholder='Type a message'
+              name='content'
+              autoFocus
+              onChange={handleChange}
+              value={currentChat?.draft ?? ''}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
             />
-          </div>
-        )}
-        <button
-          name='emoji'
-          className={`hover:scale-125 ease-out duration-100 ${
-            showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
-          }`}
-          onClick={handleEmojiClick}
-        >
-          <Emoji className='w-6 h-6' />
-          <span className='sr-only'>Insert emoji</span>
-        </button>
-        <button
-          className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
-          onClick={event => {
-            event.preventDefault()
-          }}
-        >
-          <AttachFile className='w-6 h-6' />
-          <span className='sr-only'>Attach file</span>
-        </button>
-        <input
-          className='flex h-10 w-full border-input bg-background px-3 mx-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
-          placeholder='Type a message'
-          name='content'
-          autoFocus
-          onChange={handleChange}
-          value={currentChat?.draft ?? ''}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          type='submit'
-          className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
-        >
-          <SendHorizontal className='w-6 h-6' />
-          <span className='sr-only'>Send</span>
-        </button>
-      </aside>
+            <button
+              type='submit'
+              className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
+            >
+              <SendHorizontal className='w-6 h-6' />
+              <span className='sr-only'>Send</span>
+            </button>
+          </aside>
+        </>
+      )}
+      {currentChat?.blockedBy && (
+        <div className='flex place-content-center p-3 pt-6'>
+          <h2 className='text-muted-foreground text-center'>
+            {currentChat.blockedBy === loggedUser?.sub ? (
+              <>
+                <span className='block'>
+                  You can't send messages to blocked user
+                  <i className='font-medium not-italic'>
+                    {' '}
+                    {currentChat.user.name}
+                  </i>
+                </span>
+                <button
+                  className='px-3 text-sm py-2 hover:bg-blue-700 w-full text-center max-w-max mt-2 rounded-md bg-blue-600 text-white font-small hover:scale-105 ease-in-out duration-100'
+                  onClick={handleUnblockChat}
+                >
+                  <LockKeyholeOpen className='w-4 h-4 inline me-2' />
+                  Unblock user
+                </button>
+              </>
+            ) : (
+              <span>
+                You can't send messages to
+                <i className='font-medium not-italic'>
+                  {' '}
+                  {currentChat.user.name}
+                </i>
+              </span>
+            )}
+          </h2>
+        </div>
+      )}
     </form>
   )
 }
