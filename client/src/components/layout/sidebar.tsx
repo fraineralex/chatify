@@ -2,12 +2,22 @@ import { useChatMessage } from '../../hooks/useChatMessage'
 import { useSocketStore } from '../../store/socket'
 import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
-import { useFilterChats } from '../../hooks/useFilterChats'
+import { Chat } from '../../types/chat'
 
 export function Sidebar () {
   const { areChatsLoaded } = useChatMessage()
-  const { chatFilterState, setChatFilterState } = useSocketStore()
-  const { filteredChats } = useFilterChats()
+  const { chatFilterState, setChatFilterState, chats } = useSocketStore()
+
+  const filters: {
+    [key: string]: (chat: Chat) => boolean | string | undefined | null
+  } = {
+    all: chat => !chat.isDeleted && !chat.isArchived && !chat.blockedBy,
+    blocked: chat => !chat.isDeleted && chat.blockedBy,
+    archived: chat => !chat.isDeleted && chat.isArchived,
+    muted: chat => !chat.isDeleted && chat.isMuted,
+    unread: chat =>
+      !chat.isDeleted && (chat.unreadMessages > 0 || chat.isUnread)
+  }
 
   let notChatsText =
     chatFilterState === 'all'
@@ -42,7 +52,8 @@ export function Sidebar () {
       </div>
       <nav className='pb-2 px-1 space-y-4 h-[90%]'>
         <ul>
-          {filteredChats
+          {chats
+            .filter(filters[chatFilterState])
             .sort((a, b) => {
               const dateA = a.lastMessage
                 ? new Date(a.lastMessage.createdAt)
@@ -64,7 +75,7 @@ export function Sidebar () {
             .map((chat, index) => (
               <ChatItem key={index} {...chat} />
             ))}
-          {filteredChats.length === 0 && (
+          {chats.length === 0 && (
             <p className='text-center font-medium'>
               {areChatsLoaded ? notChatsText : 'Loading chats...'}
             </p>
