@@ -11,10 +11,9 @@ import { useSocketStore } from '../../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
 import { LockKeyholeOpen, SendHorizontal } from 'lucide-react'
 import { toggleChatBlock } from '../../../services/chat'
+import EmojiPicker from 'emoji-picker-react'
 
 export function Form ({
   replyingMessage,
@@ -44,7 +43,7 @@ export function Form ({
       const target = event.target as HTMLElement
       if (
         showEmojiPickerRef.current &&
-        !target.closest('div[id="emoji-mart"]') &&
+        !target.closest('div[id="emoji-selector"]') &&
         !target.closest('button[name="emoji"]')
       ) {
         setShowEmojiPicker(false)
@@ -181,12 +180,8 @@ export function Form ({
           />
           <aside className='flex items-center space-x-3 text-gray-600'>
             {showEmojiPicker && (
-              <div id='emoji-mart' className='fixed bottom-20'>
-                <Picker
-                  theme='light'
-                  data={data}
-                  onEmojiSelect={handleEmojiSelect}
-                />
+              <div id='emoji-selector' className='fixed bottom-20'>
+                <EmojiPicker onEmojiClick={handleEmojiSelect} />
               </div>
             )}
             <button

@@ -5,7 +5,7 @@ import './chat.css'
 import { useSocketStore } from '../../store/socket'
 import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/currenChat'
-import { ReplyMessage } from '../../types/chat'
+import { ReplyMessage, uuid } from '../../types/chat'
 
 export function Chat () {
   const { messages } = useSocketStore()
@@ -14,6 +14,40 @@ export function Chat () {
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(
     null
   )
+  const [showEmojiPicker, setShowEmojiPicker] = useState<uuid | null>(null)
+  const showEmojiPickerRef = useRef(showEmojiPicker)
+  const [emojiPickerPosition, setEmojiPickerPosition] =
+    useState('absolute -top-12')
+
+  useEffect(() => {
+    showEmojiPickerRef.current = showEmojiPicker
+  }, [showEmojiPicker])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!showEmojiPicker) return
+      const target = event.target as HTMLElement
+      if (
+        showEmojiPickerRef.current &&
+        !target.closest('div[id="emoji-selector"]') &&
+        !target.closest('button[name="emoji"]') &&
+        !target.closest('button[title="Show all Emojis"]')
+      ) {
+        setShowEmojiPicker(prevState => (prevState === null ? prevState : null))
+      }
+
+      if (
+        showEmojiPickerRef.current &&
+        target.closest('button[title="Show all Emojis"]')
+      )
+        setEmojiPickerPosition('fixed top-1/2 transform -translate-y-1/2')
+    }
+
+    window.addEventListener('click', handleClickOutside)
+
+    return () => window.removeEventListener('click', handleClickOutside)
+  }, [showEmojiPicker])
+
   useEffect(() => {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight
@@ -52,6 +86,9 @@ export function Chat () {
                   message={message}
                   setReplyingMessage={setReplyingMessage}
                   messageListRef={messageListRef}
+                  showEmojiPicker={showEmojiPicker}
+                  setShowEmojiPicker={setShowEmojiPicker}
+                  emojiPickerPosition={emojiPickerPosition}
                 />
               ))}
           </ul>
