@@ -6,7 +6,6 @@ import { Chat, ChatItem, MessagesToUpdate } from '../types/chat'
 import { SOCKET_EVENTS } from '../constants'
 import { useNewChatModalStore } from '../store/newChatModal'
 import { createChat } from '../services/chat'
-import { useUserMetadata } from './useUserMetadata'
 import { updateUserMetadata } from '../services/user'
 
 export function useChatItem ({
@@ -15,13 +14,13 @@ export function useChatItem ({
   unreadMessages,
   isNewChat
 }: ChatItem) {
-  const { userMetadata } = useUserMetadata()
   const {
     socket,
     addChat: setChat,
     chats,
     removeChat,
-    replaceChat
+    replaceChat,
+    userMetadata
   } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
