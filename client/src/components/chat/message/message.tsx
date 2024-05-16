@@ -77,11 +77,25 @@ export function Message ({
   }
 
   const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
+    setShowEmojiPicker(null)
     const unicodeSymbols = emojiEvent.unified.split('_')
     const codePoints: Array<number> = []
     unicodeSymbols.forEach(symbol => codePoints.push(parseInt('0x' + symbol)))
     const emojiChar = String.fromCodePoint(...codePoints)
-    console.log(emojiChar)
+    if (
+      message.reactions &&
+      message.reactions[loggedUser?.sub as string] === emojiChar
+    )
+      return
+    const newMessage = {
+      ...message,
+      reactions: {
+        ...message.reactions,
+        [loggedUser?.sub as string]: emojiChar
+      }
+    }
+    replaceMessage(newMessage)
+    socket?.emit(SOCKET_EVENTS.EDIT_MESSAGE, newMessage)
   }
 
   return (
@@ -123,7 +137,7 @@ export function Message ({
               messageListRef={messageListRef}
               isMe={isMe}
             />
-            {!isDeleted && !showEmojiPicker &&(
+            {!isDeleted && !showEmojiPicker && (
               <span className='absolute -top-11 invisible group-hover:visible ease-in-out duration-150 backdrop-blur-3xl border-1 rounded-md p-2 flex items-center space-x-2'>
                 <button
                   name='emoji'

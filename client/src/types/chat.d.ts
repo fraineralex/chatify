@@ -17,6 +17,7 @@ export interface Message {
   isEdited: boolean
   isDeleted: boolean
   replyToId: uuid | null
+  reactions: { [key: string]: string } | null
 }
 
 export interface ReplyMessage {
@@ -41,6 +42,7 @@ export interface ServerMessage {
   is_deleted: boolean
   reply_to_id: uuid | null
   created_at: string
+  reactions: string | null
 }
 
 export type Messages = Message[]

@@ -73,6 +73,7 @@ export function Form ({
       is_read: false,
       reply_to_id: replyingMessage?.uuid || null,
       resource_url: null,
+      reactions: null,
       created_at: new Date().toISOString()
     }
     const newMessage: Message = {
@@ -89,6 +90,7 @@ export function Form ({
       isDelivered: message.is_delivered,
       isRead: message.is_read,
       replyToId: message.reply_to_id,
+      reactions: null,
       resourceUrl: message.resource_url
     }
 

@@ -112,7 +112,8 @@ export const useChatMessage = () => {
             isDelivered: !!message.is_delivered,
             isRead: !!message.is_read,
             replyToId: message.reply_to_id,
-            resourceUrl: message.resource_url
+            resourceUrl: message.resource_url,
+            reactions: message.reactions ? JSON.parse(message.reactions) : null
           }
 
           addMessage(newMessage)
