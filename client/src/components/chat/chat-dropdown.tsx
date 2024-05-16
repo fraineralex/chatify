@@ -16,7 +16,6 @@ import { Dropdown } from '../common/dropdown'
 import { MessagesToUpdate, uuid } from '../../types/chat'
 import { useSocketStore } from '../../store/socket'
 import { useChatStore } from '../../store/currenChat'
-import { useUserMetadata } from '../../hooks/useUserMetadata'
 import React from 'react'
 import { toggleChatBlock } from '../../services/chat'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -24,9 +23,9 @@ import { SOCKET_EVENTS } from '../../constants'
 import { updateUserMetadata } from '../../services/user'
 
 export function ChatDropdown ({ uuid }: { uuid: uuid }) {
-  const { chats, replaceChat, socket } = useSocketStore()
+  const { chats, replaceChat, socket, userMetadata, setUserMetadata } =
+    useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
-  const { userMetadata, setUserMetadata } = useUserMetadata()
   const { user } = useAuth0()
   const chat = chats.find(chat => chat.uuid === uuid)
   if (!chat) return null
