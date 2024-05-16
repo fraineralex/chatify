@@ -29,7 +29,7 @@ export class SocketController {
 
     try {
       await this.client.execute({
-        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :created_at)',
+        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :reactions, :created_at)',
         args: {
           ...message
         }
@@ -96,9 +96,12 @@ export class SocketController {
 
   async editMessage (message: Message) {
     try {
+      const reactions = message.reactions
+        ? JSON.stringify(message.reactions)
+        : null
       const updateResult = await this.client.execute({
-        sql: 'UPDATE messages SET is_edited = TRUE, content = :content WHERE uuid = :uuid;',
-        args: { content: message.content, uuid: message.uuid! }
+        sql: 'UPDATE messages SET is_edited = TRUE, content = :content, reactions = :reactions WHERE uuid = :uuid;',
+        args: { content: message.content, uuid: message.uuid!, reactions }
       })
 
       if (updateResult.rowsAffected === 1) {
@@ -132,7 +135,7 @@ export class SocketController {
 
     try {
       const results = await this.client.execute({
-        sql: `SELECT uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, created_at FROM messages WHERE created_at > :offset AND (sender_id = :loggedUserId OR receiver_id = :loggedUserId) ORDER BY created_at ASC`,
+        sql: `SELECT uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at FROM messages WHERE created_at > :offset AND (sender_id = :loggedUserId OR receiver_id = :loggedUserId) ORDER BY created_at ASC`,
         args: { offset, loggedUserId }
       })
 
@@ -172,7 +175,8 @@ export class SocketController {
           replyToId: message.replyToId,
           resourceUrl: message.resource_url,
           senderId: message.sender_id,
-          type: message.type
+          type: message.type,
+          reactions: message.reactions ? JSON.parse(message.reactions) : null
         }
       }
 

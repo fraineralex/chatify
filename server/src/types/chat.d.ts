@@ -16,6 +16,7 @@ export interface ServerMessage {
   is_deleted: boolean
   replyToId: uuid | null
   created_at: string
+  reactions: string | null
 }
 
 export interface MessagesToUpdate {
@@ -53,6 +54,7 @@ export interface Message {
   isEdited: boolean
   isDeleted: boolean
   replyToId: uuid | null
+  reactions: { [key: string]: string } | null
 }
 
 export interface ServerChat {

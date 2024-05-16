@@ -17,6 +17,7 @@ export async function createTables (client: Client) {
         reply_to_id TEXT,
         type TEXT NOT NULL DEFAULT 'text' CHECK( type IN ('text', 'image', 'audio', 'video', 'file', 'emoji', 'sticker') ),
         resource_url TEXT,
+        reactions TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `)

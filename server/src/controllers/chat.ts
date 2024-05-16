@@ -60,7 +60,10 @@ export class ChatController {
             resourceUrl: resultMessage.rows[0].resource_url as string,
             senderId: resultMessage.rows[0].sender_id as string,
             type: resultMessage.rows[0]
-              .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
+              .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
+            reactions: resultMessage.rows[0].reactions
+              ? JSON.parse(resultMessage.rows[0].reactions as string)
+              : null
           }
 
           const resultUnreadMessages = await this.client.execute({
