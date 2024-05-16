@@ -109,10 +109,12 @@ export interface ChatItem {
   isNewChat?: boolean
   isPinned?: boolean
   isUnread?: boolean
+  cleaned?: Date | null
 }
 
 export type EmojiEvent = {
   unified: string
+  emoji: string
 }
 
 export type ChatFilterState =

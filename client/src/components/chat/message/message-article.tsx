@@ -110,7 +110,9 @@ export function MessageArticle ({
               } py-[1px] px-[5px] rounded-full text-sm`}
             >
               {reaction}
-              {count > 1 && <small className='text-xs font-medium'>{count}</small>}
+              {count > 1 && (
+                <small className='text-xs font-medium'>{count}</small>
+              )}
             </span>
           ))}
       </span>

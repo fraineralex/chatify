@@ -10,7 +10,8 @@ export function ChatItem ({
   unreadMessages,
   isNewChat,
   isPinned,
-  isUnread
+  isUnread,
+  cleaned
 }: Props) {
   const {
     handleOpenChat,
@@ -52,16 +53,18 @@ export function ChatItem ({
             <LastMessageTime createdAt={lastMessage.createdAt} />
           )}
         </div>
-        {!isNewChat && (
-          <LastMessage
-            loggedUser={loggedUser}
-            lastMessage={lastMessage}
-            unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
-            uuid={uuid}
-            isPinned={isPinned}
-            isUnread={isUnread}
-          />
-        )}
+        {!isNewChat &&
+          lastMessage &&
+          lastMessage?.createdAt.getTime() > (cleaned?.getTime() ?? 0) && (
+            <LastMessage
+              loggedUser={loggedUser}
+              lastMessage={lastMessage}
+              unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
+              uuid={uuid}
+              isPinned={isPinned}
+              isUnread={isUnread}
+            />
+          )}
       </article>
     </li>
   )
