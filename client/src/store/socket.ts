@@ -9,6 +9,7 @@ import {
 } from '../types/chat'
 import { Socket } from 'socket.io-client'
 import { db } from '../database/db'
+import { metadata } from '../types/user'
 
 type SocketState = {
   socket: Socket | undefined
@@ -23,16 +24,29 @@ type SocketState = {
   removeChat: (chatUuid: uuid) => void
   chatFilterState: ChatFilterState
   setChatFilterState: (state: ChatFilterState) => void
+  userMetadata: metadata
+  setUserMetadata: (metadata: metadata) => void
 }
 
 const initialMessages = (await db.messages.toArray()) ?? []
 const initialChats = (await db.chats.toArray()) ?? []
+
+const initialUserMetadata: metadata = {
+  chat_preferences: {
+    archived: [],
+    cleaned: {},
+    deleted: [],
+    muted: [],
+    pinned: []
+  }
+}
 
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: undefined,
   messages: initialMessages,
   chats: initialChats,
   chatFilterState: 'all',
+  userMetadata: initialUserMetadata,
 
   setSocket: socket => set({ socket }),
   setServerOffset: (serverOffset: Date) => {
@@ -83,7 +97,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     const chats = get().chats
     const index = chats.findIndex(c => c.uuid === chat.uuid)
     if (index === -1) get().addChat(chat)
-    chats[index] = chat
+    chats.splice(index, 1, chat)
     await db.chats.put(chat)
     set({ chats })
   },
@@ -97,5 +111,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     set({ chats })
   },
 
-  setChatFilterState: state => set({ chatFilterState: state })
+  setChatFilterState: state => set({ chatFilterState: state }),
+  setUserMetadata: metadata => set({ userMetadata: metadata })
 }))
