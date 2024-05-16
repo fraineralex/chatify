@@ -1,52 +1,30 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useEffect, useState } from 'react'
-import { metadata } from '../types/user'
+import { useEffect } from 'react'
+import { useSocketStore } from '../store/socket'
 
-const domain = import.meta.env.VITE_AUTH0_DOMAIN ?? ''
-
-const initialUserMetadata: metadata = {
-  chat_preferences: {
-    archived: [],
-    cleaned: {},
-    deleted: [],
-    muted: [],
-    pinned: []
-  }
-}
+const domain = import.meta.env.VITE_SERVER_DOMAIN ?? ''
 
 export function useUserMetadata () {
-  const { user, getAccessTokenSilently } = useAuth0()
-  const [userMetadata, setUserMetadata] =
-    useState<metadata>(initialUserMetadata)
+  const { user } = useAuth0()
+  const { setUserMetadata } = useSocketStore()
 
   useEffect(() => {
     const getUserMetadata = async () => {
+      console.log('Fetching user metadata')
       try {
-        const accessToken = await getAccessTokenSilently({
-          authorizationParams: {
-            audience: `https://${domain}/api/v2/`,
-            scope: 'read:current_user'
-          }
-        })
+        const response = await fetch(`${domain}/users/metadata/${user?.sub}`)
+        if (response.status !== 200) {
+          console.log('Failed to get user metadata:', response.statusText)
+          return
+        }
 
-        const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user?.sub}`
-
-        const metadataResponse = await fetch(userDetailsByIdUrl, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        })
-
-        const { user_metadata } = await metadataResponse.json()
-
-        setUserMetadata(user_metadata)
+        const userMetadata = await response.json()
+        setUserMetadata(userMetadata)
       } catch (e) {
         console.log(e)
       }
     }
 
     getUserMetadata()
-  }, [getAccessTokenSilently, user?.sub])
-
-  return { userMetadata, setUserMetadata }
+  }, [user?.sub])
 }
