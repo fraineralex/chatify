@@ -11,9 +11,10 @@ import { useSocketStore } from '../../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
-import { LockKeyholeOpen, SendHorizontal } from 'lucide-react'
+import { LockKeyholeOpen, SendHorizontal, Image, FileText } from 'lucide-react'
 import { toggleChatBlock } from '../../../services/chat'
 import EmojiPicker from 'emoji-picker-react'
+import { Dropdown } from '../../common/dropdown'
 
 export function Form ({
   replyingMessage,
@@ -136,7 +137,10 @@ export function Form ({
   ) => {
     event.preventDefault()
     setShowEmojiPicker(!showEmojiPicker)
-    formRef.current?.querySelector('input')?.focus()
+    const input = formRef.current?.querySelector(
+      'input[name="content"]'
+    ) as HTMLInputElement
+    input.focus()
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -196,15 +200,58 @@ export function Form ({
               <Emoji className='w-6 h-6' />
               <span className='sr-only'>Insert emoji</span>
             </button>
-            <button
-              className='hover:scale-125 ease-out duration-100 hover:text-gray-700'
-              onClick={event => {
-                event.preventDefault()
-              }}
+
+            <Dropdown
+              Icon={<AttachFile className='w-6 h-6' />}
+              buttonClassName='hover:scale-125 ease-out duration-100 hover:text-gray-700 align-middle'
+              dropdownClassName='bottom-20'
             >
-              <AttachFile className='w-6 h-6' />
-              <span className='sr-only'>Attach file</span>
-            </button>
+              <ul
+                className='py-2 text-sm text-gray-700 dark:text-gray-200'
+                aria-labelledby='dropdownDefaultButton'
+              >
+                <li>
+                  <button
+                    className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                    onClick={() => {
+                      const input = formRef.current?.querySelector(
+                        'input[name="file-media"]'
+                      ) as HTMLInputElement
+                      input.click()
+                    }}
+                  >
+                    <Image className='w-5 h-5 inline me-2' />
+                    Photos & Videos
+                  </button>
+                  <input
+                    name='file-media'
+                    type='file'
+                    accept='image/*, video/*'
+                    className='hidden'
+                  />
+                </li>
+                <li>
+                  <button
+                    className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                    onClick={() => {
+                      const input = formRef.current?.querySelector(
+                        'input[name="file-document"]'
+                      ) as HTMLInputElement
+                      input.click()
+                    }}
+                  >
+                    <FileText className='w-5 h-5 inline me-2' />
+                    Document
+                  </button>
+                  <input
+                    name='file-document'
+                    type='file'
+                    accept='doccument/*'
+                    className='hidden'
+                  />
+                </li>
+              </ul>
+            </Dropdown>
             <input
               className='flex h-10 w-full border-input bg-background px-3 mx-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-full border-0 flex-1'
               placeholder='Type a message'

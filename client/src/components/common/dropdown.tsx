@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from 'react'
 export function Dropdown ({
   children,
   Icon,
-  buttonClassName
+  buttonClassName,
+  dropdownClassName
 }: {
   children: React.ReactNode
   Icon: React.ReactNode
   buttonClassName?: string
+  dropdownClassName?: string
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -37,10 +39,11 @@ export function Dropdown ({
           setDropdownOpen(!dropdownOpen)
         }}
         className={
-          buttonClassName ??
-          `${
-            dropdownOpen ? 'inline' : 'hidden'
-          } group-hover:inline-block ease-in-out duration-100 hover:scale-125`
+          buttonClassName
+            ? `${buttonClassName} ${dropdownOpen ? 'text-gray-900' : undefined}`
+            : `${
+                dropdownOpen ? 'inline text-gray-900' : 'hidden'
+              } group-hover:inline-block ease-in-out duration-100 hover:scale-125`
         }
       >
         {Icon}
@@ -49,7 +52,7 @@ export function Dropdown ({
       <div
         className={`z-10 ${
           dropdownOpen ? 'absolute' : 'hidden'
-        } bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
+        } bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${dropdownClassName}`}
       >
         {children}
       </div>
