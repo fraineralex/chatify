@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AttachFile, Emoji } from '../../common/svg-icons'
 import {
   EmojiEvent,
@@ -15,6 +15,8 @@ import { LockKeyholeOpen, SendHorizontal, Image, FileText } from 'lucide-react'
 import { toggleChatBlock } from '../../../services/chat'
 import EmojiPicker from 'emoji-picker-react'
 import { Dropdown } from '../../common/dropdown'
+import './form.css'
+import { FilePreview } from './file-preview'
 
 export function Form ({
   replyingMessage,
@@ -32,6 +34,8 @@ export function Form ({
   const [contentMessage, setContentMessage] = useState<string>(
     currentChat?.draft ?? ''
   )
+  const [files, setFiles] = useState<Array<File>>([])
+  const [selectedFile, setSelectedFile] = useState(0)
 
   if (!currentChat) return null
 
@@ -57,6 +61,13 @@ export function Form ({
       window.removeEventListener('click', handleClickOutside)
     }
   }, [])
+
+  useEffect(() => {
+    const input = formRef.current?.querySelector(
+      'input[name="content"]'
+    ) as HTMLInputElement
+    input.focus()
+  }, [replyingMessage])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -176,6 +187,31 @@ export function Form ({
     }
   }
 
+  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const uploadedFiles = Array.from(event.target.files)
+      const newFiles = files ? files.concat(uploadedFiles) : uploadedFiles
+      if (newFiles.length >= 10)
+        return alert('You can only send 10 files at once')
+      const maximumSize = 50 * 1024 * 1024 // 50MB
+      const totalSize = newFiles.reduce((acc, file) => acc + file.size, 0)
+      if (totalSize > maximumSize) {
+        alert('The total size of the files exceeds the limit of 20MB')
+        return
+      }
+      setFiles(newFiles)
+      const dropdownButton = formRef.current?.querySelector(
+        'button[name="options"]'
+      ) as HTMLButtonElement
+      dropdownButton.click()
+
+      const input = formRef.current?.querySelector(
+        'input[name="content"]'
+      ) as HTMLInputElement
+      input.focus()
+    }
+  }
+
   return (
     <form className='p-2 border-t w-full' onSubmit={handleSubmit} ref={formRef}>
       {!currentChat?.blockedBy && (
@@ -183,6 +219,12 @@ export function Form ({
           <ReplyingMessage
             replyingMessage={replyingMessage}
             handleReplyMessage={handleReplyMessage}
+          />
+          <FilePreview
+            files={files}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            setFiles={setFiles}
           />
           <aside className='flex items-center space-x-3 text-gray-600'>
             {showEmojiPicker && (
@@ -227,7 +269,9 @@ export function Form ({
                     name='file-media'
                     type='file'
                     accept='image/*, video/*'
+                    multiple
                     className='hidden'
+                    onChange={handleFileInputChange}
                   />
                 </li>
                 <li>
@@ -248,6 +292,7 @@ export function Form ({
                     type='file'
                     accept='doccument/*'
                     className='hidden'
+                    onChange={handleFileInputChange}
                   />
                 </li>
               </ul>
