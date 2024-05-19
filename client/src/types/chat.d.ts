@@ -28,6 +28,11 @@ export interface ReplyMessage {
   user: User
 }
 
+interface ResourceData {
+  file: string
+  filename: string
+  fileType: string
+}
 export interface ServerMessage {
   uuid: uuid
   content: string
@@ -35,7 +40,7 @@ export interface ServerMessage {
   receiver_id: string
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resource_url: string | null
+  resource_url: string | null | ResourceData
   is_delivered: boolean
   is_read: boolean
   is_edited: boolean
@@ -124,3 +129,8 @@ export type ChatFilterState =
   | 'muted'
   | 'unread'
   | 'search'
+
+export interface FileMessage {
+  file: File
+  caption: string
+}

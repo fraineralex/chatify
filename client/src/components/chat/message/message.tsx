@@ -77,7 +77,6 @@ export function Message ({
   }
 
   const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
-    console.log(emojiEvent.unified)
     setShowEmojiPicker(null)
     const unicodeSymbols = emojiEvent.unified.split('_')
     const codePoints: Array<number> = []

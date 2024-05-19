@@ -61,9 +61,6 @@ export const useChatMessage = () => {
         if (!loadedChats) return
 
         loadedChats.forEach(chat => {
-          chat.uuid === '9bb26d78-c775-4b52-a613-db9a8785ee0c'
-            ? console.log(userMetadata?.chat_preferences.cleaned[chat.uuid])
-            : undefined
           if (chat.lastMessage) {
             chat.lastMessage = {
               ...chat.lastMessage,

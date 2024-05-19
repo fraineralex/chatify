@@ -4,7 +4,9 @@ import {
   EmojiEvent,
   Message,
   ReplyMessage,
-  ServerMessage
+  ServerMessage,
+  FileMessage,
+  ResourceData
 } from '../../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../../constants'
 import { useSocketStore } from '../../../store/socket'
@@ -17,6 +19,7 @@ import EmojiPicker from 'emoji-picker-react'
 import { Dropdown } from '../../common/dropdown'
 import './form.css'
 import { FilePreview } from './file-preview'
+import { readFileAsBase64 } from '../../../utils/chat'
 
 export function Form ({
   replyingMessage,
@@ -34,8 +37,8 @@ export function Form ({
   const [contentMessage, setContentMessage] = useState<string>(
     currentChat?.draft ?? ''
   )
-  const [files, setFiles] = useState<Array<File>>([])
-  const [selectedFile, setSelectedFile] = useState(0)
+  const [fileMessages, setFileMessages] = useState<Array<FileMessage>>([])
+  const [selectedFileIndex, setSelectedFileIndex] = useState(0)
 
   if (!currentChat) return null
 
@@ -69,59 +72,109 @@ export function Form ({
     input.focus()
   }, [replyingMessage])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!contentMessage || !currentChat) return
-    const message: ServerMessage = {
-      uuid: crypto.randomUUID(),
-      content: currentChat.draft || '',
-      sender_id: loggedUser?.sub || '',
-      receiver_id: currentChat.user.id,
-      chat_id: currentChat.uuid,
-      type: MESSAGES_TYPES.TEXT,
-      is_deleted: false,
-      is_edited: false,
-      is_delivered: false,
-      is_read: false,
-      reply_to_id: replyingMessage?.uuid || null,
-      resource_url: null,
-      reactions: null,
-      created_at: new Date().toISOString()
-    }
-    const newMessage: Message = {
-      uuid: message.uuid,
-      content: message.content,
-      createdAt: new Date(),
-      senderId: message.sender_id,
-      receiverId: message.receiver_id,
-      chatId: message.chat_id,
-      type: message.type,
-      isDeleted: message.is_deleted,
-      isEdited: message.is_edited,
-      isSent: false,
-      isDelivered: message.is_delivered,
-      isRead: message.is_read,
-      replyToId: message.reply_to_id,
-      reactions: null,
-      resourceUrl: message.resource_url
+    if (fileMessages.length > 0) {
+      for (const fileMsg of fileMessages) {
+        const base64File = await readFileAsBase64(fileMsg.file)
+        const resourceData: ResourceData = {
+          file: base64File,
+          filename: fileMsg.file.name,
+          fileType: fileMsg.file.type
+        }
+
+        const message = {
+          uuid: crypto.randomUUID(),
+          content: fileMsg.caption ?? '',
+          sender_id: loggedUser?.sub || '',
+          receiver_id: currentChat.user.id,
+          chat_id: currentChat.uuid,
+          type: fileMsg.file.type.startsWith('image')
+            ? MESSAGES_TYPES.IMAGE
+            : fileMsg.file.type.startsWith('video')
+            ? MESSAGES_TYPES.VIDEO
+            : fileMsg.file.type.startsWith('application') ||
+              fileMsg.file.type.startsWith('text')
+            ? MESSAGES_TYPES.DOCUMENT
+            : MESSAGES_TYPES.UNKNOWN,
+          is_deleted: false,
+          is_edited: false,
+          is_delivered: false,
+          is_read: false,
+          reply_to_id: replyingMessage?.uuid || null,
+          resource_url: resourceData,
+          reactions: null,
+          created_at: new Date().toISOString()
+        }
+
+        socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+      }
+
+      setFileMessages([])
+      setSelectedFileIndex(0)
+    } else {
+      const message: ServerMessage = {
+        uuid: crypto.randomUUID(),
+        content: currentChat.draft || '',
+        sender_id: loggedUser?.sub || '',
+        receiver_id: currentChat.user.id,
+        chat_id: currentChat.uuid,
+        type: MESSAGES_TYPES.TEXT,
+        is_deleted: false,
+        is_edited: false,
+        is_delivered: false,
+        is_read: false,
+        reply_to_id: replyingMessage?.uuid || null,
+        resource_url: null,
+        reactions: null,
+        created_at: new Date().toISOString()
+      }
+      const newMessage: Message = {
+        uuid: message.uuid,
+        content: message.content,
+        createdAt: new Date(),
+        senderId: message.sender_id,
+        receiverId: message.receiver_id,
+        chatId: message.chat_id,
+        type: message.type,
+        isDeleted: message.is_deleted,
+        isEdited: message.is_edited,
+        isSent: false,
+        isDelivered: message.is_delivered,
+        isRead: message.is_read,
+        replyToId: message.reply_to_id,
+        reactions: null,
+        resourceUrl: message.resource_url as string
+      }
+
+      addMessage(newMessage)
+      const chatUpdated = { ...currentChat, lastMessage: newMessage, draft: '' }
+      replaceChat(chatUpdated)
+      setCurrentChat(chatUpdated)
+
+      socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     }
 
-    addMessage(newMessage)
-    const chatUpdated = { ...currentChat, lastMessage: newMessage, draft: '' }
-    replaceChat(chatUpdated)
-    setCurrentChat(chatUpdated)
-
-    socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     setContentMessage('')
-
     if (replyingMessage) handleReplyMessage(null)
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContentMessage(event.target.value)
     if (!currentChat) return
-    setCurrentChat({ ...currentChat, draft: event.target.value })
-    replaceChat({ ...currentChat, draft: event.target.value })
+    if (fileMessages.length > 0) {
+      const updatedFileMessage = fileMessages[selectedFileIndex ?? 0]
+      updatedFileMessage.caption = event.target.value
+      setFileMessages(
+        fileMessages.map((fileMsg, index) =>
+          index === selectedFileIndex ?? 0 ? updatedFileMessage : fileMsg
+        )
+      )
+    } else {
+      setCurrentChat({ ...currentChat, draft: event.target.value })
+      replaceChat({ ...currentChat, draft: event.target.value })
+    }
   }
 
   const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
@@ -189,17 +242,27 @@ export function Form ({
 
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      const uploadedFiles = Array.from(event.target.files)
-      const newFiles = files ? files.concat(uploadedFiles) : uploadedFiles
+      const uploadedFiles: Array<FileMessage> = Array.from(
+        event.target.files
+      ).map(file => ({
+        file: file,
+        caption: ''
+      }))
+      const newFiles = fileMessages
+        ? fileMessages.concat(uploadedFiles)
+        : uploadedFiles
       if (newFiles.length >= 10)
         return alert('You can only send 10 files at once')
       const maximumSize = 50 * 1024 * 1024 // 50MB
-      const totalSize = newFiles.reduce((acc, file) => acc + file.size, 0)
+      const totalSize = newFiles.reduce(
+        (acc, fileMsg) => acc + fileMsg.file.size,
+        0
+      )
       if (totalSize > maximumSize) {
         alert('The total size of the files exceeds the limit of 20MB')
         return
       }
-      setFiles(newFiles)
+      setFileMessages(newFiles)
       const dropdownButton = formRef.current?.querySelector(
         'button[name="options"]'
       ) as HTMLButtonElement
@@ -221,10 +284,11 @@ export function Form ({
             handleReplyMessage={handleReplyMessage}
           />
           <FilePreview
-            files={files}
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-            setFiles={setFiles}
+            fileMessages={fileMessages}
+            selectedFileIndex={selectedFileIndex}
+            setSelectedFileIndex={setSelectedFileIndex}
+            setFileMessages={setFileMessages}
+            formRef={formRef}
           />
           <aside className='flex items-center space-x-3 text-gray-600'>
             {showEmojiPicker && (
@@ -255,7 +319,8 @@ export function Form ({
                 <li>
                   <button
                     className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
-                    onClick={() => {
+                    onClick={event => {
+                      event.preventDefault()
                       const input = formRef.current?.querySelector(
                         'input[name="file-media"]'
                       ) as HTMLInputElement
@@ -277,7 +342,8 @@ export function Form ({
                 <li>
                   <button
                     className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
-                    onClick={() => {
+                    onClick={event => {
+                      event.preventDefault()
                       const input = formRef.current?.querySelector(
                         'input[name="file-document"]'
                       ) as HTMLInputElement
@@ -303,7 +369,11 @@ export function Form ({
               name='content'
               autoFocus
               onChange={handleChange}
-              value={currentChat?.draft ?? ''}
+              value={
+                fileMessages.length > 0
+                  ? fileMessages[selectedFileIndex ?? 0]?.caption ?? ''
+                  : currentChat?.draft ?? ''
+              }
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
             />

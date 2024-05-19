@@ -1,38 +1,47 @@
 import { CircleX, FileQuestion, FileText } from 'lucide-react'
+import { FileMessage } from '../../../types/chat'
 
 interface Props {
-  files: File[]
-  setSelectedFile: React.Dispatch<React.SetStateAction<number>>
-  selectedFile: number
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>
+  fileMessages: Array<FileMessage>
+  setSelectedFileIndex: React.Dispatch<React.SetStateAction<number>>
+  selectedFileIndex: number
+  setFileMessages: React.Dispatch<React.SetStateAction<Array<FileMessage>>>
+  formRef: React.RefObject<HTMLFormElement>
 }
 
 export function FilePreview ({
-  files,
-  setSelectedFile,
-  selectedFile,
-  setFiles
+  fileMessages,
+  setSelectedFileIndex,
+  selectedFileIndex,
+  setFileMessages,
+  formRef
 }: Props) {
   const handleRemoveFile =
     (index: number) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      event.stopPropagation()
-      setFiles(files.filter((_, i) => i !== index))
-      if (selectedFile !== 0) setSelectedFile(selectedFile - 1)
+      event.preventDefault()
+      setFileMessages(fileMessages.filter((_, i) => i !== index))
+      if (selectedFileIndex !== 0) setSelectedFileIndex(selectedFileIndex - 1)
     }
 
   const handleSelectFile =
     (index: number) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
-      setSelectedFile(index)
+      setSelectedFileIndex(index)
+      const contentInput = formRef.current?.querySelector(
+        'input[name="content"]'
+      ) as HTMLInputElement
+      contentInput.focus()
     }
 
   return (
     <div className='flex mb-3 overflow-x-auto max-w-full space-x-2 form-slider py-2 text-gray-700 place-content-center'>
-      {files?.map((file, index) =>
-        file.type.startsWith('image') ? (
+      {fileMessages?.map((fileMsg, index) =>
+        fileMsg.file.type.startsWith('image') ? (
           <figure
             className={`self-center relative rounded-md cursor-pointer border-[3px] flex-shrink-0 ${
-              selectedFile === index ? 'border-blue-500' : 'border-transparent'
+              selectedFileIndex === index
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
             onClick={handleSelectFile(index)}
             key={index}
@@ -45,15 +54,17 @@ export function FilePreview ({
             </button>
             <img
               key={index}
-              src={URL.createObjectURL(file)}
+              src={URL.createObjectURL(fileMsg.file)}
               alt='preview of the image'
               className='h-80 w-auto rounded-sm'
             />
           </figure>
-        ) : file.type.startsWith('video') ? (
+        ) : fileMsg.file.type.startsWith('video') ? (
           <figure
             className={`self-center relative rounded-md cursor-pointer border-[3px] flex-shrink-0 ${
-              selectedFile === index ? 'border-blue-500' : 'border-transparent'
+              selectedFileIndex === index
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
             onClick={handleSelectFile(index)}
             key={index}
@@ -66,18 +77,20 @@ export function FilePreview ({
             </button>
             <video
               key={index}
-              src={URL.createObjectURL(file)}
+              src={URL.createObjectURL(fileMsg.file)}
               controls
               className='h-80 w-auto rounded-sm'
             />
           </figure>
-        ) : file.type.startsWith('application') ||
-          file.type.startsWith('text') ? (
+        ) : fileMsg.file.type.startsWith('application') ||
+          fileMsg.file.type.startsWith('text') ? (
           <figure
             className={`flex-shrink-0 self-center text-center relative mx-2 max-w-72 rounded-md cursor-pointer border-[3px] ${
-              selectedFile === index ? 'border-blue-500' : 'border-transparent'
+              selectedFileIndex === index
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
-            onClick={() => setSelectedFile(index)}
+            onClick={() => setSelectedFileIndex(index)}
             key={index}
           >
             <button
@@ -88,16 +101,18 @@ export function FilePreview ({
             </button>
             <FileText className='h-64 w-64 text-gray-600' strokeWidth={1.1} />
             <h3 className='font-semibold text-base text-gray-500 -mt-2 px-2'>
-              {file.name}
+              {fileMsg.file.name}
             </h3>
             <p className='text-gray-400 font-medium text-sm'>
-              {(file.size / 1024).toFixed(1)} KB
+              {(fileMsg.file.size / 1024).toFixed(1)} KB
             </p>
           </figure>
         ) : (
           <figure
             className={`flex-shrink-0 self-center text-center relative mx-2 max-w-72 rounded-md cursor-pointer border-[3px] ${
-              selectedFile === index ? 'border-blue-500' : 'border-transparent'
+              selectedFileIndex === index
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
             onClick={handleSelectFile(index)}
             key={index}
@@ -113,10 +128,10 @@ export function FilePreview ({
               strokeWidth={1.1}
             />
             <h3 className='font-semibold text-base text-gray-500 -mt-2 px-2'>
-              {file.name}
+              {fileMsg.file.name}
             </h3>
             <p className='text-gray-400 font-medium text-sm'>
-              {(file.size / 1024).toFixed(1)} KB
+              {(fileMsg.file.size / 1024).toFixed(1)} KB
             </p>
           </figure>
         )

@@ -36,7 +36,6 @@ export function useChatItem ({
   const handleOpenChat = async () => {
     if (isCurrentChat || !socket || !userMetadata) return
     const newCurrentChat = chats.find(chat => chat.user.id === user.id)
-    console.log(newCurrentChat)
     if (!newCurrentChat) return
 
     if (newCurrentChat.isDeleted) {

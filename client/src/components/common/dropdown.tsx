@@ -37,6 +37,7 @@ export function Dropdown ({
         aria-label='Options'
         onClick={event => {
           event.stopPropagation()
+          event.preventDefault()
           setDropdownOpen(!dropdownOpen)
         }}
         className={

@@ -9,15 +9,15 @@ export const SOCKET_EVENTS = {
   UPDATE_MESSAGE: 'update_message',
   CHANGE_CHAT: 'change_chat',
   RECOVER_MESSAGES: 'recover_messages',
-  DELIVERED_MESSAGE: 'delivered_message',
+  DELIVERED_MESSAGE: 'delivered_message'
 } as const
 
 export const MESSAGES_TYPES = {
   TEXT: 'text',
   IMAGE: 'image',
   VIDEO: 'video',
+  DOCUMENT: 'document',
   AUDIO: 'audio',
-  FILE: 'file',
-  EMOJI: 'emoji',
-  STICKER: 'sticker'
+  STICKER: 'sticker',
+  UNKNOWN: 'unknown'
 } as const
