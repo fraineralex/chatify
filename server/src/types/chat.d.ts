@@ -3,7 +3,7 @@ import { MESSAGES_TYPES } from '../constants/index.ts'
 type uuid = `${string}-${string}-${string}-${string}-${string}`
 
 interface ResourceData {
-  file: string
+  file: string | Buffer
   filename: string
   fileType: string
 }

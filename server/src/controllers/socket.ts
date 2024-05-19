@@ -1,5 +1,4 @@
 import { Server, Socket } from 'socket.io'
-import sharp from 'sharp'
 import {
   ChangeChat,
   Message,
@@ -10,6 +9,8 @@ import {
 } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../constants/index.js'
+import { deleteObject, getObjectSignedUrl, uploadFile } from '../utils/s3.js'
+import { generateRandomFileName, optimizeImage } from '../utils/chat.js'
 
 export class SocketController {
   private client: Client
@@ -25,23 +26,25 @@ export class SocketController {
   }
 
   async newMessage (message: ServerMessage): Promise<void> {
-    console.log(message)
+    let filename = null
+    let signedFileUrl = null
     if (message.type !== MESSAGES_TYPES.TEXT) {
-      const file = message.resource_url as ResourceData
-      const fileBuffer = await sharp(Buffer.from(file.file, 'base64'))
-        .resize({
-          height: 1920,
-          width: 1080,
-          fit: 'inside'
-        })
-        .webp({ quality: 80 })
-        .toBuffer()
-      console.log(fileBuffer)
-    }
-    const resourceUrl = null
-    const createdMessage: ServerMessage = {
-      ...message,
-      resource_url: resourceUrl
+      let file = message.resource_url as ResourceData
+      try {
+        if (file.fileType.startsWith('image')) {
+          file = await optimizeImage(file)
+        } else {
+          file.file = Buffer.from(file.file as string, 'base64')
+        }
+
+        file.filename = generateRandomFileName(file)
+        await uploadFile(file)
+        filename = file.filename
+        signedFileUrl = (await getObjectSignedUrl(file.filename)) ?? null
+      } catch (error) {
+        console.error(error)
+        return
+      }
     }
 
     try {
@@ -49,9 +52,14 @@ export class SocketController {
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :reactions, :created_at)',
         args: {
           ...message,
-          resource_url: resourceUrl
+          resource_url: filename
         }
       })
+
+      const createdMessage: ServerMessage = {
+        ...message,
+        resource_url: signedFileUrl
+      }
 
       this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
     } catch (error) {
@@ -133,12 +141,20 @@ export class SocketController {
 
   async deleteMessage (message: Message) {
     try {
+      const selectResult = await this.client.execute({
+        sql: 'SELECT * FROM messages WHERE uuid = :uuid AND is_deleted = FALSE LIMIT 1;',
+        args: { uuid: message.uuid! }
+      })
+
+      if (selectResult.rows.length === 0) return
+
       const updateResult = await this.client.execute({
         sql: 'UPDATE messages SET is_deleted = TRUE WHERE uuid = :uuid;',
         args: { uuid: message.uuid! }
       })
 
       if (updateResult.rowsAffected === 1) {
+        await deleteObject(selectResult.rows[0].resource_url as string)
         this.io.emit(SOCKET_EVENTS.UPDATE_MESSAGE, message)
       }
     } catch (error) {
@@ -157,9 +173,10 @@ export class SocketController {
         args: { offset, loggedUserId }
       })
 
-      results.rows.forEach(row => {
+      results.rows.forEach(async row => {
         const message = {
-          ...row
+          ...row,
+          resource_url: await getObjectSignedUrl(row.resource_url as string)
         }
         socket.emit(SOCKET_EVENTS.CHAT_MESSAGE, message)
       })
