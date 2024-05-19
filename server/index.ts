@@ -25,6 +25,7 @@ const app = express()
 const server = createServer(app)
 const io = new Server(server, {
   cors: { origin: clientDomain },
+  maxHttpBufferSize: 2e8,
   connectionStateRecovery: {
     maxDisconnectionDuration: 2 * 60 * 1000,
     skipMiddlewares: true

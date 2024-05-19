@@ -16,8 +16,8 @@ export const MESSAGES_TYPES = {
   TEXT: 'text',
   IMAGE: 'image',
   VIDEO: 'video',
+  DOCUMENT: 'document',
   AUDIO: 'audio',
-  FILE: 'file',
-  EMOJI: 'emoji',
-  STICKER: 'sticker'
+  STICKER: 'sticker',
+  UNKNOWN: 'unknown'
 } as const

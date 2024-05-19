@@ -33,6 +33,7 @@ interface ResourceData {
   filename: string
   fileType: string
 }
+
 export interface ServerMessage {
   uuid: uuid
   content: string

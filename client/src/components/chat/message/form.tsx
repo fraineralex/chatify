@@ -84,7 +84,7 @@ export function Form ({
           fileType: fileMsg.file.type
         }
 
-        const message = {
+        const message: ServerMessage = {
           uuid: crypto.randomUUID(),
           content: fileMsg.caption ?? '',
           sender_id: loggedUser?.sub || '',
@@ -109,6 +109,7 @@ export function Form ({
         }
 
         socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+        console.log('message submited', message)
       }
 
       setFileMessages([])

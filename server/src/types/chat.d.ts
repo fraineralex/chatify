@@ -2,6 +2,12 @@ import { MESSAGES_TYPES } from '../constants/index.ts'
 
 type uuid = `${string}-${string}-${string}-${string}-${string}`
 
+interface ResourceData {
+  file: string
+  filename: string
+  fileType: string
+}
+
 export interface ServerMessage {
   uuid: uuid
   content: string
@@ -9,12 +15,12 @@ export interface ServerMessage {
   receiver_id: string
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resource_url: string | null
+  resource_url: string | null | ResourceData
   is_delivered: boolean
   is_read: boolean
   is_edited: boolean
   is_deleted: boolean
-  replyToId: uuid | null
+  reply_to_id: uuid | null
   created_at: string
   reactions: string | null
 }

@@ -1,13 +1,15 @@
 import { Server, Socket } from 'socket.io'
+import sharp from 'sharp'
 import {
   ChangeChat,
   Message,
   MessagesToUpdate,
+  ResourceData,
   ServerMessage,
   uuid
 } from '../types/chat.js'
 import { Client } from '@libsql/client'
-import { SOCKET_EVENTS } from '../constants/index.js'
+import { MESSAGES_TYPES, SOCKET_EVENTS } from '../constants/index.js'
 
 export class SocketController {
   private client: Client
@@ -23,15 +25,31 @@ export class SocketController {
   }
 
   async newMessage (message: ServerMessage): Promise<void> {
+    console.log(message)
+    if (message.type !== MESSAGES_TYPES.TEXT) {
+      const file = message.resource_url as ResourceData
+      const fileBuffer = await sharp(Buffer.from(file.file, 'base64'))
+        .resize({
+          height: 1920,
+          width: 1080,
+          fit: 'inside'
+        })
+        .webp({ quality: 80 })
+        .toBuffer()
+      console.log(fileBuffer)
+    }
+    const resourceUrl = null
     const createdMessage: ServerMessage = {
-      ...message
+      ...message,
+      resource_url: resourceUrl
     }
 
     try {
       await this.client.execute({
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :reactions, :created_at)',
         args: {
-          ...message
+          ...message,
+          resource_url: resourceUrl
         }
       })
 
@@ -172,8 +190,8 @@ export class SocketController {
           isDelivered: message.is_delivered,
           isRead: message.is_read,
           receiverId: message.receiver_id,
-          replyToId: message.replyToId,
-          resourceUrl: message.resource_url,
+          replyToId: message.reply_to_id,
+          resourceUrl: message.resource_url as string,
           senderId: message.sender_id,
           type: message.type,
           reactions: message.reactions ? JSON.parse(message.reactions) : null
