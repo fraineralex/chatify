@@ -10,7 +10,7 @@ export interface Message {
   receiverId: string
   chatId: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resourceUrl: string | null
+  file: StaticFile | null
   isSent: boolean
   isDelivered: boolean
   isRead: boolean
@@ -34,6 +34,11 @@ interface ResourceData {
   fileType: string
 }
 
+interface StaticFile {
+  url: string
+  expiresAt: string
+}
+
 export interface ServerMessage {
   uuid: uuid
   content: string
@@ -41,7 +46,7 @@ export interface ServerMessage {
   receiver_id: string
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resource_url: string | null | ResourceData
+  file: StaticFile | null
   is_delivered: boolean
   is_read: boolean
   is_edited: boolean

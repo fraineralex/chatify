@@ -35,7 +35,14 @@ export function Message ({
 }: Props) {
   const { user: loggedUser } = useAuth0()
   if (!loggedUser) return null
-  const { uuid, content, senderId, resourceUrl, type, isDeleted } = message
+  const {
+    uuid,
+    content,
+    senderId,
+    file: resourceUrl,
+    type,
+    isDeleted
+  } = message
   const { chats, replaceMessage, socket } = useSocketStore()
   const isMe = senderId === loggedUser?.sub
   const user = isMe

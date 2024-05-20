@@ -76,8 +76,8 @@ export function Chat () {
               .filter(
                 message =>
                   message.chatId === currentChat?.uuid &&
-                  message.createdAt.getTime() >
-                    (currentChat.cleaned?.getTime() ?? 0)
+                  new Date(message.createdAt).getTime() >
+                    (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
               )
               .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
               .map((message, index) => (

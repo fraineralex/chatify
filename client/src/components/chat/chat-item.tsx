@@ -55,7 +55,8 @@ export function ChatItem ({
         </div>
         {!isNewChat &&
           lastMessage &&
-          lastMessage?.createdAt.getTime() > (cleaned?.getTime() ?? 0) && (
+          new Date(lastMessage?.createdAt).getTime() >
+            new Date(cleaned ?? 0)?.getTime() && (
             <LastMessage
               loggedUser={loggedUser}
               lastMessage={lastMessage}

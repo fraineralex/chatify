@@ -5,11 +5,11 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useSocketStore } from '../store/socket'
 import { SOCKET_EVENTS } from '../constants'
 import {
-  Chat,
   Chats,
   Message,
   MessagesToUpdate,
   ServerMessage,
+  StaticFile,
   uuid
 } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
@@ -23,7 +23,7 @@ const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
 
 export const useChatMessage = () => {
-  const { getCurrentChat, setCurrentChat } = useChatStore()
+  const { getCurrentChat, setCurrentChat, currentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
 
   const {
@@ -54,38 +54,15 @@ export const useChatMessage = () => {
       })
 
       setSocket(newSocket)
-      let loadedChats: Chats | undefined = chats
+      const loadedChats: Chats | undefined = chats
+      const allChats = (await getAllChats(loggedUser?.sub)) ?? []
 
-      if (loadedChats.length === 0) {
-        loadedChats = await getAllChats(loggedUser?.sub)
-        if (!loadedChats) return
-
-        loadedChats.forEach(chat => {
-          if (chat.lastMessage) {
-            chat.lastMessage = {
-              ...chat.lastMessage,
-              createdAt: new Date(chat.lastMessage.createdAt)
-            }
-          }
-
-          addChat({
-            ...chat,
-            createdAt: new Date(chat.createdAt),
-            isArchived: userMetadata?.chat_preferences.archived?.includes(
-              chat.uuid
-            ),
-            isDeleted: userMetadata?.chat_preferences.deleted?.includes(
-              chat.uuid
-            ),
-            isMuted: userMetadata?.chat_preferences.muted?.includes(chat.uuid),
-            isPinned: userMetadata?.chat_preferences.pinned?.includes(
-              chat.uuid
-            ),
-            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
-              ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ?? 0
-              : null
-          })
-        })
+      if (allChats.length > 0 && loadedChats.length !== allChats?.length) {
+        for (const chat of allChats) {
+          if (!loadedChats.find(c => c.uuid === chat.uuid))
+            loadedChats.push(chat)
+          addChat(chat)
+        }
       }
 
       setAreChatsLoaded(true)
@@ -109,7 +86,7 @@ export const useChatMessage = () => {
             isDelivered: !!message.is_delivered,
             isRead: !!message.is_read,
             replyToId: message.reply_to_id,
-            resourceUrl: message.resource_url,
+            file: message.file as StaticFile,
             reactions: message.reactions ? JSON.parse(message.reactions) : null
           }
 
@@ -117,39 +94,13 @@ export const useChatMessage = () => {
           setServerOffset(new Date(message.created_at))
 
           let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
+          let isChatFromApi = false
           if (!chat) {
             chat = await getChatById(newMessage.chatId, loggedUser?.sub)
             if (!chat) return
-            chat = {
-              ...chat,
-              isArchived: userMetadata?.chat_preferences.archived?.includes(
-                chat.uuid
-              ),
-              isDeleted: userMetadata?.chat_preferences.deleted?.includes(
-                chat.uuid
-              ),
-              isMuted: userMetadata?.chat_preferences.muted?.includes(
-                chat.uuid
-              ),
-              isPinned: userMetadata?.chat_preferences.pinned?.includes(
-                chat.uuid
-              ),
-              cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
-                ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ??
-                  0
-                : null
-            }
+            isChatFromApi = true
             addChat(chat)
           }
-
-          const lastMessage =
-            chat.lastMessage &&
-            chat.lastMessage.createdAt.getTime() >
-              newMessage.createdAt.getTime()
-              ? chat.lastMessage
-              : newMessage
-
-          chat.lastMessage = lastMessage
 
           let unreadMessages = 0
           if (loggedUser?.sub === newMessage?.receiverId) {
@@ -171,29 +122,22 @@ export const useChatMessage = () => {
             }
           }
 
-          const newChat: Chat = {
-            uuid: chat.uuid,
-            lastMessage,
-            user: chat.user,
-            createdAt: chat.createdAt,
-            unreadMessages,
-            isArchived: userMetadata?.chat_preferences.archived?.includes(
-              chat.uuid
-            ),
-            isDeleted: userMetadata?.chat_preferences.deleted?.includes(
-              chat.uuid
-            ),
-            isMuted: userMetadata?.chat_preferences.muted?.includes(chat.uuid),
-            isPinned: userMetadata?.chat_preferences.pinned?.includes(
-              chat.uuid
-            ),
-            cleaned: userMetadata?.chat_preferences.cleaned[chat.uuid]
-              ? new Date(userMetadata?.chat_preferences.cleaned[chat.uuid]) ?? 0
-              : null
-          }
+          if (!isChatFromApi || chat.unreadMessages !== unreadMessages) {
+            const lastMessage =
+              chat.lastMessage &&
+              chat.lastMessage.createdAt.getTime() >
+                newMessage.createdAt.getTime()
+                ? chat.lastMessage
+                : newMessage
 
-          replaceChat(newChat)
-          if (newChat.uuid === getCurrentChat()?.uuid) setCurrentChat(newChat)
+            const newChat = {
+              ...chat,
+              unreadMessages: unreadMessages,
+              lastMessage: lastMessage
+            }
+            replaceChat(newChat)
+            if (newChat.uuid === getCurrentChat()?.uuid) setCurrentChat(newChat)
+          }
         }
       )
 
@@ -271,6 +215,17 @@ export const useChatMessage = () => {
       }
     })()
   }, [loggedUser, userMetadata])
+
+  useEffect(() => {
+    const isFileExpired = (msg: Message) =>
+      msg.file && new Date(msg.file?.expiresAt).getTime() > new Date().getTime()
+
+    if (messages.some(msg => !isFileExpired(msg))) {
+      const expiredFileMsgs = messages.find(msg => isFileExpired(msg))
+      console.log(expiredFileMsgs)
+
+    }
+  }, [currentChat])
 
   return { areChatsLoaded }
 }

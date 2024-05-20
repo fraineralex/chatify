@@ -6,7 +6,8 @@ import {
   ReplyMessage,
   ServerMessage,
   FileMessage,
-  ResourceData
+  ResourceData,
+  StaticFile
 } from '../../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../../constants'
 import { useSocketStore } from '../../../store/socket'
@@ -78,7 +79,7 @@ export function Form ({
     if (fileMessages.length > 0) {
       for (const fileMsg of fileMessages) {
         const base64File = await readFileAsBase64(fileMsg.file)
-        const resourceData: ResourceData = {
+        const fileData: ResourceData = {
           file: base64File,
           filename: fileMsg.file.name,
           fileType: fileMsg.file.type
@@ -103,13 +104,12 @@ export function Form ({
           is_delivered: false,
           is_read: false,
           reply_to_id: replyingMessage?.uuid || null,
-          resource_url: resourceData,
+          file: null,
           reactions: null,
           created_at: new Date().toISOString()
         }
 
-        socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
-        console.log('message submited', message)
+        socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message, fileData)
       }
 
       setFileMessages([])
@@ -127,7 +127,7 @@ export function Form ({
         is_delivered: false,
         is_read: false,
         reply_to_id: replyingMessage?.uuid || null,
-        resource_url: null,
+        file: null,
         reactions: null,
         created_at: new Date().toISOString()
       }
@@ -146,7 +146,7 @@ export function Form ({
         isRead: message.is_read,
         replyToId: message.reply_to_id,
         reactions: null,
-        resourceUrl: message.resource_url as string
+        file: message.file as StaticFile
       }
 
       addMessage(newMessage)
