@@ -22,6 +22,10 @@ export class ChatRouter {
       '/:chatId',
       this.chatController.updateChat.bind(this.chatController)
     )
+    router.get(
+      '/signed-urls/:messageIds',
+      this.chatController.getSignedFileUrls.bind(this.chatController)
+    )
 
     return router
   }

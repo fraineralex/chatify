@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-semi */
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -16,6 +15,7 @@ import { useChatStore } from '../store/currenChat'
 import {
   getAllChats,
   getChatById,
+  getSignedUrls,
   updateChatLastMessage
 } from '../services/chat'
 
@@ -217,14 +217,30 @@ export const useChatMessage = () => {
   }, [loggedUser, userMetadata])
 
   useEffect(() => {
-    const isFileExpired = (msg: Message) =>
-      msg.file && new Date(msg.file?.expiresAt).getTime() > new Date().getTime()
+    if (!currentChat) return
+    ;(async () => {
+      const isFileExpired = (msg: Message) =>
+        !msg.isDeleted &&
+        msg.file &&
+        new Date(msg.file?.expiresAt).getTime() <= new Date().getTime()
 
-    if (messages.some(msg => !isFileExpired(msg))) {
-      const expiredFileMsgs = messages.find(msg => isFileExpired(msg))
-      console.log(expiredFileMsgs)
-
-    }
+      if (
+        messages
+          .filter(msg => msg.file && !msg.isDeleted)
+          .some(msg => isFileExpired(msg))
+      ) {
+        const expiredFileUUIDs = messages
+          .filter(msg => isFileExpired(msg))
+          .map(msg => msg.uuid)
+        const updatedSignedUrls = await getSignedUrls(expiredFileUUIDs)
+        for (const signedFile of updatedSignedUrls) {
+          const message = messages.find(msg => msg.uuid === signedFile.uuid)
+          if (!message) return
+          message.file = signedFile.file
+          replaceMessage(message)
+        }
+      }
+    })()
   }, [currentChat])
 
   return { areChatsLoaded }

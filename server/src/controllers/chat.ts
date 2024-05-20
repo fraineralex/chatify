@@ -3,6 +3,7 @@ import { Message, ServerChat, uuid } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { getUserById } from '../utils/user.js'
 import { MESSAGES_TYPES } from '../constants/index.js'
+import { getObjectSignedUrl } from '../utils/s3.js'
 
 export class ChatController {
   private client: Client
@@ -45,24 +46,23 @@ export class ChatController {
         })
 
         if (resultMessage.rows.length > 0) {
+          const message = resultMessage.rows[0]
           lastMessage = {
-            uuid: resultMessage.rows[0].uuid as uuid,
+            uuid: message.uuid as uuid,
             chatId: chat.uuid as uuid,
-            content: resultMessage.rows[0].content as string,
-            createdAt: resultMessage.rows[0].created_at as string,
-            isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
-            isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
-            isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
-            isDelivered: !!resultMessage.rows[0]
-              .is_delivered as unknown as boolean,
-            receiverId: resultMessage.rows[0].receiver_id as string,
-            replyToId: resultMessage.rows[0].reply_to_id as uuid,
-            resourceUrl: resultMessage.rows[0].resource_url as string,
-            senderId: resultMessage.rows[0].sender_id as string,
-            type: resultMessage.rows[0]
-              .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
-            reactions: resultMessage.rows[0].reactions
-              ? JSON.parse(resultMessage.rows[0].reactions as string)
+            content: message.content as string,
+            createdAt: message.created_at as string,
+            isDeleted: !!message.is_deleted as unknown as boolean,
+            isEdited: !!message.is_edited as unknown as boolean,
+            isRead: !!message.is_read as unknown as boolean,
+            isDelivered: !!message.is_delivered as unknown as boolean,
+            receiverId: message.receiver_id as string,
+            replyToId: message.reply_to_id as uuid,
+            file: await getObjectSignedUrl(message.resource_url as string),
+            senderId: message.sender_id as string,
+            type: message.type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
+            reactions: message.reactions
+              ? JSON.parse(message.reactions as string)
               : null
           }
 
@@ -186,24 +186,23 @@ export class ChatController {
       })
 
       if (resultMessage.rows.length > 0) {
+        const message = resultMessage.rows[0]
         lastMessage = {
-          uuid: resultMessage.rows[0].uuid as uuid,
+          uuid: message.uuid as uuid,
           chatId: chatDB.uuid as uuid,
-          content: resultMessage.rows[0].content as string,
-          createdAt: resultMessage.rows[0].created_at as string,
-          isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
-          isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
-          isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
-          isDelivered: !!resultMessage.rows[0]
-            .is_delivered as unknown as boolean,
-          receiverId: resultMessage.rows[0].receiver_id as string,
-          replyToId: resultMessage.rows[0].reply_to_id as uuid,
-          resourceUrl: resultMessage.rows[0].resource_url as string,
-          senderId: resultMessage.rows[0].sender_id as string,
-          type: resultMessage.rows[0]
-            .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
-          reactions: resultMessage.rows[0].reactions
-            ? JSON.parse(resultMessage.rows[0].reactions as string)
+          content: message.content as string,
+          createdAt: message.created_at as string,
+          isDeleted: !!message.is_deleted as unknown as boolean,
+          isEdited: !!message.is_edited as unknown as boolean,
+          isRead: !!message.is_read as unknown as boolean,
+          isDelivered: !!message.is_delivered as unknown as boolean,
+          receiverId: message.receiver_id as string,
+          replyToId: message.reply_to_id as uuid,
+          file: await getObjectSignedUrl(message.resource_url as string),
+          senderId: message.sender_id as string,
+          type: message.type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
+          reactions: message.reactions
+            ? JSON.parse(message.reactions as string)
             : null
         }
       }
@@ -250,6 +249,54 @@ export class ChatController {
     } catch (error) {
       console.error(error)
       throw Error('Failed to fetch record: ' + JSON.stringify(error))
+      return
+    }
+  }
+
+  async getSignedFileUrls (req: Request, res: Response): Promise<void> {
+    const messageIds = req.params.messageIds?.split(',')
+
+    if (
+      !messageIds ||
+      !messageIds?.every(id => typeof id === 'string' && id.length === 36)
+    ) {
+      res.status(400).json({
+        statusText:
+          "Invalid input: 'messageIds' should be an array of valid UUID strings.",
+        status: 400
+      })
+      return
+    }
+
+    if (messageIds?.length === 0) {
+      res.status(400).json({ statusText: 'Missing messageIds', status: 400 })
+      return
+    }
+
+    const encoder = new TextEncoder()
+    const messageIdsArrayBuffer = encoder.encode(JSON.stringify(messageIds))
+
+    try {
+      const selectStatement = await this.client.execute({
+        sql: 'SELECT uuid, resource_url FROM messages WHERE uuid IN (:messageIds) AND resource_url IS NOT NULL',
+        args: { messageIds: messageIdsArrayBuffer }
+      })
+
+      if (selectStatement.rows.length === 0) {
+        res.status(404).json({ statusText: 'Messages not found', status: 404 })
+        return
+      }
+
+      const updatedSignedUrls = selectStatement.rows.map(async message => {
+        const signedUrl = await getObjectSignedUrl(
+          message.resource_url as string
+        )
+        return { uuid: message.uuid, resource_url: signedUrl }
+      })
+
+      res.status(200).json(updatedSignedUrls)
+    } catch (error) {
+      console.error(error)
       return
     }
   }

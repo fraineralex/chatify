@@ -44,16 +44,16 @@ export class SocketController {
 
     try {
       await this.client.execute({
-        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :reactions, :created_at)',
+        sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :file, :chat_id, :reactions, :created_at)',
         args: {
           ...message,
-          resource_url: file?.filename ?? null
+          file: file?.filename ?? null
         }
       })
 
       const createdMessage: ServerMessage = {
         ...message,
-        resource_url: file ? await getObjectSignedUrl(file.filename) : null
+        file: file ? await getObjectSignedUrl(file.filename) : null
       }
 
       this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
@@ -203,7 +203,7 @@ export class SocketController {
           isRead: message.is_read,
           receiverId: message.receiver_id,
           replyToId: message.reply_to_id,
-          resourceUrl: message.resource_url as string,
+          file: null,
           senderId: message.sender_id,
           type: message.type,
           reactions: message.reactions ? JSON.parse(message.reactions) : null

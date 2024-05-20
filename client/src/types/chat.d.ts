@@ -34,9 +34,14 @@ interface ResourceData {
   fileType: string
 }
 
-interface StaticFile {
+export interface StaticFile {
   url: string
   expiresAt: string
+}
+
+export interface SignedFile {
+  uuid: uuid
+  file: StaticFile
 }
 
 export interface ServerMessage {

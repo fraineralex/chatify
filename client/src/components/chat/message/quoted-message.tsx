@@ -14,9 +14,6 @@ export function QuotedMessage ({
   if (!message) return null
   const { user: loggedUser } = useAuth0()
   const isMe = message.senderId === loggedUser?.sub
-  const user = isMe
-    ? loggedUser
-    : chats.find(chat => chat.user.id === message.senderId)?.user
 
   const accentColor = isMe
     ? 'border-blue-500 text-blue-500'
@@ -42,7 +39,11 @@ export function QuotedMessage ({
       className={`flex flex-col bg-gray-100 px-2 -ms-1 mb-1 rounded-lg border-l-4 whitespace-normal break-words cursor-pointer ${accentColor}`}
       onClick={handleClickQuotedMessage}
     >
-      <p className='font-medium text-xs my-1'>{user?.name}</p>
+      <p className='font-medium text-xs my-1'>
+        {isMe
+          ? 'You'
+          : chats.find(chat => chat.user.id === message.senderId)?.user.name}
+      </p>
       <p className='text-gray-600 text-xs pb-2 line-clamp-2 max-w-md truncate inline-block pr-10'>
         {message.content}
       </p>

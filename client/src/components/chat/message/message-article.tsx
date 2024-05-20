@@ -3,6 +3,7 @@ import { Message } from '../../../types/chat'
 import { MessageState } from './message-state'
 import { QuotedMessage } from './quoted-message'
 import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
+import { MESSAGES_TYPES } from '../../../constants'
 
 interface Props {
   message: Message
@@ -36,7 +37,7 @@ export function MessageArticle ({
   return (
     <div className='relative mb-1'>
       <article
-        className={`items-center rounded-lg pt-2 pb-1 px-1 ps-2 max-w-3xl whitespace-normal break-words border border-transparent ${
+        className={`items-center rounded-lg pt-1 pb-1 px-1 ps-1 max-w-3xl whitespace-normal break-words border border-transparent ${
           isMe ? 'bg-gray-300' : 'bg-gray-100'
         }`}
       >
@@ -47,9 +48,17 @@ export function MessageArticle ({
           />
         )}
 
+        {message.type === MESSAGES_TYPES.IMAGE && message.file && (
+          <img
+            src={message.file.url}
+            alt='message'
+            className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+          />
+        )}
+
         <div
           className={`${
-            !isAnEmoji ? 'flex justify-between h-full' : undefined
+            !isAnEmoji ? 'flex justify-between h-full pt-1 ps-1' : undefined
           }  `}
         >
           {!message.isDeleted && (

@@ -1,5 +1,5 @@
 import { User } from '@auth0/auth0-react'
-import { Chat, Message, uuid } from '../types/chat'
+import { Chat, Message, SignedFile, uuid } from '../types/chat'
 
 const SERVER_DOMAIN =
   (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
@@ -92,4 +92,17 @@ export async function updateChatLastMessage (
       : message
 
   return chat
+}
+
+export async function getSignedUrls (messageIds: uuid[]) {
+  try {
+    const response = await fetch(
+      `${SERVER_DOMAIN}/chats/signed-urls/${messageIds.join(',')}`
+    )
+    if (!response.ok) return []
+    return (await response.json()) as SignedFile[]
+  } catch (error) {
+    console.log(error)
+    return []
+  }
 }

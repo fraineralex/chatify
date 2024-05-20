@@ -44,8 +44,12 @@ export async function getObjectSignedUrl (key: string) {
   }
   const command = new GetObjectCommand(getObjectParams)
   try {
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
-    return url
+    const expirationTime = 3600 // seconds
+    const url = await getSignedUrl(s3, command, { expiresIn: expirationTime })
+    return {
+      url,
+      expiresAt: new Date(Date.now() + expirationTime * 1000).toISOString()
+    }
   } catch (error) {
     console.error(error)
     return null
