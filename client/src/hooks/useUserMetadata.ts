@@ -9,9 +9,10 @@ export function useUserMetadata () {
   const { setUserMetadata } = useSocketStore()
 
   useEffect(() => {
+    if (!user) return
     const getUserMetadata = async () => {
       try {
-        const response = await fetch(`${domain}/users/metadata/${user?.sub}`)
+        const response = await fetch(`${domain}/users/metadata/${user.sub}`)
         if (response.status !== 200) {
           console.log('Failed to get user metadata:', response.statusText)
           return

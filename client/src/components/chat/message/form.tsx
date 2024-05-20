@@ -75,7 +75,7 @@ export function Form ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!contentMessage || !currentChat) return
+    if ((!contentMessage && fileMessages.length === 0) || !currentChat) return
     if (fileMessages.length > 0) {
       for (const fileMsg of fileMessages) {
         const base64File = await readFileAsBase64(fileMsg.file)
@@ -84,6 +84,7 @@ export function Form ({
           filename: fileMsg.file.name,
           fileType: fileMsg.file.type
         }
+        console.log(fileData)
 
         const message: ServerMessage = {
           uuid: crypto.randomUUID(),
@@ -98,7 +99,7 @@ export function Form ({
             : fileMsg.file.type.startsWith('application') ||
               fileMsg.file.type.startsWith('text')
             ? MESSAGES_TYPES.DOCUMENT
-            : MESSAGES_TYPES.UNKNOWN,
+            : MESSAGES_TYPES.TEXT,
           is_deleted: false,
           is_edited: false,
           is_delivered: false,
@@ -254,13 +255,13 @@ export function Form ({
         : uploadedFiles
       if (newFiles.length >= 10)
         return alert('You can only send 10 files at once')
-      const maximumSize = 50 * 1024 * 1024 // 50MB
+      const maximumSize = 100 * 1024 * 1024 // 100MB
       const totalSize = newFiles.reduce(
         (acc, fileMsg) => acc + fileMsg.file.size,
         0
       )
       if (totalSize > maximumSize) {
-        alert('The total size of the files exceeds the limit of 20MB')
+        alert('The total size of the files exceeds the limit of 100MB')
         return
       }
       setFileMessages(newFiles)

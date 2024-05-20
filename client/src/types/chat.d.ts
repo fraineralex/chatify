@@ -24,7 +24,7 @@ export interface ReplyMessage {
   uuid: uuid
   content: string
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resourceUrl: string | null
+  resourceUrl: StaticFile | null
   user: User
 }
 

@@ -56,6 +56,13 @@ export function MessageArticle ({
           />
         )}
 
+        {message.type === MESSAGES_TYPES.VIDEO && message.file && (
+          <video
+            src={message.file.url}
+            className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+          />
+        )}
+
         <div
           className={`${
             !isAnEmoji ? 'flex justify-between h-full pt-1 ps-1' : undefined

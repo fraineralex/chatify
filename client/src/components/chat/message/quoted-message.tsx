@@ -36,7 +36,7 @@ export function QuotedMessage ({
   }
   return (
     <span
-      className={`flex flex-col bg-gray-100 px-2 -ms-1 mb-1 rounded-lg border-l-4 whitespace-normal break-words cursor-pointer ${accentColor}`}
+      className={`flex flex-col bg-gray-100 px-2 mb-1 rounded-lg border-l-4 whitespace-normal break-words cursor-pointer ${accentColor}`}
       onClick={handleClickQuotedMessage}
     >
       <p className='font-medium text-xs my-1'>

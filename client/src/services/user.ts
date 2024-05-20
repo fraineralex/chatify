@@ -16,7 +16,7 @@ export async function getAllUsers (): Promise<User[] | undefined> {
 
 export const updateUserMetadata = async (
   metadata: metadata,
-  userSub: string | undefined
+  userSub: string
 ) => {
   const data = await fetch(`${SERVER_DOMAIN}/users/metadata/${userSub}`, {
     method: 'PATCH',

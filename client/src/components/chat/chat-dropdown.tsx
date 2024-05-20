@@ -28,7 +28,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   const { currentChat, setCurrentChat } = useChatStore()
   const { user } = useAuth0()
   const chat = chats.find(chat => chat.uuid === uuid)
-  if (!chat || !userMetadata) return null
+  if (!chat || !userMetadata || !user) return null
 
   const handleDeleteChat = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -66,7 +66,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       {
         chat_preferences: newChatPreferences
       },
-      user?.sub
+      user.sub ?? ''
     )
 
     if (response.status !== 200) {
@@ -106,7 +106,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           pinned: pinnedChats
         }
       },
-      user?.sub
+      user.sub ?? ''
     )
 
     if (response.status !== 200) {
@@ -147,7 +147,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           archived: hiddenChats
         }
       },
-      user?.sub
+      user.sub ?? ''
     )
 
     if (response.status !== 200) {
@@ -187,7 +187,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           muted: muttedChats
         }
       },
-      user?.sub
+      user.sub ?? ''
     )
 
     if (response.status !== 200) {

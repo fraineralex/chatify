@@ -27,6 +27,7 @@ export class SocketController {
 
   async newMessage (message: ServerMessage, file?: ResourceData): Promise<void> {
     if (file && message.type !== MESSAGES_TYPES.TEXT) {
+      console.log('File received', file.filename)
       try {
         if (file.fileType.startsWith('image')) {
           file = await optimizeImage(file)
