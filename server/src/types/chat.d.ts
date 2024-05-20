@@ -15,7 +15,7 @@ export interface ServerMessage {
   receiver_id: string
   chat_id: uuid
   type: typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES]
-  resource_url: string | null | ResourceData
+  resource_url: string | null
   is_delivered: boolean
   is_read: boolean
   is_edited: boolean

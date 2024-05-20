@@ -48,6 +48,7 @@ export async function getObjectSignedUrl (key: string) {
     return url
   } catch (error) {
     console.error(error)
+    return null
   }
 }
 

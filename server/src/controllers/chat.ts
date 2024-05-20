@@ -146,7 +146,6 @@ export class ChatController {
   async getChatById (req: Request, res: Response): Promise<void> {
     const chatId = req.params.chatId
     const userId = req.query.user_id as string
-    console.log(chatId)
 
     if (!chatId) {
       res.status(400).json({ statusText: 'Missing chat_id', status: 400 })
@@ -178,7 +177,36 @@ export class ChatController {
       const chatUser = await getUserById(id)
       const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
 
+      let lastMessage: Message | undefined = undefined
       let unreadMessages: number = 0
+
+      const resultMessage = await this.client.execute({
+        sql: 'SELECT * FROM messages WHERE chat_id = :chat_id ORDER BY created_at DESC LIMIT 1',
+        args: { chat_id: chatDB.uuid }
+      })
+
+      if (resultMessage.rows.length > 0) {
+        lastMessage = {
+          uuid: resultMessage.rows[0].uuid as uuid,
+          chatId: chatDB.uuid as uuid,
+          content: resultMessage.rows[0].content as string,
+          createdAt: resultMessage.rows[0].created_at as string,
+          isDeleted: !!resultMessage.rows[0].is_deleted as unknown as boolean,
+          isEdited: !!resultMessage.rows[0].is_edited as unknown as boolean,
+          isRead: !!resultMessage.rows[0].is_read as unknown as boolean,
+          isDelivered: !!resultMessage.rows[0]
+            .is_delivered as unknown as boolean,
+          receiverId: resultMessage.rows[0].receiver_id as string,
+          replyToId: resultMessage.rows[0].reply_to_id as uuid,
+          resourceUrl: resultMessage.rows[0].resource_url as string,
+          senderId: resultMessage.rows[0].sender_id as string,
+          type: resultMessage.rows[0]
+            .type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
+          reactions: resultMessage.rows[0].reactions
+            ? JSON.parse(resultMessage.rows[0].reactions as string)
+            : null
+        }
+      }
 
       const resultUnreadMessages = await this.client.execute({
         sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
@@ -187,6 +215,7 @@ export class ChatController {
 
       unreadMessages = (resultUnreadMessages.rows[0].count as number) ?? 0
 
+      const loggedUser = await getUserById(userId)
       const chat: ServerChat = {
         uuid: chatDB.uuid as uuid,
         user: {
@@ -196,7 +225,25 @@ export class ChatController {
         },
         createdAt: chatDB.created_at as string,
         unreadMessages,
-        blockedBy: (chatDB.blocked_by as string) ?? null
+        lastMessage,
+        blockedBy: (chatDB.blocked_by as string) ?? null,
+        isArchived:
+          loggedUser.user_metadata?.chat_preferences.archived.includes(
+            chatDB.uuid as uuid
+          ),
+        isDeleted: loggedUser.user_metadata?.chat_preferences.deleted.includes(
+          chatDB.uuid as uuid
+        ),
+        isMuted: loggedUser.user_metadata?.chat_preferences.muted.includes(
+          chatDB.uuid as uuid
+        ),
+        isPinned: loggedUser.user_metadata?.chat_preferences.pinned.includes(
+          chatDB.uuid as uuid
+        ),
+        cleaned:
+          (loggedUser.user_metadata?.chat_preferences.cleaned[
+            chatDB.uuid as uuid
+          ] as string) ?? null
       }
 
       res.status(200).json(chat)

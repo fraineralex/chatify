@@ -25,11 +25,8 @@ export class SocketController {
     //console.log('User disconnected')
   }
 
-  async newMessage (message: ServerMessage): Promise<void> {
-    let filename = null
-    let signedFileUrl = null
-    if (message.type !== MESSAGES_TYPES.TEXT) {
-      let file = message.resource_url as ResourceData
+  async newMessage (message: ServerMessage, file?: ResourceData): Promise<void> {
+    if (file && message.type !== MESSAGES_TYPES.TEXT) {
       try {
         if (file.fileType.startsWith('image')) {
           file = await optimizeImage(file)
@@ -39,8 +36,6 @@ export class SocketController {
 
         file.filename = generateRandomFileName(file)
         await uploadFile(file)
-        filename = file.filename
-        signedFileUrl = (await getObjectSignedUrl(file.filename)) ?? null
       } catch (error) {
         console.error(error)
         return
@@ -52,13 +47,13 @@ export class SocketController {
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :resource_url, :chat_id, :reactions, :created_at)',
         args: {
           ...message,
-          resource_url: filename
+          resource_url: file?.filename ?? null
         }
       })
 
       const createdMessage: ServerMessage = {
         ...message,
-        resource_url: signedFileUrl
+        resource_url: file ? await getObjectSignedUrl(file.filename) : null
       }
 
       this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
