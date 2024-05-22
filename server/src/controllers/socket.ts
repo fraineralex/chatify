@@ -31,11 +31,12 @@ export class SocketController {
       try {
         if (file.fileType.startsWith('image')) {
           file = await optimizeImage(file)
+          file.filename = generateRandomFileName(file)
         } else {
           file.file = Buffer.from(file.file as string, 'base64')
+          file.filename = `${file.filename}.${generateRandomFileName(file)}`
         }
 
-        file.filename = generateRandomFileName(file)
         await uploadFile(file)
       } catch (error) {
         console.error(error)
@@ -71,14 +72,14 @@ export class SocketController {
         args: { ...messages }
       })
 
-      if (selectResult.rows.length === 0) return
+      if (selectResult.rows?.length === 0) return
 
       const updateResult = await this.client.execute({
         sql: 'UPDATE messages SET is_read = TRUE, is_delivered = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_read = FALSE',
         args: { ...messages }
       })
 
-      if (selectResult.rows.length === updateResult.rowsAffected) {
+      if (selectResult.rows?.length === updateResult.rowsAffected) {
         const messages: uuid[] = []
         selectResult.rows.forEach(row => messages.push(row.uuid as uuid))
 
@@ -97,14 +98,14 @@ export class SocketController {
         args: { ...messages }
       })
 
-      if (selectResult.rows.length === 0) return
+      if (selectResult.rows?.length === 0) return
 
       const updateResult = await this.client.execute({
         sql: 'UPDATE messages SET is_delivered = TRUE WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND chat_id = :chat_id AND is_delivered = FALSE',
         args: { ...messages }
       })
 
-      if (selectResult.rows.length === updateResult.rowsAffected) {
+      if (selectResult.rows?.length === updateResult.rowsAffected) {
         const messages: uuid[] = []
         selectResult.rows.forEach(row => messages.push(row.uuid as uuid))
 
@@ -142,7 +143,7 @@ export class SocketController {
         args: { uuid: message.uuid! }
       })
 
-      if (selectResult.rows.length === 0) return
+      if (selectResult.rows?.length === 0) return
 
       const updateResult = await this.client.execute({
         sql: 'UPDATE messages SET is_deleted = TRUE WHERE uuid = :uuid;',
@@ -172,7 +173,7 @@ export class SocketController {
       results.rows.forEach(async row => {
         const message = {
           ...row,
-          resource_url: await getObjectSignedUrl(row.resource_url as string)
+          file: row.resource_url ? await getObjectSignedUrl(row.resource_url as string) : null
         }
         socket.emit(SOCKET_EVENTS.CHAT_MESSAGE, message)
       })
