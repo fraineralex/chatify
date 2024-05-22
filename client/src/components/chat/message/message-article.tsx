@@ -4,6 +4,7 @@ import { MessageState } from './message-state'
 import { QuotedMessage } from './quoted-message'
 import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
 import { MESSAGES_TYPES } from '../../../constants'
+import {FileInfo} from './file-info'
 
 interface Props {
   message: Message
@@ -59,8 +60,13 @@ export function MessageArticle ({
         {message.type === MESSAGES_TYPES.VIDEO && message.file && (
           <video
             src={message.file.url}
+            controls
             className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
           />
+        )}
+
+        {message.type === MESSAGES_TYPES.DOCUMENT && message.file && (
+          <FileInfo file={message.file} />
         )}
 
         <div
