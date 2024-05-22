@@ -45,7 +45,7 @@ export class ChatController {
           args: { chat_id: chat.uuid }
         })
 
-        if (resultMessage.rows.length > 0) {
+        if (resultMessage.rows?.length > 0) {
           const message = resultMessage.rows[0]
           lastMessage = {
             uuid: message.uuid as uuid,
@@ -57,8 +57,10 @@ export class ChatController {
             isRead: !!message.is_read as unknown as boolean,
             isDelivered: !!message.is_delivered as unknown as boolean,
             receiverId: message.receiver_id as string,
-            replyToId: message.reply_to_id as uuid,
-            file: await getObjectSignedUrl(message.resource_url as string),
+            replyToId: message.reply_to_id as uuid | null,
+            file: message.resource_url
+              ? await getObjectSignedUrl(message.resource_url as string)
+              : null,
             senderId: message.sender_id as string,
             type: message.type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
             reactions: message.reactions
@@ -163,7 +165,7 @@ export class ChatController {
         args: { uuid: chatId }
       })
 
-      if (result.rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         res.status(404).json({ statusText: 'Chat not found', status: 404 })
         return
       }
@@ -185,7 +187,7 @@ export class ChatController {
         args: { chat_id: chatDB.uuid }
       })
 
-      if (resultMessage.rows.length > 0) {
+      if (resultMessage.rows && resultMessage.rows.length > 0) {
         const message = resultMessage.rows[0]
         lastMessage = {
           uuid: message.uuid as uuid,
@@ -255,6 +257,7 @@ export class ChatController {
 
   async getSignedFileUrls (req: Request, res: Response): Promise<void> {
     const messageIds = req.params.messageIds?.split(',')
+    console.log(messageIds)
 
     if (
       !messageIds ||
@@ -282,7 +285,7 @@ export class ChatController {
         args: { messageIds: messageIdsArrayBuffer }
       })
 
-      if (selectStatement.rows.length === 0) {
+      if (selectStatement.rows?.length === 0) {
         res.status(404).json({ statusText: 'Messages not found', status: 404 })
         return
       }
@@ -323,7 +326,7 @@ export class ChatController {
         args: { uuid: chatId }
       })
 
-      if (result.rows.length === 0) {
+      if (result.rows?.length === 0) {
         res.status(404).json({ statusText: 'Chat not found', status: 404 })
         return
       }
