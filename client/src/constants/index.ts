@@ -4,7 +4,19 @@ import {
   PPTIcon,
   XLSIcon,
   XLSXIcon,
-  UnknownFileIcon
+  UnknownFileIcon,
+  CSSIcon,
+  CSVIcon,
+  EXEIcon,
+  HTMLIcon,
+  JSIcon,
+  JSXIcon,
+  TXTIcon,
+  TSIcon,
+  SVGIcon,
+  XMLIcon,
+  ZIPIcon,
+  PYIcon
 } from '../components/common/svg-icons'
 
 export const SOCKET_EVENTS = {
@@ -42,6 +54,19 @@ export const FILE_ICONS: {
   xls: XLSIcon,
   xlsx: XLSXIcon,
   xlsm: XLSXIcon,
+  css: CSSIcon,
+  csv: CSVIcon,
+  html: HTMLIcon,
+  js: JSIcon,
+  ts: TSIcon,
+  jsx: JSXIcon,
+  tsx: JSXIcon,
+  txt: TXTIcon,
+  svg: SVGIcon,
+  xml: XMLIcon,
+  zip: ZIPIcon,
+  py: PYIcon,
+  exe: EXEIcon,
   unknown: UnknownFileIcon
 }
 
@@ -60,5 +85,16 @@ export const MIME_TYPE_MAP: { [key: string]: string } = {
   'text/csv': 'CSV File',
   'text/html': 'HTML File',
   'text/xml': 'XML File',
-  'unknown': 'Unknown File'
+  'text/css': 'CSS File',
+  'application/javascript': 'JavaScript File',
+  'application/typescript': 'TypeScript File',
+  'application/json': 'JSON File',
+  'application/vnd.python': 'Python File',
+  'image/svg+xml': 'SVG File',
+  'application/zip': 'ZIP Archive',
+  'application/octet-stream': 'Binary File',
+  'application/x-msdownload': 'Executable File',
+  jsx: 'JSX File',
+  tsx: 'TSX File',
+  unknown: 'Unknown File'
 }

@@ -5,9 +5,11 @@ export function FileInfo ({ file }: { file: StaticFile }) {
   console.log(file)
   const fileExtension =
     file.filename?.split('.').pop()?.toLowerCase() ?? 'unknown'
-  const Icon = FILE_ICONS[fileExtension]
-  const fileType =
-    MIME_TYPE_MAP[file.contentType ?? 'unknown'] ?? 'Unknown File'
+  const Icon = FILE_ICONS[fileExtension] || FILE_ICONS.unknown
+  const fileType = file.contentType
+    ? MIME_TYPE_MAP[file.contentType]
+    : `${fileExtension.toUpperCase()} File`
+
   let fileWeight = ''
   if (file.contentLength) {
     const bytes = file.contentLength
