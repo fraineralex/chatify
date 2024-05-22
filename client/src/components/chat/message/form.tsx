@@ -75,6 +75,7 @@ export function Form ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    console.log(fileMessages)
     if ((!contentMessage && fileMessages.length === 0) || !currentChat) return
     if (fileMessages.length > 0) {
       for (const fileMsg of fileMessages) {
@@ -84,22 +85,20 @@ export function Form ({
           filename: fileMsg.file.name,
           fileType: fileMsg.file.type
         }
-        console.log(fileData)
-
+        console.log(fileData.fileType)
         const message: ServerMessage = {
           uuid: crypto.randomUUID(),
           content: fileMsg.caption ?? '',
           sender_id: loggedUser?.sub || '',
           receiver_id: currentChat.user.id,
           chat_id: currentChat.uuid,
-          type: fileMsg.file.type.startsWith('image')
-            ? MESSAGES_TYPES.IMAGE
-            : fileMsg.file.type.startsWith('video')
-            ? MESSAGES_TYPES.VIDEO
-            : fileMsg.file.type.startsWith('application') ||
-              fileMsg.file.type.startsWith('text')
-            ? MESSAGES_TYPES.DOCUMENT
-            : MESSAGES_TYPES.TEXT,
+          type:
+            fileMsg.file.type.startsWith('image') &&
+            !fileMsg.file.type.includes('svg')
+              ? MESSAGES_TYPES.IMAGE
+              : fileMsg.file.type.startsWith('video')
+              ? MESSAGES_TYPES.VIDEO
+              : MESSAGES_TYPES.DOCUMENT,
           is_deleted: false,
           is_edited: false,
           is_delivered: false,
@@ -116,6 +115,7 @@ export function Form ({
       setFileMessages([])
       setSelectedFileIndex(0)
     } else {
+      if (!contentMessage) return
       const message: ServerMessage = {
         uuid: crypto.randomUUID(),
         content: currentChat.draft || '',
@@ -253,9 +253,9 @@ export function Form ({
       const newFiles = fileMessages
         ? fileMessages.concat(uploadedFiles)
         : uploadedFiles
-      if (newFiles.length >= 10)
+      if (newFiles.length >= 100)
         return alert('You can only send 10 files at once')
-      const maximumSize = 100 * 1024 * 1024 // 100MB
+      const maximumSize = 1000 * 1024 * 1024 // 100MB
       const totalSize = newFiles.reduce(
         (acc, fileMsg) => acc + fileMsg.file.size,
         0
@@ -359,6 +359,7 @@ export function Form ({
                     name='file-document'
                     type='file'
                     accept='doccument/*'
+                    multiple
                     className='hidden'
                     onChange={handleFileInputChange}
                   />

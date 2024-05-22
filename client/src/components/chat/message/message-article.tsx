@@ -49,7 +49,7 @@ export function MessageArticle ({
           />
         )}
 
-        {message.type === MESSAGES_TYPES.IMAGE && message.file && (
+        {!message.isDeleted && message.type === MESSAGES_TYPES.IMAGE && message.file && (
           <img
             src={message.file.url}
             alt='message'
@@ -57,7 +57,7 @@ export function MessageArticle ({
           />
         )}
 
-        {message.type === MESSAGES_TYPES.VIDEO && message.file && (
+        {!message.isDeleted && message.type === MESSAGES_TYPES.VIDEO && message.file && (
           <video
             src={message.file.url}
             controls
@@ -65,7 +65,7 @@ export function MessageArticle ({
           />
         )}
 
-        {message.type === MESSAGES_TYPES.DOCUMENT && message.file && (
+        {!message.isDeleted && message.type === MESSAGES_TYPES.DOCUMENT && message.file && (
           <FileInfo file={message.file} />
         )}
 
