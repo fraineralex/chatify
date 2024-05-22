@@ -16,7 +16,8 @@ import {
   SVGIcon,
   XMLIcon,
   ZIPIcon,
-  PYIcon
+  PYIcon,
+  SQLIcon
 } from '../components/common/svg-icons'
 
 export const SOCKET_EVENTS = {
@@ -67,6 +68,7 @@ export const FILE_ICONS: {
   zip: ZIPIcon,
   py: PYIcon,
   exe: EXEIcon,
+  sql: SQLIcon,
   unknown: UnknownFileIcon
 }
 
