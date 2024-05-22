@@ -125,7 +125,7 @@ export const useChatMessage = () => {
           if (!isChatFromApi || chat.unreadMessages !== unreadMessages) {
             const lastMessage =
               chat.lastMessage &&
-              chat.lastMessage.createdAt.getTime() >
+              new Date(chat.lastMessage.createdAt).getTime() >
                 newMessage.createdAt.getTime()
                 ? chat.lastMessage
                 : newMessage
