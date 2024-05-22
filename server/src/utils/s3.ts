@@ -2,7 +2,8 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  DeleteObjectCommand
+  DeleteObjectCommand,
+  HeadObjectCommand
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { ResourceData } from '../types/chat.js'
@@ -38,17 +39,36 @@ export async function uploadFile (file: ResourceData) {
 }
 
 export async function getObjectSignedUrl (key: string) {
-  const getObjectParams = {
+  const objectParams = {
     Bucket: s3BucketName,
     Key: key
   }
-  const command = new GetObjectCommand(getObjectParams)
+  const getObjectCommand = new GetObjectCommand(objectParams)
+  let contentType = ''
+  let contentLength = 0
+  let filename = ''
   try {
+    const isDocument = key.split('.').length > 2
+    if (isDocument) {
+      const headObjectCommand = new HeadObjectCommand(objectParams)
+      const metadata = await s3.send(headObjectCommand)
+
+      contentType = metadata.ContentType ?? ''
+      contentLength = metadata.ContentLength ?? 0
+      filename = `${key.split('.')[0]}.${key.split('.').pop()}`
+      console.log(contentLength, contentType, filename)
+    }
     const expirationTime = 3600 // seconds
-    const url = await getSignedUrl(s3, command, { expiresIn: expirationTime })
+    const url = await getSignedUrl(s3, getObjectCommand, {
+      expiresIn: expirationTime
+    })
+
     return {
       url,
-      expiresAt: new Date(Date.now() + expirationTime * 1000).toISOString()
+      expiresAt: new Date(Date.now() + expirationTime * 1000).toISOString(),
+      filename,
+      contentType,
+      contentLength
     }
   } catch (error) {
     console.error(error)
