@@ -56,7 +56,6 @@ export async function getObjectSignedUrl (key: string) {
       contentType = metadata.ContentType ?? ''
       contentLength = metadata.ContentLength ?? 0
       filename = `${key.split('.')[0]}.${key.split('.').pop()}`
-      console.log(contentLength, contentType, filename)
     }
     const expirationTime = 3600 // seconds
     const url = await getSignedUrl(s3, getObjectCommand, {

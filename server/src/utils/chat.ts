@@ -6,8 +6,8 @@ export async function optimizeImage (file: ResourceData) {
   try {
     const fileBuffer = await sharp(Buffer.from(file.file as string, 'base64'))
       .resize({
-        height: 1920,
-        width: 1080,
+        height: 800,
+        width: 800,
         fit: 'inside'
       })
       .webp({ quality: 80 })
@@ -23,8 +23,9 @@ export async function optimizeImage (file: ResourceData) {
 }
 
 export function generateRandomFileName (file: ResourceData, bytes = 32) {
-  const fileExtension = file.fileType.startsWith('image')
-    ? 'webp'
-    : file.filename.split('.').pop() ?? ''
+  const fileExtension =
+    file.fileType.startsWith('image') && !file.fileType.includes('svg')
+      ? 'webp'
+      : file.filename.split('.').pop() ?? ''
   return `${crypto.randomBytes(bytes).toString('hex')}.${fileExtension}`
 }
