@@ -15,7 +15,7 @@ export async function createTables (client: Client) {
         is_edited BOOLEAN DEFAULT FALSE,
         is_deleted BOOLEAN DEFAULT FALSE,
         reply_to_id TEXT,
-        type TEXT NOT NULL DEFAULT 'text' CHECK( type IN ('text', 'image', 'audio', 'video', 'file', 'emoji', 'sticker') ),
+        type TEXT NOT NULL DEFAULT 'text' CHECK( type IN ('text', 'image', 'audio', 'video', 'document', 'emoji', 'sticker') ),
         resource_url TEXT,
         reactions TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -24,6 +24,10 @@ export async function createTables (client: Client) {
 
     await client.execute(
       `CREATE INDEX IF NOT EXISTS sender_id_receiver_id ON messages (sender_id, receiver_id, chat_id);`
+    )
+
+    await client.execute(
+      `CREATE INDEX IF NOT EXISTS resource_url ON messages (resource_url);`
     )
 
     await client.execute(`
