@@ -55,7 +55,7 @@ export function useChatItem ({
         {
           chat_preferences: newChatPreferences
         },
-        loggedUser?.sub
+        loggedUser?.sub ?? ''
       )
 
       if (response.status !== 200) {

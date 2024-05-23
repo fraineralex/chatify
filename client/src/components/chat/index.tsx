@@ -6,6 +6,10 @@ import { useSocketStore } from '../../store/socket'
 import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/currenChat'
 import { ReplyMessage, uuid } from '../../types/chat'
+import { PhotoSlider } from 'react-photo-view'
+import { useImageSliderStore } from '../../store/imageSlider'
+import 'react-photo-view/dist/react-photo-view.css'
+import { MESSAGES_TYPES } from '../../constants'
 
 export function Chat () {
   const { messages } = useSocketStore()
@@ -18,6 +22,17 @@ export function Chat () {
   const showEmojiPickerRef = useRef(showEmojiPicker)
   const [emojiPickerPosition, setEmojiPickerPosition] =
     useState('absolute -top-12')
+  const { visible, index, setVisible, setIndex } = useImageSliderStore()
+  const chatImageMessages = useSocketStore(state => state.messages)
+    .filter(
+      c =>
+        c.chatId === currentChat?.uuid &&
+        c.type === MESSAGES_TYPES.IMAGE &&
+        !!c.file
+    )
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .map(message => message.file?.url ?? '')
+    .filter(Boolean)
 
   useEffect(() => {
     showEmojiPickerRef.current = showEmojiPicker
@@ -96,6 +111,14 @@ export function Chat () {
           <Form
             replyingMessage={replyingMessage}
             handleReplyMessage={handleReplyMessage}
+          />
+
+          <PhotoSlider
+            images={chatImageMessages.map(url => ({ src: url, key: url }))}
+            visible={visible}
+            onClose={() => setVisible(false)}
+            index={index}
+            onIndexChange={setIndex}
           />
         </>
       ) : (

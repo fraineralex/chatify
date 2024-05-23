@@ -75,7 +75,6 @@ export function Form ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log(fileMessages)
     if ((!contentMessage && fileMessages.length === 0) || !currentChat) return
     if (fileMessages.length > 0) {
       for (const fileMsg of fileMessages) {
@@ -85,7 +84,7 @@ export function Form ({
           filename: fileMsg.file.name,
           fileType: fileMsg.file.type
         }
-        console.log(fileData.fileType)
+        
         const message: ServerMessage = {
           uuid: crypto.randomUUID(),
           content: fileMsg.caption ?? '',

@@ -12,7 +12,6 @@ export function FileInfo ({
   msgId: uuid
 }) {
   const [file, setFile] = useState<StaticFile>(fileMsg)
-  console.log(file)
 
   const fileExtension =
     file.filename?.split('.').pop()?.toLowerCase() ?? 'unknown'

@@ -5,6 +5,7 @@ import { QuotedMessage } from './quoted-message'
 import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
 import { MESSAGES_TYPES } from '../../../constants'
 import { FileInfo } from './file-info'
+import DisplayImage from './display-image'
 
 interface Props {
   message: Message
@@ -15,7 +16,7 @@ interface Props {
 export function MessageArticle ({
   message,
   messageListRef,
-  isMe = true
+  isMe = true,
 }: Props) {
   const isAnEmoji = isOnlyOneEmoji(message.content)
 
@@ -52,11 +53,7 @@ export function MessageArticle ({
         {!message.isDeleted &&
           message.type === MESSAGES_TYPES.IMAGE &&
           message.file && (
-            <img
-              src={message.file.url}
-              alt='message'
-              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
-            />
+            <DisplayImage chatId={message.chatId} imageUrl={message.file.url} />
           )}
 
         {!message.isDeleted &&
