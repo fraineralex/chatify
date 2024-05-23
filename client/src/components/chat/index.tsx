@@ -10,9 +10,10 @@ import { PhotoSlider } from 'react-photo-view'
 import { useImageSliderStore } from '../../store/imageSlider'
 import 'react-photo-view/dist/react-photo-view.css'
 import { MESSAGES_TYPES } from '../../constants'
+import { getSignedUrls } from '../../services/chat'
 
 export function Chat () {
-  const { messages } = useSocketStore()
+  const { messages, replaceMessage } = useSocketStore()
   const currentChat = useChatStore(state => state.currentChat)
   const messageListRef = useRef<HTMLUListElement>(null)
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(
@@ -23,16 +24,34 @@ export function Chat () {
   const [emojiPickerPosition, setEmojiPickerPosition] =
     useState('absolute -top-12')
   const { visible, index, setVisible, setIndex } = useImageSliderStore()
-  const chatImageMessages = useSocketStore(state => state.messages)
-    .filter(
-      c =>
-        c.chatId === currentChat?.uuid &&
-        c.type === MESSAGES_TYPES.IMAGE &&
-        !!c.file
-    )
+  const chatImageMessages = messages.filter(
+    c =>
+      c.chatId === currentChat?.uuid &&
+      c.type === MESSAGES_TYPES.IMAGE &&
+      !!c.file
+  )
+  const chatImageUrls = chatImageMessages
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .map(message => message.file?.url ?? '')
     .filter(Boolean)
+
+  useEffect(() => {
+    if (!visible) return
+    ;(async () => {
+      const updatedSignedUrls = await getSignedUrls(
+        chatImageMessages.map(c => c.uuid)
+      )
+
+      for (const signedFile of updatedSignedUrls) {
+        const message = chatImageMessages.find(c => c.uuid === signedFile.uuid)
+        if (!message) return
+        replaceMessage({
+          ...message,
+          file: signedFile.file
+        })
+      }
+    })()
+  }, [visible])
 
   useEffect(() => {
     showEmojiPickerRef.current = showEmojiPicker
@@ -114,7 +133,7 @@ export function Chat () {
           />
 
           <PhotoSlider
-            images={chatImageMessages.map(url => ({ src: url, key: url }))}
+            images={chatImageUrls.map(url => ({ src: url, key: url }))}
             visible={visible}
             onClose={() => setVisible(false)}
             index={index}

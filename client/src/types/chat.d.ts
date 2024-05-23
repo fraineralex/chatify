@@ -142,7 +142,6 @@ export type ChatFilterState =
   | 'archived'
   | 'muted'
   | 'unread'
-  | 'search'
 
 export interface FileMessage {
   file: File

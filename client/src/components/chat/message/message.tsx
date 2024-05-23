@@ -8,13 +8,14 @@ import {
 } from '../../../types/chat'
 import { useSocketStore } from '../../../store/socket'
 
-import { Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
+import { Download, Pencil, Reply, SmilePlus, Trash2 } from 'lucide-react'
 
 import { useState } from 'react'
 import { UpdateMessageModal } from './update-message-modal'
 import { MessageArticle } from './message-article'
-import { SOCKET_EVENTS } from '../../../constants'
+import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../../constants'
 import EmojiPicker from 'emoji-picker-react'
+import { downloadFile } from '../../../services/message'
 
 interface Props {
   message: MessageType
@@ -105,6 +106,13 @@ export function Message ({
     socket?.emit(SOCKET_EVENTS.EDIT_MESSAGE, newMessage)
   }
 
+  const handleDownloadFile = async () => {
+    if (!message.file) return
+    const updatedFile = await downloadFile(message.file, message.uuid)
+    if (updatedFile && updatedFile.url !== message.file.url)
+      replaceMessage({ ...message, file: updatedFile })
+  }
+
   return (
     <>
       <li
@@ -180,6 +188,16 @@ export function Message ({
                 >
                   <Trash2 className='w-4 h-4' />
                 </button>
+                {(message.type === MESSAGES_TYPES.IMAGE ||
+                  message.type === MESSAGES_TYPES.VIDEO) &&
+                  message.file && (
+                    <button
+                      className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-red-500'
+                      onClick={handleDownloadFile}
+                    >
+                      <Download className='w-4 h-4' />
+                    </button>
+                  )}
               </span>
             )}
           </aside>
