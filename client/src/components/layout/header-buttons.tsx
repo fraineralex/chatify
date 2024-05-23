@@ -22,8 +22,14 @@ export function HeaderButtons () {
   const { isOpen, closeModal, openModal } = useNewChatModalStore()
   const [users, setUsers] = useState<User[]>([])
   const { user: loggedUser, logout } = useAuth0()
-
+  const [search, setSearch] = useState('')
   const { chats, setChatFilterState, chatFilterState } = useSocketStore()
+
+  const filteredUsers = users.filter(
+    user =>
+      user.id !== loggedUser?.sub &&
+      user.name.toLowerCase().includes(search.toLowerCase())
+  )
 
   const toggleBlockedChats = () => {
     chatFilterState === 'blocked'
@@ -151,15 +157,21 @@ export function HeaderButtons () {
               type='text'
               className='w-full placeholder-gray-700 bg-transparent border outline-none disabled:bg-gray-400 text-gray-800 border-gray-500 focus:bg-gray-300 focus:border-gray-300  focus:border-2 rounded-xl px-3 py-1'
               placeholder='Start typing to search'
+              onChange={({ target }) => setSearch(target.value)}
+              value={search}
             />
           </div>
           <nav className='self-start w-full'>
             <ul className='space-y-1'>
-              {users
-                .filter(user => user.id !== loggedUser?.sub)
-                .map((user, index) => (
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user, index) => (
                   <ChatItem key={index} user={user} isNewChat />
-                ))}
+                ))
+              ) : (
+                <p className='text-center font-medium'>
+                  {search ? 'Chat not found' : 'No chats to show'}
+                </p>
+              )}
             </ul>
           </nav>
         </article>
