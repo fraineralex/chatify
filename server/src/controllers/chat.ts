@@ -257,7 +257,6 @@ export class ChatController {
 
   async getSignedFileUrls (req: Request, res: Response): Promise<void> {
     const messageIds = req.params.messageIds?.split(',')
-    console.log(messageIds)
 
     if (
       !messageIds ||

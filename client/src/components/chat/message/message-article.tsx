@@ -4,7 +4,7 @@ import { MessageState } from './message-state'
 import { QuotedMessage } from './quoted-message'
 import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
 import { MESSAGES_TYPES } from '../../../constants'
-import {FileInfo} from './file-info'
+import { FileInfo } from './file-info'
 
 interface Props {
   message: Message
@@ -49,25 +49,31 @@ export function MessageArticle ({
           />
         )}
 
-        {!message.isDeleted && message.type === MESSAGES_TYPES.IMAGE && message.file && (
-          <img
-            src={message.file.url}
-            alt='message'
-            className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
-          />
-        )}
+        {!message.isDeleted &&
+          message.type === MESSAGES_TYPES.IMAGE &&
+          message.file && (
+            <img
+              src={message.file.url}
+              alt='message'
+              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+            />
+          )}
 
-        {!message.isDeleted && message.type === MESSAGES_TYPES.VIDEO && message.file && (
-          <video
-            src={message.file.url}
-            controls
-            className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
-          />
-        )}
+        {!message.isDeleted &&
+          message.type === MESSAGES_TYPES.VIDEO &&
+          message.file && (
+            <video
+              src={message.file.url}
+              controls
+              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+            />
+          )}
 
-        {!message.isDeleted && message.type === MESSAGES_TYPES.DOCUMENT && message.file && (
-          <FileInfo file={message.file} />
-        )}
+        {!message.isDeleted &&
+          message.type === MESSAGES_TYPES.DOCUMENT &&
+          message.file && (
+            <FileInfo fileMsg={message.file} msgId={message.uuid} />
+          )}
 
         <div
           className={`${
