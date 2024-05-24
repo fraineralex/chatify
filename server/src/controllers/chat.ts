@@ -256,11 +256,17 @@ export class ChatController {
   }
 
   async getSignedFileUrls (req: Request, res: Response): Promise<void> {
-    const messageIds = req.params.messageIds?.split(',')
+    const messageUUIDs = req.params.messageIds?.split(',')
 
     if (
-      !messageIds ||
-      !messageIds?.every(id => typeof id === 'string' && id.length === 36)
+      !messageUUIDs ||
+      !messageUUIDs?.every(
+        id =>
+          typeof id === 'string' &&
+          id.match(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+          )
+      )
     ) {
       res.status(400).json({
         statusText:
@@ -270,18 +276,16 @@ export class ChatController {
       return
     }
 
-    if (messageIds?.length === 0) {
+    if (messageUUIDs?.length === 0) {
       res.status(400).json({ statusText: 'Missing messageIds', status: 400 })
       return
     }
 
-    const encoder = new TextEncoder()
-    const messageIdsArrayBuffer = encoder.encode(JSON.stringify(messageIds))
-
     try {
+      const stringMessageUUIDs = messageUUIDs.map(id => `'${id}'`).join(',')
       const selectStatement = await this.client.execute({
-        sql: 'SELECT uuid, resource_url FROM messages WHERE uuid IN (:messageIds) AND resource_url IS NOT NULL',
-        args: { messageIds: messageIdsArrayBuffer }
+        sql: `SELECT uuid, resource_url FROM messages WHERE uuid IN (${stringMessageUUIDs})`,
+        args: {}
       })
 
       if (selectStatement.rows?.length === 0) {
@@ -289,12 +293,20 @@ export class ChatController {
         return
       }
 
-      const updatedSignedUrls = selectStatement.rows.map(async message => {
-        const signedUrl = await getObjectSignedUrl(
-          message.resource_url as string
-        )
-        return { uuid: message.uuid, resource_url: signedUrl }
-      })
+      const updatedSignedUrls = await Promise.all(
+        selectStatement.rows.map(async message => {
+          const signedUrl = await getObjectSignedUrl(message.resource_url as string)
+          return {
+            uuid: message.uuid as uuid,
+            file: signedUrl
+          }
+        })
+      )
+
+      if (!updatedSignedUrls) {
+        res.status(404).json({ statusText: 'Files not found', status: 404 })
+        return
+      }
 
       res.status(200).json(updatedSignedUrls)
     } catch (error) {
