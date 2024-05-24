@@ -2,6 +2,7 @@ import { CircleX } from 'lucide-react'
 import { FileMessage } from '../../../types/chat'
 import { FILE_ICONS } from '../../../constants'
 import { FileMetadata } from './file-metadata'
+import { useRef } from 'react'
 
 interface Props {
   fileMessages: Array<FileMessage>
@@ -18,6 +19,8 @@ export function FilePreview ({
   setFileMessages,
   formRef
 }: Props) {
+  const fileRefs = useRef<(HTMLElement | null)[]>([])
+
   const handleRemoveFile =
     (index: number) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
@@ -28,6 +31,11 @@ export function FilePreview ({
   const handleSelectFile =
     (index: number) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
+      fileRefs.current[index]?.scrollIntoView({
+        behavior: 'instant',
+        block: 'center',
+        inline: 'center'
+      })
       setSelectedFileIndex(index)
       const contentInput = formRef.current?.querySelector(
         'input[name="content"]'
@@ -42,18 +50,19 @@ export function FilePreview ({
   }
 
   return (
-    <div className='flex mb-3 overflow-x-auto max-w-full space-x-2 form-slider py-2 text-gray-700 place-content-center'>
+    <div className='flex mb-3 overflow-x-auto max-w-full space-x-2 form-slider py-2 text-gray-700 place-content-stretch'>
       {fileMessages?.map((fileMsg, index) =>
         fileMsg.file.type.startsWith('image') &&
         !fileMsg.file.type.includes('svg') ? (
           <figure
             className={`self-center relative rounded-md cursor-pointer border-[3px] flex-shrink-0 ${
               selectedFileIndex === index
-                ? 'border-blue-500'
-                : 'border-transparent'
+                ? 'contrast-125 text-gray-800'
+                : 'contrast-50 text-gray-500'
             }`}
             onClick={handleSelectFile(index)}
             key={index}
+            ref={element => (fileRefs.current[index] = element)}
           >
             <button
               className='absolute top-1 right-1 p-1 text-white hover:text-red-500 hover:scale-105'
@@ -72,11 +81,12 @@ export function FilePreview ({
           <figure
             className={`self-center relative rounded-md cursor-pointer border-[3px] flex-shrink-0 ${
               selectedFileIndex === index
-                ? 'border-blue-500'
-                : 'border-transparent'
+                ? 'contrast-125 text-gray-800'
+                : 'contrast-50 text-gray-500'
             }`}
             onClick={handleSelectFile(index)}
             key={index}
+            ref={element => (fileRefs.current[index] = element)}
           >
             <button
               className='absolute top-1 right-1 p-1 text-white hover:text-red-500 hover:scale-105 z-10'
@@ -93,13 +103,14 @@ export function FilePreview ({
           </figure>
         ) : (
           <figure
-            className={`flex-shrink-0 self-center text-center relative mx-2 max-w-72 rounded-md cursor-pointer ${
+            className={`flex-shrink-0 self-center text-center relative max-w-72 rounded-md cursor-pointer ${
               selectedFileIndex === index
-                ? 'contrast-150 scale-105 text-gray-800'
-                : 'contrast-75 text-gray-500'
+                ? 'contrast-125 text-gray-800'
+                : 'contrast-50 text-gray-500'
             }`}
             onClick={() => setSelectedFileIndex(index)}
             key={index}
+            ref={element => (fileRefs.current[index] = element)}
           >
             <button
               className={`absolute top-1 right-1 p-1 hover:text-red-500 hover:scale-105 ${
