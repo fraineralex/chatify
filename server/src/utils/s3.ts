@@ -46,7 +46,7 @@ export async function getObjectSignedUrl (key: string) {
   const getObjectCommand = new GetObjectCommand(objectParams)
   let contentType = ''
   let contentLength = 0
-  let filename = ''
+  let filename = key
   try {
     const isDocument = key.split('.').length > 2
     if (isDocument) {
