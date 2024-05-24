@@ -71,7 +71,7 @@ export function Form ({
       'input[name="content"]'
     ) as HTMLInputElement
     input.focus()
-  }, [replyingMessage])
+  }, [replyingMessage, currentChat])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -84,7 +84,7 @@ export function Form ({
           filename: fileMsg.file.name,
           fileType: fileMsg.file.type
         }
-        
+
         const message: ServerMessage = {
           uuid: crypto.randomUUID(),
           content: fileMsg.caption ?? '',

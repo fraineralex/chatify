@@ -192,7 +192,7 @@ export function Message ({
                   message.type === MESSAGES_TYPES.VIDEO) &&
                   message.file && (
                     <button
-                      className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-red-500'
+                      className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'
                       onClick={handleDownloadFile}
                     >
                       <Download className='w-4 h-4' />

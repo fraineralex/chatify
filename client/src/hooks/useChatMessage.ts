@@ -220,6 +220,7 @@ export const useChatMessage = () => {
     if (!currentChat) return
     ;(async () => {
       const isFileExpired = (msg: Message) =>
+        msg.chatId === currentChat.uuid &&
         !msg.isDeleted &&
         msg.file &&
         new Date(msg.file?.expiresAt).getTime() <= new Date().getTime()

@@ -25,7 +25,8 @@ export const downloadFile = async (file: StaticFile, msgId: uuid) => {
   const url = URL.createObjectURL(new Blob([blob]))
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', updatedFile.filename ?? 'file')
+  link.download =
+    updatedFile.filename ?? `chatify-file${updatedFile.url.split('.').pop()}`
   document.body.appendChild(link)
   link.click()
   document.body?.removeChild(link)
