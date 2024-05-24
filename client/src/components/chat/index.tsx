@@ -36,6 +36,16 @@ export function Chat () {
     .filter(Boolean)
 
   useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scroll({
+        behavior: 'instant',
+        top: messageListRef.current.scrollHeight
+      })
+      messageListRef.current.nextElementSibling?.querySelector('input')?.focus()
+    }
+  }, [messages, currentChat])
+
+  useEffect(() => {
     if (!visible) return
     ;(async () => {
       const updatedSignedUrls = await getSignedUrls(
@@ -82,13 +92,6 @@ export function Chat () {
     return () => window.removeEventListener('click', handleClickOutside)
   }, [showEmojiPicker])
 
-  useEffect(() => {
-    if (messageListRef.current) {
-      messageListRef.current.scrollTop = messageListRef.current.scrollHeight
-      messageListRef.current.nextElementSibling?.querySelector('input')?.focus()
-    }
-  }, [messages, currentChat])
-
   const handleReplyMessage = (replyingMessage: ReplyMessage | null) => {
     setReplyingMessage(replyingMessage)
     messageListRef.current?.nextElementSibling?.querySelector('input')?.focus()
@@ -114,17 +117,21 @@ export function Chat () {
                     (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
               )
               .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-              .map((message, index) => (
-                <Message
-                  key={message.uuid ?? index}
-                  message={message}
-                  setReplyingMessage={setReplyingMessage}
-                  messageListRef={messageListRef}
-                  showEmojiPicker={showEmojiPicker}
-                  setShowEmojiPicker={setShowEmojiPicker}
-                  emojiPickerPosition={emojiPickerPosition}
-                />
-              ))}
+              .map((message, index) =>
+                message.type !== MESSAGES_TYPES.TEXT &&
+                message.file &&
+                new Date(message.file.expiresAt) < new Date() ? null : (
+                  <Message
+                    key={message.uuid ?? index}
+                    message={message}
+                    setReplyingMessage={setReplyingMessage}
+                    messageListRef={messageListRef}
+                    showEmojiPicker={showEmojiPicker}
+                    setShowEmojiPicker={setShowEmojiPicker}
+                    emojiPickerPosition={emojiPickerPosition}
+                  />
+                )
+              )}
           </ul>
 
           <Form
