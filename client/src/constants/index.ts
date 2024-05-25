@@ -1,4 +1,13 @@
 import {
+  Camera,
+  LucideIcon,
+  Mic,
+  ShieldQuestion,
+  Video,
+  File,
+  Sticker
+} from 'lucide-react'
+import {
   PDFIcon,
   DOCIcon,
   PPTIcon,
@@ -99,4 +108,15 @@ export const MIME_TYPE_MAP: { [key: string]: string } = {
   jsx: 'JSX File',
   tsx: 'TSX File',
   unknown: 'Unknown File'
+}
+
+export const MESSAGE_TYPE_ICONS: {
+  [key: string]: LucideIcon
+} = {
+  image: Camera,
+  video: Video,
+  document: File,
+  audio: Mic,
+  sticker: Sticker,
+  unknown: ShieldQuestion
 }

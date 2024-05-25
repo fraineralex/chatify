@@ -1,8 +1,9 @@
 import { User } from '@auth0/auth0-react'
 import { Message, uuid } from '../../types/chat'
 import { MessageState } from './message/message-state'
-import { Ban, Pin } from 'lucide-react'
+import { Ban, Pin, ShieldQuestion } from 'lucide-react'
 import { ChatDropdown } from './chat-dropdown'
+import { MESSAGE_TYPE_ICONS, MESSAGES_TYPES } from '../../constants'
 
 interface Props {
   loggedUser: User | undefined
@@ -23,6 +24,17 @@ export function LastMessage ({
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
 
+  const lastMessageContent =
+    lastMessage?.content ||
+    MESSAGES_TYPES[
+      lastMessage?.type.toUpperCase() as keyof typeof MESSAGES_TYPES
+    ]
+
+  const Icon =
+    lastMessage && MESSAGE_TYPE_ICONS[lastMessage.type]
+      ? MESSAGE_TYPE_ICONS[lastMessage?.type]
+      : ShieldQuestion
+
   return (
     <aside className='flex items-center text-left  flex-grow w-full justify-between text-gray-500'>
       <p className='text-sm truncate max-w-full inline-block'>
@@ -34,7 +46,20 @@ export function LastMessage ({
             isChatItem
           />
         )}
-        {!lastMessage?.isDeleted && lastMessage?.content}
+        {lastMessage && !lastMessage.isDeleted && (
+          <>
+            {lastMessage.type !== MESSAGES_TYPES.TEXT && (
+              <Icon className='w-4 h-4 inline me-1 align-middle' />
+            )}
+            <span
+              className={`align-middle ${
+                !lastMessage.content ? 'capitalize' : undefined
+              }`}
+            >
+              {lastMessageContent}
+            </span>
+          </>
+        )}
         {lastMessage?.isDeleted && (
           <>
             <Ban className='w-4 h-4 inline me-1 align-middle' />
