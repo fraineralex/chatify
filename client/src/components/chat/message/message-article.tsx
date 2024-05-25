@@ -6,6 +6,7 @@ import { isOnlyOneEmoji } from '../../../utils/isOneEmoji'
 import { MESSAGES_TYPES } from '../../../constants'
 import { FileInfo } from './file-info'
 import DisplayImage from './display-image'
+import { extractUrlsFromText } from '../../../utils/chat'
 
 interface Props {
   message: Message
@@ -16,7 +17,7 @@ interface Props {
 export function MessageArticle ({
   message,
   messageListRef,
-  isMe = true,
+  isMe = true
 }: Props) {
   const isAnEmoji = isOnlyOneEmoji(message.content)
 
@@ -35,6 +36,8 @@ export function MessageArticle ({
         return acc
       }, {})
   }
+
+  const contentMessage = extractUrlsFromText(message.content)
 
   return (
     <div className='relative mb-1'>
@@ -83,7 +86,27 @@ export function MessageArticle ({
                 isAnEmoji ? 'text-5xl' : 'text-sm'
               }`}
             >
-              {message.content}
+              {contentMessage.map((word, index) =>
+                typeof word === 'string' ? (
+                  <span key={index}>{word} </span>
+                ) : (
+                  <a
+                    href={
+                      !word.link.includes('http')
+                        ? word.link.includes('@')
+                          ? `mailto:${word.link}`
+                          : `https://${word.link}`
+                        : word.link
+                    }
+                    target='_blank'
+                    rel='noreferrer'
+                    key={index}
+                    className='text-blue-600 me-1 hover:underline underline-offset-[3px] hover:text-blue-800'
+                  >
+                    {word.link}
+                  </a>
+                )
+              )}
             </p>
           )}
           {message.isDeleted && (
