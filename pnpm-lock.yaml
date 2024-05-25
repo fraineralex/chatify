@@ -90,6 +90,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 3.577.0
         version: 3.577.0
+      '@aws-sdk/cloudfront-signer':
+        specifier: 3.576.0
+        version: 3.576.0
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.577.0
         version: 3.577.0
@@ -197,6 +200,10 @@ packages:
 
   '@aws-sdk/client-sts@3.577.0':
     resolution: {integrity: sha512-509Kklimva1XVlhGbpTpeX3kOP6ORpm44twJxDHpa9TURbmoaxj7veWlnLCbDorxDTrbsDghvYZshvcLsojVpg==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/cloudfront-signer@3.576.0':
+    resolution: {integrity: sha512-el5CXKRpDn1aGb1YLZpa+lEiInUkLck3kargf2VVdjqlHbMhhklukVTYQ08kVdULvkBiFy4du06R8QRmsFGq1A==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/core@3.576.0':
@@ -3455,6 +3462,11 @@ snapshots:
       tslib: 2.6.2
     transitivePeerDependencies:
       - aws-crt
+
+  '@aws-sdk/cloudfront-signer@3.576.0':
+    dependencies:
+      '@smithy/url-parser': 3.0.0
+      tslib: 2.6.2
 
   '@aws-sdk/core@3.576.0':
     dependencies:
