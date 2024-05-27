@@ -109,6 +109,39 @@ export function Form ({
         }
 
         socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message, fileData)
+
+        const newMessage: Message = {
+          uuid: message.uuid,
+          content: message.content,
+          createdAt: new Date(),
+          senderId: message.sender_id,
+          receiverId: message.receiver_id,
+          chatId: message.chat_id,
+          type: message.type,
+          isDeleted: message.is_deleted,
+          isEdited: message.is_edited,
+          isSent: false,
+          isDelivered: message.is_delivered,
+          isRead: message.is_read,
+          replyToId: message.reply_to_id,
+          reactions: null,
+          file: {
+            expiresAt: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
+            url: URL.createObjectURL(fileMsg.file),
+            contentLength: fileMsg.file.size,
+            contentType: fileMsg.file.type,
+            filename: fileMsg.file.name
+          }
+        }
+
+        addMessage(newMessage)
+        const chatUpdated = {
+          ...currentChat,
+          lastMessage: newMessage,
+          draft: ''
+        }
+        replaceChat(chatUpdated)
+        setCurrentChat(chatUpdated)
       }
 
       setFileMessages([])
@@ -131,6 +164,9 @@ export function Form ({
         reactions: null,
         created_at: new Date().toISOString()
       }
+
+      socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+
       const newMessage: Message = {
         uuid: message.uuid,
         content: message.content,
@@ -153,8 +189,6 @@ export function Form ({
       const chatUpdated = { ...currentChat, lastMessage: newMessage, draft: '' }
       replaceChat(chatUpdated)
       setCurrentChat(chatUpdated)
-
-      socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
     }
 
     setContentMessage('')
