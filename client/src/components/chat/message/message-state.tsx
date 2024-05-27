@@ -18,14 +18,9 @@ export function MessageState ({
 
   return (
     <>
-      {isSent ? (
-        <>
-          {!isDelivered && <Check className={className} />}
-          {isDelivered && <CheckCheck className={className} />}
-        </>
-      ) : (
-        <Clock className={className} />
-      )}
+      {isSent && !isDelivered && <Check className={className} />}
+      {isSent && isDelivered && <CheckCheck className={className} />}
+      {!isSent && <Clock className={className} />}
     </>
   )
 }
