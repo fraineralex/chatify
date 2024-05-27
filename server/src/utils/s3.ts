@@ -47,7 +47,7 @@ export async function getObjectSignedUrl (key: string) {
     Key: key
   }
 
-  const expirationTime = 60 * 60 * 24 // 24 hours
+  const expirationTime = 60 * 60 * 24 * 7 // 1 week
 
   const cloudfrontSignParams: CloudfrontSignInput = {
     url: `${cloudfrontUrl}/${key}`,
@@ -80,7 +80,6 @@ export async function getObjectSignedUrl (key: string) {
       filename = `${key.split('.')[0]}.${key.split('.').pop()}`
     }
     const url = getSignedUrl(cloudfrontSignParams)
-    console.log(url)
 
     return {
       url,
