@@ -34,39 +34,48 @@ export function Chat () {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .map(message => message.file?.url ?? '')
     .filter(Boolean)
+  const [serach, setSearch] = useState<string | null>(null)
   const [messageFilter, setMessageFilter] = useState<MessageFilter>(null)
-  let filteredMessages: Messages = []
-
-  if (messageFilter?.includes('media'))
-    filteredMessages = messages.filter(
+  let filteredMessages: Messages = messages
+    .filter(
       message =>
-        (message.chatId === currentChat?.uuid &&
-          new Date(message.createdAt).getTime() >
-            (new Date(currentChat.cleaned ?? 0).getTime() ?? 0) &&
-          message.type === MESSAGES_TYPES.IMAGE) ||
-        message.type === MESSAGES_TYPES.VIDEO
-    )
-
-  if (messageFilter?.includes('files')) {
-    const fileMessages = messages.filter(
-      message =>
-        message.type === MESSAGES_TYPES.DOCUMENT &&
         message.chatId === currentChat?.uuid &&
         new Date(message.createdAt).getTime() >
           (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
     )
-    filteredMessages?.push(...fileMessages)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+
+  if (messageFilter) {
+    filteredMessages = filteredMessages.filter(
+      message =>
+        message.type !== MESSAGES_TYPES.TEXT &&
+        message.type !== MESSAGES_TYPES.STICKER &&
+        message.type !== MESSAGES_TYPES.AUDIO &&
+        message.type !== MESSAGES_TYPES.UNKNOWN
+    )
+  }
+  if (messageFilter && !messageFilter.includes('media')) {
+    filteredMessages = filteredMessages.filter(
+      message =>
+        message.type !== MESSAGES_TYPES.IMAGE &&
+        message.type !== MESSAGES_TYPES.VIDEO
+    )
   }
 
-  if (!messageFilter)
-    filteredMessages = messages
-      .filter(
-        message =>
-          message.chatId === currentChat?.uuid &&
-          new Date(message.createdAt).getTime() >
-            (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
-      )
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+  if (messageFilter && !messageFilter.includes('files')) {
+    filteredMessages = filteredMessages.filter(
+      message => message.type !== MESSAGES_TYPES.DOCUMENT
+    )
+  }
+
+  if (serach !== null) {
+    filteredMessages = filteredMessages.filter(
+      message =>
+        message.content.toLowerCase().includes(serach.toLowerCase()) ||
+        (message.file &&
+          message.file.filename?.toLowerCase().includes(serach.toLowerCase()))
+    )
+  }
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -139,6 +148,8 @@ export function Chat () {
             picture={`${currentChat.user.picture}`}
             messageFilter={messageFilter}
             setMessageFilter={setMessageFilter}
+            search={serach}
+            setSearch={setSearch}
           />
           <ul
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'

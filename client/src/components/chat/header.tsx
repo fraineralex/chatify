@@ -20,30 +20,36 @@ import { useSocketStore } from '../../store/socket'
 import { toggleChatBlock } from '../../services/chat'
 import { updateUserMetadata } from '../../services/user'
 import { MessageFilter } from '../../types/chat'
-import { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 interface Props {
   name: string
   picture: string
   messageFilter: MessageFilter
   setMessageFilter: (state: MessageFilter) => void
+  search: string | null
+  setSearch: (state: string | null) => void
 }
 
 export function Header ({
   name,
   picture,
   messageFilter,
-  setMessageFilter
+  setMessageFilter,
+  search,
+  setSearch
 }: Props) {
   const { currentChat, setCurrentChat } = useChatStore()
   const { replaceChat, chats, userMetadata, setUserMetadata } = useSocketStore()
   const chat = chats.find(chat => chat.uuid === currentChat?.uuid)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   if (!chat || !userMetadata) return null
   const user = useAuth0().user
 
   useEffect(() => {
     if (!currentChat) return
     setMessageFilter(null)
+    setSearch(null)
   }, [currentChat])
 
   const handleToggleBlockChat = async (
@@ -219,6 +225,15 @@ export function Header ({
     }
   }
 
+  const handleSearchClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault()
+    if (search !== null) return
+    setSearch('')
+    searchInputRef.current?.focus()
+  }
+
   return (
     <header className='flex border-b py-3 justify-between'>
       <article className='flex gap-2'>
@@ -233,7 +248,7 @@ export function Header ({
         <h2 className='text-base font-bold my-auto'>{name}</h2>
       </article>
       <aside className='flex mt-3'>
-        <div className='flex place-content-center text-center me-5 mt-1 flex-row-reverse'>
+        <div className='flex place-content-center text-center me-6 mt-1 flex-row-reverse'>
           {messageFilter?.map(filter => (
             <span
               key={filter}
@@ -249,7 +264,28 @@ export function Header ({
             </span>
           ))}
         </div>
-        <Search className='w-5 h-5 mt-1' />
+        <span className='flex'>
+          {search !== null && (
+            <input
+              ref={searchInputRef}
+              className='flex md:w-80 border-input me-6 bg-background px-3 py-1 text-xs ring-offset-background placeholder:text-muted-foreground outline-none ring-2 ring-ring ring-offset-2 rounded-full border-0 flex-1'
+              placeholder='Search in chat...'
+              autoFocus
+              onBlur={() => setSearch(null)}
+              value={search ?? ''}
+              onChange={event => setSearch(event.target.value)}
+            />
+          )}
+          <button
+            disabled={search !== null}
+            className={`hover:scale-110 p-1 rounded-md ${
+              search || (search === '' && 'bg-gray-200')
+            }`}
+            onClick={handleSearchClick}
+          >
+            <Search className='w-5 h-5' />
+          </button>
+        </span>
         <Dropdown
           Icon={<ListFilter className='w-5 h-5' />}
           buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
