@@ -5,7 +5,7 @@ import './chat.css'
 import { useSocketStore } from '../../store/socket'
 import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/currenChat'
-import { ReplyMessage, uuid } from '../../types/chat'
+import { MessageFilter, Messages, ReplyMessage, uuid } from '../../types/chat'
 import { PhotoSlider } from 'react-photo-view'
 import { useImageSliderStore } from '../../store/imageSlider'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -34,6 +34,39 @@ export function Chat () {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .map(message => message.file?.url ?? '')
     .filter(Boolean)
+  const [messageFilter, setMessageFilter] = useState<MessageFilter>(null)
+  let filteredMessages: Messages = []
+
+  if (messageFilter?.includes('media'))
+    filteredMessages = messages.filter(
+      message =>
+        (message.chatId === currentChat?.uuid &&
+          new Date(message.createdAt).getTime() >
+            (new Date(currentChat.cleaned ?? 0).getTime() ?? 0) &&
+          message.type === MESSAGES_TYPES.IMAGE) ||
+        message.type === MESSAGES_TYPES.VIDEO
+    )
+
+  if (messageFilter?.includes('files')) {
+    const fileMessages = messages.filter(
+      message =>
+        message.type === MESSAGES_TYPES.DOCUMENT &&
+        message.chatId === currentChat?.uuid &&
+        new Date(message.createdAt).getTime() >
+          (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
+    )
+    filteredMessages?.push(...fileMessages)
+  }
+
+  if (!messageFilter)
+    filteredMessages = messages
+      .filter(
+        message =>
+          message.chatId === currentChat?.uuid &&
+          new Date(message.createdAt).getTime() >
+            (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
+      )
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -104,34 +137,28 @@ export function Chat () {
           <Header
             name={currentChat.user.name}
             picture={`${currentChat.user.picture}`}
+            messageFilter={messageFilter}
+            setMessageFilter={setMessageFilter}
           />
           <ul
             className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
             ref={messageListRef}
           >
-            {messages
-              .filter(
-                message =>
-                  message.chatId === currentChat?.uuid &&
-                  new Date(message.createdAt).getTime() >
-                    (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
+            {filteredMessages.map((message, index) =>
+              message.type !== MESSAGES_TYPES.TEXT &&
+              message.file &&
+              new Date(message.file.expiresAt) < new Date() ? null : (
+                <Message
+                  key={message.uuid ?? index}
+                  message={message}
+                  setReplyingMessage={setReplyingMessage}
+                  messageListRef={messageListRef}
+                  showEmojiPicker={showEmojiPicker}
+                  setShowEmojiPicker={setShowEmojiPicker}
+                  emojiPickerPosition={emojiPickerPosition}
+                />
               )
-              .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-              .map((message, index) =>
-                message.type !== MESSAGES_TYPES.TEXT &&
-                message.file &&
-                new Date(message.file.expiresAt) < new Date() ? null : (
-                  <Message
-                    key={message.uuid ?? index}
-                    message={message}
-                    setReplyingMessage={setReplyingMessage}
-                    messageListRef={messageListRef}
-                    showEmojiPicker={showEmojiPicker}
-                    setShowEmojiPicker={setShowEmojiPicker}
-                    emojiPickerPosition={emojiPickerPosition}
-                  />
-                )
-              )}
+            )}
           </ul>
 
           <Form

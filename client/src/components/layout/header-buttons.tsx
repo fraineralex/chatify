@@ -5,7 +5,7 @@ import {
   SquarePlus,
   LogOut,
   Settings,
-  EyeOff,
+  Archive,
   Lock
 } from 'lucide-react'
 import Modal from '../common/modal'
@@ -134,7 +134,7 @@ export function HeaderButtons () {
           aria-label='Hidden Chats'
           onClick={toggleArchivedChats}
         >
-          <EyeOff className='w-5 h-5' />
+          <Archive className='w-5 h-5' />
         </button>
         <button
           className={`hover:scale-110 hover:contrast-200 ${

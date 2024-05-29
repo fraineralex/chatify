@@ -42,6 +42,8 @@ export interface StaticFile {
   contentLength?: number
 }
 
+export type MessageFilter = Array<'media' | 'files'> | null
+
 export interface SignedFile {
   uuid: uuid
   file: StaticFile
