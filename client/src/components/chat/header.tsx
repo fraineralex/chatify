@@ -10,6 +10,7 @@ import {
   Megaphone,
   MegaphoneOff,
   Search,
+  Trash2,
   X
 } from 'lucide-react'
 import { Dropdown } from '../common/dropdown'
@@ -50,7 +51,7 @@ export function Header ({
   ) => {
     event.stopPropagation()
 
-    replaceChat({
+    const updatedChat = {
       ...chat,
       blockedBy: chat.blockedBy ? null : user?.sub,
       isMuted: false,
@@ -58,9 +59,11 @@ export function Header ({
       isPinned: false,
       isUnread: false,
       isDeleted: false
-    })
+    }
+    replaceChat(updatedChat)
 
-    setCurrentChat(null)
+    if (chat.blockedBy) setCurrentChat(updatedChat)
+    else setCurrentChat(null)
 
     const response = await toggleChatBlock(
       chat.uuid,
@@ -84,6 +87,8 @@ export function Header ({
       ...chat,
       isMuted: !chat.isMuted
     })
+
+    setCurrentChat({ ...chat, isMuted: !chat.isMuted })
 
     const muttedChats = chat.isMuted
       ? userMetadata.chat_preferences.muted.filter(uuid => uuid !== chat.uuid)
@@ -124,6 +129,8 @@ export function Header ({
       cleaned: new Date()
     })
 
+    setCurrentChat({ ...chat, cleaned: new Date() })
+
     const newChatPreferences = {
       ...userMetadata.chat_preferences,
       cleaned: {
@@ -162,6 +169,54 @@ export function Header ({
       )
 
     setMessageFilter([...messageFilter, filter])
+  }
+
+  const handleDeleteChat = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.stopPropagation()
+    replaceChat({
+      ...chat,
+      isDeleted: !chat.isDeleted,
+      cleaned: new Date(),
+      isPinned: false,
+      isMuted: false,
+      isArchived: false,
+      isUnread: false
+    })
+
+    setCurrentChat(null)
+
+    const deleteChats = chat.isDeleted
+      ? userMetadata.chat_preferences.deleted.filter(uuid => uuid !== chat.uuid)
+      : [...userMetadata.chat_preferences.deleted, chat.uuid]
+
+    const newChatPreferences = {
+      ...userMetadata.chat_preferences,
+      deleted: deleteChats,
+      cleaned: {
+        ...userMetadata.chat_preferences.cleaned,
+        [chat.uuid]: new Date().toISOString()
+      }
+    }
+
+    setUserMetadata({
+      chat_preferences: newChatPreferences
+    })
+    const response = await updateUserMetadata(
+      {
+        chat_preferences: newChatPreferences
+      },
+      user?.sub ?? ''
+    )
+
+    if (response.status !== 200) {
+      setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+      replaceChat({ ...chat })
+      setCurrentChat(currentChat)
+
+      return console.log(response.statusText)
+    }
   }
 
   return (
@@ -301,6 +356,17 @@ export function Header ({
                     Block user
                   </>
                 )}
+              </button>
+            </li>
+            <li>
+              <button
+                title='Delete chat'
+                aria-label='Delete chat'
+                className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                onClick={handleDeleteChat}
+              >
+                <Trash2 className='w-5 h-5 inline me-2' />
+                Delete chat
               </button>
             </li>
           </ul>

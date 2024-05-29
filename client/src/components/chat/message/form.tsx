@@ -67,6 +67,7 @@ export function Form ({
   }, [])
 
   useEffect(() => {
+    if (currentChat.blockedBy) return
     const input = formRef.current?.querySelector(
       'input[name="content"]'
     ) as HTMLInputElement
