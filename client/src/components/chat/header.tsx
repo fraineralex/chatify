@@ -1,4 +1,5 @@
 import {
+  CircleX,
   EllipsisVertical,
   Eraser,
   FileText,
@@ -18,6 +19,7 @@ import { useSocketStore } from '../../store/socket'
 import { toggleChatBlock } from '../../services/chat'
 import { updateUserMetadata } from '../../services/user'
 import { MessageFilter } from '../../types/chat'
+import { useEffect } from 'react'
 
 interface Props {
   name: string
@@ -37,6 +39,11 @@ export function Header ({
   const chat = chats.find(chat => chat.uuid === currentChat?.uuid)
   if (!chat || !userMetadata) return null
   const user = useAuth0().user
+
+  useEffect(() => {
+    if (!currentChat) return
+    setMessageFilter(null)
+  }, [currentChat])
 
   const handleToggleBlockChat = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -148,7 +155,11 @@ export function Header ({
     if (!messageFilter) return setMessageFilter([filter])
 
     if (messageFilter?.includes(filter))
-      return setMessageFilter(messageFilter.filter(f => f !== filter))
+      return setMessageFilter(
+        messageFilter.filter(f => f !== filter).length === 0
+          ? null
+          : messageFilter.filter(f => f !== filter)
+      )
 
     setMessageFilter([...messageFilter, filter])
   }
@@ -166,10 +177,26 @@ export function Header ({
         />
         <h2 className='text-base font-bold my-auto'>{name}</h2>
       </article>
-      <aside className='flex'>
-        <Search className='w-5 h-5 mt-3' />
+      <aside className='flex mt-3'>
+        <div className='flex place-content-center text-center me-5 mt-1 flex-row-reverse'>
+          {messageFilter?.map(filter => (
+            <span
+              key={filter}
+              className='bg-blue-400 text-xs text-gray-800 px-2 py-1 rounded-full align-middle h-fit flex font-normal mx-1'
+            >
+              <button
+                className='hover:scale-105 text-gray-700 hover:text-gray-800'
+                onClick={updateMessageFilter(filter)}
+              >
+                <CircleX className='w-4 h-4 me-2 align-middle' />
+              </button>
+              {filter === 'media' ? 'Photos & videos' : 'Shared files'}
+            </span>
+          ))}
+        </div>
+        <Search className='w-5 h-5 mt-1' />
         <Dropdown
-          Icon={<ListFilter className='w-5 h-5 mt-3' />}
+          Icon={<ListFilter className='w-5 h-5' />}
           buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
           dropdownClassName='right-16 mt-2'
         >
@@ -179,7 +206,10 @@ export function Header ({
           >
             <li>
               <button
-                className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                className={`flex px-4 py-2 w-full text-left align-middle ${
+                  !messageFilter?.includes('media') &&
+                  'hover:bg-gray-600 hover:text-white'
+                }`}
                 title='Shared photos & videos'
                 aria-label='Shared photos & videos'
                 onClick={updateMessageFilter('media')}
@@ -192,7 +222,10 @@ export function Header ({
               <button
                 title='Shared files'
                 aria-label='Shared files'
-                className='flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle'
+                className={`flex px-4 py-2 w-full text-left align-middle ${
+                  !messageFilter?.includes('files') &&
+                  'hover:bg-gray-600 hover:text-white'
+                }`}
                 onClick={updateMessageFilter('files')}
                 disabled={messageFilter?.includes('files')}
               >
@@ -202,7 +235,7 @@ export function Header ({
           </ul>
         </Dropdown>
         <Dropdown
-          Icon={<EllipsisVertical className='w-5 h-5 mt-3 me-5' />}
+          Icon={<EllipsisVertical className='w-5 h-5 me-5' />}
           buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
           dropdownClassName='right-9 mt-2'
         >
