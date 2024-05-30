@@ -140,7 +140,7 @@ export function Chat () {
   }
 
   return (
-    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-5'>
+    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-5 max-w-full'>
       {currentChat ? (
         <>
           <Header
@@ -158,6 +158,7 @@ export function Chat () {
             {filteredMessages.map((message, index) =>
               message.type !== MESSAGES_TYPES.TEXT &&
               message.file &&
+              message.file.expiresAt &&
               new Date(message.file.expiresAt) < new Date() ? null : (
                 <Message
                   key={message.uuid ?? index}

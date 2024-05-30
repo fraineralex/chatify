@@ -43,7 +43,6 @@ export function Form ({
   const { user: loggedUser } = useAuth0()
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [showGifsPicker, setShowGifsPicker] = useState(false)
-  const showEmojiPickerRef = useRef(showEmojiPicker)
   const formRef = useRef<HTMLFormElement>(null)
   const [contentMessage, setContentMessage] = useState<string>(
     currentChat?.draft ?? ''
@@ -335,6 +334,53 @@ export function Form ({
 
   const handleGifClick = (gif: TenorImage) => {
     console.log(gif)
+    const message: ServerMessage = {
+      uuid: crypto.randomUUID(),
+      content: '',
+      sender_id: loggedUser?.sub || '',
+      receiver_id: currentChat.user.id,
+      chat_id: currentChat.uuid,
+      type: MESSAGES_TYPES.STICKER,
+      is_deleted: false,
+      is_edited: false,
+      is_delivered: false,
+      is_read: false,
+      reply_to_id: replyingMessage?.uuid || null,
+      file: {
+        url: gif.url,
+        filename: 'Gif message.gif',
+        contentType: 'image/gif'
+      },
+      reactions: null,
+      created_at: new Date().toISOString()
+    }
+
+    socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+
+    const newMessage: Message = {
+      uuid: message.uuid,
+      content: message.content,
+      createdAt: new Date(),
+      senderId: message.sender_id,
+      receiverId: message.receiver_id,
+      chatId: message.chat_id,
+      type: message.type,
+      isDeleted: message.is_deleted,
+      isEdited: message.is_edited,
+      isSent: false,
+      isDelivered: message.is_delivered,
+      isRead: message.is_read,
+      replyToId: message.reply_to_id,
+      reactions: null,
+      file: message.file as StaticFile
+    }
+
+    addMessage(newMessage)
+    const chatUpdated = { ...currentChat, lastMessage: newMessage }
+    replaceChat(chatUpdated)
+    setCurrentChat(chatUpdated)
+
+    if (replyingMessage) handleReplyMessage(null)
   }
 
   return (

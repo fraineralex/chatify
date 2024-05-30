@@ -116,7 +116,7 @@ export function Message ({
   return (
     <>
       <li
-        className={`flex flex-col space-y-2 relative  ${
+        className={`flex flex-col space-y-2 relative max-w-full  ${
           isMe ? 'items-end' : 'items-start'
         }`}
         data-uuid={uuid}
@@ -189,7 +189,8 @@ export function Message ({
                   <Trash2 className='w-4 h-4' />
                 </button>
                 {(message.type === MESSAGES_TYPES.IMAGE ||
-                  message.type === MESSAGES_TYPES.VIDEO) &&
+                  message.type === MESSAGES_TYPES.VIDEO ||
+                  message.type === MESSAGES_TYPES.STICKER) &&
                   message.file && (
                     <button
                       className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'

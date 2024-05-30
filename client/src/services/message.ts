@@ -2,7 +2,11 @@ import { StaticFile, uuid } from '../types/chat'
 import { getSignedUrls } from './chat'
 
 export const updateSignedFile = async (file: StaticFile, msgId: uuid) => {
-  if (new Date().getTime() < new Date(file.expiresAt).getTime()) return file
+  if (
+    !file.expiresAt ||
+    new Date().getTime() < new Date(file.expiresAt).getTime()
+  )
+    return file
 
   const updatedSignedUrls = await getSignedUrls([msgId])
   if (updatedSignedUrls.length > 0) {
