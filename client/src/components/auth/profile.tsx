@@ -5,22 +5,15 @@ export function Profile () {
   const formatedName = user?.name?.split(' ').slice(0, 2).join(' ')
 
   return (
-    <article
+    <img
       title={user?.name}
       aria-label={user?.name}
-      className='flex justify-between items-center rounded-md group'
-    >
-      <figure className='flex justify-center items-center space-x-2 group-hover:space-x-3'>
-        <img
-          width='50'
-          height='50'
-          src={user?.picture}
-          alt={`avatar of the user ${formatedName}`}
-          className='w-10 h-10 rounded-full'
-          style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
-        />
-        <figcaption className='text-gray-700 font-semibold text-sm group-hover:text-gray-900 group-hover:scale-105 ease-in-out duration-300'></figcaption>
-      </figure>
-    </article>
+      width='50'
+      height='50'
+      src={user?.picture}
+      alt={`avatar of the user ${formatedName}`}
+      className='w-10 h-10 rounded-full'
+      style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
+    />
   )
 }

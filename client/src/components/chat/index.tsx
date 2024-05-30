@@ -13,8 +13,8 @@ import { MESSAGES_TYPES } from '../../constants'
 import { getSignedUrls } from '../../services/chat'
 
 export function Chat () {
-  const { messages, replaceMessage } = useSocketStore()
   const currentChat = useChatStore(state => state.currentChat)
+  const { messages, replaceMessage } = useSocketStore()
   const messageListRef = useRef<HTMLUListElement>(null)
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(
     null
