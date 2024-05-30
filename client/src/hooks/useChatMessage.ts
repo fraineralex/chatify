@@ -223,6 +223,7 @@ export const useChatMessage = () => {
         msg.chatId === currentChat.uuid &&
         !msg.isDeleted &&
         msg.file &&
+        msg.file.expiresAt &&
         new Date(msg.file?.expiresAt).getTime() <= new Date().getTime()
 
       if (
