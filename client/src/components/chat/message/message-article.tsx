@@ -65,7 +65,7 @@ export function MessageArticle ({
             <video
               src={message.file.url}
               controls
-              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg'
             />
           )}
 
@@ -76,15 +76,13 @@ export function MessageArticle ({
           )}
 
         <div
-          className={`${
-            !isAnEmoji ? 'flex justify-between h-full pt-1 ps-1' : undefined
-          }  `}
+          className={`${!isAnEmoji && 'flex justify-between h-full ps-1'}  `}
         >
           {!message.isDeleted && (
             <p
-              className={`w-100 inline align-middle ${
+              className={`w-100 inline align-middle font-medium ${
                 isAnEmoji ? 'text-5xl' : 'text-sm'
-              }`}
+              } ${message.type !== MESSAGES_TYPES.TEXT ? 'm-0' : 'mt-1 pb-1'}`}
             >
               {contentMessage.map((word, index) =>
                 typeof word === 'string' ? (
@@ -118,7 +116,12 @@ export function MessageArticle ({
 
           <span
             className={`text-gray-500 items-end ms-2 flex space-x-1 self-end ${
-              isAnEmoji ? 'mt-1' : 'mt-2'
+              message.type === MESSAGES_TYPES.TEXT ||
+              message.type === MESSAGES_TYPES.DOCUMENT
+                ? isAnEmoji
+                  ? 'mt-1'
+                  : 'mt-2'
+                : 'absolute bottom-2 right-2 text-white'
             }`}
           >
             {message.isEdited && !message.isDeleted && (
