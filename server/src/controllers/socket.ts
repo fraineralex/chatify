@@ -5,7 +5,8 @@ import {
   MessagesToUpdate,
   ResourceData,
   ServerMessage,
-  uuid
+  uuid,
+  StaticFile
 } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../constants/index.js'
@@ -48,13 +49,28 @@ export class SocketController {
         sql: 'INSERT INTO messages (uuid, content, sender_id, receiver_id, is_read, is_delivered, is_edited, is_deleted, reply_to_id, type, resource_url, chat_id, reactions, created_at) VALUES (:uuid, :content, :sender_id, :receiver_id, :is_read, :is_delivered, :is_edited, :is_deleted, :reply_to_id, :type, :file, :chat_id, :reactions, :created_at)',
         args: {
           ...message,
-          file: file?.filename ?? null
+          file: message.file?.url ?? file?.filename ?? null
         }
       })
 
+      let staticFile: StaticFile | null = null
+      if (
+        file &&
+        (message.type === MESSAGES_TYPES.IMAGE ||
+          message.type === MESSAGES_TYPES.DOCUMENT)
+      ) {
+        staticFile = await getObjectSignedUrl(file.filename)
+      } else if (message.type === MESSAGES_TYPES.STICKER && message.file?.url) {
+        staticFile = {
+          url: message.file.url,
+          filename: `Gift message.gif`,
+          contentType: 'image/gif'
+        }
+      }
+
       const createdMessage: ServerMessage = {
         ...message,
-        file: file ? await getObjectSignedUrl(file.filename) : null
+        file: staticFile
       }
 
       this.io.emit(SOCKET_EVENTS.CHAT_MESSAGE, createdMessage)
@@ -170,11 +186,23 @@ export class SocketController {
       })
 
       results.rows.forEach(async row => {
+        let staticFile: StaticFile | null = null
+        if (
+          row.resource_url &&
+          (row.type === MESSAGES_TYPES.IMAGE ||
+            row.type === MESSAGES_TYPES.DOCUMENT)
+        ) {
+          staticFile = await getObjectSignedUrl(row.resource_url as string)
+        } else if (row.resource_url && row.type === MESSAGES_TYPES.STICKER) {
+          staticFile = {
+            url: row.resource_url as string,
+            filename: `Gift message.gif`,
+            contentType: 'image/gif'
+          }
+        }
         const message = {
           ...row,
-          file: row.resource_url
-            ? await getObjectSignedUrl(row.resource_url as string)
-            : null
+          file: staticFile
         }
         socket.emit(SOCKET_EVENTS.CHAT_MESSAGE, message)
       })

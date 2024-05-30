@@ -10,7 +10,7 @@ interface ResourceData {
 
 interface StaticFile {
   url: string
-  expiresAt: string
+  expiresAt?: string
   filename?: string
   contentType?: string
   contentLength?: number

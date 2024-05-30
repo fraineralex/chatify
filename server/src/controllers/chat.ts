@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Message, ServerChat, uuid } from '../types/chat.js'
+import { Message, ServerChat, StaticFile, uuid } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { getUserById } from '../utils/user.js'
 import { MESSAGES_TYPES } from '../constants/index.js'
@@ -47,6 +47,27 @@ export class ChatController {
 
         if (resultMessage.rows?.length > 0) {
           const message = resultMessage.rows[0]
+          let staticFile: StaticFile | null = null
+
+          if (
+            message.resource_url &&
+            (message.type === MESSAGES_TYPES.IMAGE ||
+              message.type === MESSAGES_TYPES.DOCUMENT)
+          ) {
+            staticFile = await getObjectSignedUrl(
+              message.resource_url as string
+            )
+          } else if (
+            message.resource_url &&
+            message.type === MESSAGES_TYPES.STICKER
+          ) {
+            staticFile = {
+              url: message.resource_url as string,
+              filename: `Gift message.gif`,
+              contentType: 'image/gif'
+            }
+          }
+
           lastMessage = {
             uuid: message.uuid as uuid,
             chatId: chat.uuid as uuid,
@@ -58,9 +79,7 @@ export class ChatController {
             isDelivered: !!message.is_delivered as unknown as boolean,
             receiverId: message.receiver_id as string,
             replyToId: message.reply_to_id as uuid | null,
-            file: message.resource_url
-              ? await getObjectSignedUrl(message.resource_url as string)
-              : null,
+            file: staticFile,
             senderId: message.sender_id as string,
             type: message.type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
             reactions: message.reactions
@@ -189,6 +208,23 @@ export class ChatController {
 
       if (resultMessage.rows && resultMessage.rows.length > 0) {
         const message = resultMessage.rows[0]
+        let staticFile: StaticFile | null = null
+        if (
+          message.resource_url &&
+          (message.type === MESSAGES_TYPES.IMAGE ||
+            message.type === MESSAGES_TYPES.DOCUMENT)
+        ) {
+          staticFile = await getObjectSignedUrl(message.resource_url as string)
+        } else if (
+          message.resource_url &&
+          message.type === MESSAGES_TYPES.STICKER
+        ) {
+          staticFile = {
+            url: message.resource_url as string,
+            filename: `Gift message.gif`,
+            contentType: 'image/gif'
+          }
+        }
         lastMessage = {
           uuid: message.uuid as uuid,
           chatId: chatDB.uuid as uuid,
@@ -200,7 +236,7 @@ export class ChatController {
           isDelivered: !!message.is_delivered as unknown as boolean,
           receiverId: message.receiver_id as string,
           replyToId: message.reply_to_id as uuid,
-          file: await getObjectSignedUrl(message.resource_url as string),
+          file: staticFile,
           senderId: message.sender_id as string,
           type: message.type as typeof MESSAGES_TYPES[keyof typeof MESSAGES_TYPES],
           reactions: message.reactions
@@ -295,7 +331,9 @@ export class ChatController {
 
       const updatedSignedUrls = await Promise.all(
         selectStatement.rows.map(async message => {
-          const signedUrl = await getObjectSignedUrl(message.resource_url as string)
+          const signedUrl = await getObjectSignedUrl(
+            message.resource_url as string
+          )
           return {
             uuid: message.uuid as uuid,
             file: signedUrl
