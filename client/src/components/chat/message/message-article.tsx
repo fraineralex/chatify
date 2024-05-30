@@ -40,10 +40,13 @@ export function MessageArticle ({
   const contentMessage = extractUrlsFromText(message.content)
 
   return (
-    <div className='relative mb-1'>
+    <div className='relative mb-1 max-w-full'>
       <article
-        className={`items-center rounded-lg pt-1 pb-1 px-1 ps-1 max-w-3xl whitespace-normal break-words border border-transparent ${
+        className={`items-center rounded-lg max-w-xl whitespace-normal break-words border border-transparent ${
           isMe ? 'bg-gray-300' : 'bg-gray-100'
+        } ${
+          (message.type !== MESSAGES_TYPES.STICKER || message.isDeleted) &&
+          'pt-1 pb-1 px-1 ps-1'
         }`}
       >
         {!message.isDeleted && message.replyToId && (
@@ -57,6 +60,16 @@ export function MessageArticle ({
           message.type === MESSAGES_TYPES.IMAGE &&
           message.file && (
             <DisplayImage chatId={message.chatId} imageUrl={message.file.url} />
+          )}
+
+        {!message.isDeleted &&
+          message.type === MESSAGES_TYPES.STICKER &&
+          message.file?.url && (
+            <img
+              src={message.file?.url}
+              alt='Image of the message'
+              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg'
+            />
           )}
 
         {!message.isDeleted &&
@@ -81,8 +94,12 @@ export function MessageArticle ({
           {!message.isDeleted && (
             <p
               className={`w-100 inline align-middle font-medium ${
-                isAnEmoji ? 'text-5xl' : 'text-sm'
-              } ${message.type !== MESSAGES_TYPES.TEXT ? 'm-0' : 'mt-1 pb-1'}`}
+                message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
+              } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${
+                message.type !== MESSAGES_TYPES.TEXT
+                  ? message.content && 'mt-1'
+                  : 'mt-1 pb-1'
+              }`}
             >
               {contentMessage.map((word, index) =>
                 typeof word === 'string' ? (
@@ -115,13 +132,14 @@ export function MessageArticle ({
           )}
 
           <span
-            className={`text-gray-500 items-end ms-2 flex space-x-1 self-end ${
+            className={`text-gray-500 items-end ms-2 flex space-x-1 self-end whitespace-nowrap ${
               message.type === MESSAGES_TYPES.TEXT ||
-              message.type === MESSAGES_TYPES.DOCUMENT
+              message.type === MESSAGES_TYPES.DOCUMENT ||
+              message.isDeleted
                 ? isAnEmoji
                   ? 'mt-1'
                   : 'mt-2'
-                : 'absolute bottom-2 right-2 text-white'
+                : 'absolute bottom-1 right-2 text-white'
             }`}
           >
             {message.isEdited && !message.isDeleted && (
