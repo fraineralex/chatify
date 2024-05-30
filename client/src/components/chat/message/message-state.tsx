@@ -11,7 +11,7 @@ export function MessageState ({
   isRead: boolean
   isChatItem?: boolean
 }) {
-  let className = `w-4 h-4 inline ${isRead ? 'text-blue-500' : 'text-gray-500'}`
+  let className = `w-4 h-4 inline ${isRead && 'text-blue-500'}`
 
   if (isChatItem) className += ' text-[10px] ms-1 me-1'
   else className += ' text-[10px]'

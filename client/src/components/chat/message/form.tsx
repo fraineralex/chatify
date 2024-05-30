@@ -14,13 +14,22 @@ import { useSocketStore } from '../../../store/socket'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useChatStore } from '../../../store/currenChat'
 import { ReplyingMessage } from './replying-message'
-import { LockKeyholeOpen, SendHorizontal, Image, FileText } from 'lucide-react'
+import {
+  LockKeyholeOpen,
+  SendHorizontal,
+  Image,
+  FileText,
+  Sticker
+} from 'lucide-react'
 import { toggleChatBlock } from '../../../services/chat'
 import EmojiPicker from 'emoji-picker-react'
 import { Dropdown } from '../../common/dropdown'
 import './form.css'
 import { FilePreview } from './file-preview'
 import { readFileAsBase64 } from '../../../utils/chat'
+import GifPicker, { TenorImage } from 'gif-picker-react'
+
+const tenorApiKey = (import.meta.env.VITE_TENOR_API_KEY as string) ?? ''
 
 export function Form ({
   replyingMessage,
@@ -33,6 +42,7 @@ export function Form ({
   const { currentChat, setCurrentChat } = useChatStore()
   const { user: loggedUser } = useAuth0()
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showGifsPicker, setShowGifsPicker] = useState(false)
   const showEmojiPickerRef = useRef(showEmojiPicker)
   const formRef = useRef<HTMLFormElement>(null)
   const [contentMessage, setContentMessage] = useState<string>(
@@ -44,18 +54,23 @@ export function Form ({
   if (!currentChat) return null
 
   useEffect(() => {
-    showEmojiPickerRef.current = showEmojiPicker
-  }, [showEmojiPicker])
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (
-        showEmojiPickerRef.current &&
+        showEmojiPicker &&
         !target.closest('div[id="emoji-selector"]') &&
         !target.closest('button[name="emoji"]')
       ) {
-        setShowEmojiPicker(false)
+        setShowEmojiPicker(prev => !prev)
+      }
+
+      if (
+        showGifsPicker &&
+        !target.closest('div[id="gif-selector"]') &&
+        !target.closest('div[class="gpr-category-list"]') &&
+        !target.closest('button[name="gif"]')
+      ) {
+        setShowGifsPicker(prev => !prev)
       }
     }
 
@@ -64,7 +79,7 @@ export function Form ({
     return () => {
       window.removeEventListener('click', handleClickOutside)
     }
-  }, [])
+  }, [showEmojiPicker, showGifsPicker])
 
   useEffect(() => {
     if (currentChat.blockedBy) return
@@ -226,17 +241,24 @@ export function Form ({
     replaceChat({ ...currentChat, draft: updatedContentMessage })
   }
 
-  const handleBlur = () => {
-    if (!contentMessage || !currentChat) return
-    replaceChat({ ...currentChat, draft: contentMessage })
-    setCurrentChat({ ...currentChat, draft: contentMessage })
-  }
-
   const handleEmojiClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault()
+    if (showGifsPicker) setShowGifsPicker(false)
     setShowEmojiPicker(!showEmojiPicker)
+    const input = formRef.current?.querySelector(
+      'input[name="content"]'
+    ) as HTMLInputElement
+    input.focus()
+  }
+
+  const handleGifsClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault()
+    if (showEmojiPicker) setShowEmojiPicker(false)
+    setShowGifsPicker(!showGifsPicker)
     const input = formRef.current?.querySelector(
       'input[name="content"]'
     ) as HTMLInputElement
@@ -311,6 +333,10 @@ export function Form ({
     }
   }
 
+  const handleGifClick = (gif: TenorImage) => {
+    console.log(gif)
+  }
+
   return (
     <form className='p-2 border-t w-full' onSubmit={handleSubmit} ref={formRef}>
       {!currentChat?.blockedBy && (
@@ -334,13 +360,34 @@ export function Form ({
             )}
             <button
               name='emoji'
+              title='Emojis'
               className={`hover:scale-125 ease-out duration-100 ${
                 showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
               }`}
               onClick={handleEmojiClick}
             >
               <Emoji className='w-6 h-6' />
-              <span className='sr-only'>Insert emoji</span>
+              <span className='sr-only'>Insert emojis</span>
+            </button>
+
+            {showGifsPicker && (
+              <div id='gif-selector' className='fixed bottom-20'>
+                <GifPicker
+                  tenorApiKey={tenorApiKey}
+                  onGifClick={handleGifClick}
+                />
+              </div>
+            )}
+            <button
+              name='gif'
+              title='Gifs and Stickers'
+              onClick={handleGifsClick}
+              className={`hover:scale-125 ease-out duration-100 ${
+                showGifsPicker ? 'text-blue-500' : 'text-gray-600'
+              }`}
+            >
+              <Sticker className='w-6 h-6' />
+              <span className='sr-only'>Insert a Gif</span>
             </button>
 
             <Dropdown
@@ -411,7 +458,6 @@ export function Form ({
                   ? fileMessages[selectedFileIndex ?? 0]?.caption ?? ''
                   : currentChat?.draft ?? ''
               }
-              onBlur={handleBlur}
               onKeyDown={handleKeyDown}
             />
             <button

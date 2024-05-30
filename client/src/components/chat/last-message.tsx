@@ -52,7 +52,7 @@ export function LastMessage ({
               <Icon className='w-4 h-4 inline me-1 align-middle' />
             )}
             <span
-              className={`align-middle ${
+              className={`align-middle font-medium ${
                 !lastMessage.content ? 'capitalize' : undefined
               }`}
             >

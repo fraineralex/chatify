@@ -26,7 +26,7 @@ export default function DisplayImage ({
     <img
       src={imageUrl}
       alt='Image of the message'
-      className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg mb-1'
+      className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg'
       onClick={handleImageClick}
     />
   )

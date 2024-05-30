@@ -13,6 +13,7 @@
     "dexie": "4.0.4",
     "dexie-react-hooks": "1.1.7",
     "emoji-picker-react": "4.9.2",
+    "gif-picker-react": "1.3.2",
     "lucide-react": "0.370.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
