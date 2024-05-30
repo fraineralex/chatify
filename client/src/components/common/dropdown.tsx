@@ -44,7 +44,7 @@ export function Dropdown ({
           buttonClassName
             ? `${buttonClassName} ${dropdownOpen ? 'text-gray-900' : undefined}`
             : `${
-                dropdownOpen ? 'inline text-gray-900' : 'hidden'
+                dropdownOpen ? 'inline text-gray-900' : 'lg:hidden'
               } group-hover:inline-block ease-in-out duration-100 hover:scale-125`
         }
       >

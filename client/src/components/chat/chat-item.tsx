@@ -27,6 +27,10 @@ export function ChatItem ({
     isUnread
   })
 
+  const isCleaned =
+    new Date(lastMessage?.createdAt ?? 0).getTime() <
+    new Date(cleaned ?? 0)?.getTime()
+
   return (
     <li
       className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full group ${
@@ -49,23 +53,21 @@ export function ChatItem ({
           <h2 className='text-base font-medium inline-flex items-center'>
             {user.name}
           </h2>
-          {!isNewChat && lastMessage?.createdAt && (
+          {!isNewChat && lastMessage?.createdAt && !isCleaned && (
             <LastMessageTime createdAt={lastMessage.createdAt} />
           )}
         </div>
-        {!isNewChat &&
-          lastMessage &&
-          new Date(lastMessage?.createdAt).getTime() >
-            new Date(cleaned ?? 0)?.getTime() && (
-            <LastMessage
-              loggedUser={loggedUser}
-              lastMessage={lastMessage}
-              unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
-              uuid={uuid}
-              isPinned={isPinned}
-              isUnread={isUnread}
-            />
-          )}
+        {!isNewChat && (
+          <LastMessage
+            loggedUser={loggedUser}
+            lastMessage={lastMessage}
+            unreadMessages={isCurrentChat ? 0 : unreadMessages ?? 0}
+            uuid={uuid}
+            isPinned={isPinned}
+            isUnread={isUnread}
+            isCleaned={isCleaned}
+          />
+        )}
       </article>
     </li>
   )

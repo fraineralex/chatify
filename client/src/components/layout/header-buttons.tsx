@@ -6,7 +6,8 @@ import {
   LogOut,
   Settings,
   Archive,
-  Lock
+  Lock,
+  X
 } from 'lucide-react'
 import Modal from '../common/modal'
 import { useEffect, useState } from 'react'
@@ -69,6 +70,7 @@ export function HeaderButtons () {
         <Dropdown
           Icon={<EllipsisVertical className='w-5 h-5' />}
           buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
+          dropdownClassName='max-sm:right-3 mt-2'
         >
           <ul
             className='py-2 text-sm text-gray-700 dark:text-gray-200'
@@ -149,13 +151,19 @@ export function HeaderButtons () {
       </aside>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
-        <article className='fixed left-60 top-0 z-50 mx-2 mt-14 max-w-[400px] flex-col items-center overflow-hidden rounded-md px-4 py-6 shadow-2xl border bg-gray-200 lg:w-3/4 xl:w-2/3 md:max-h-50 max-h-132 flex'>
-          <h2 className='font-bold self-start mb-1'>New Chat</h2>
+        <article className='fixed md:left-60 top-0 mt-16 z-50 md:mx-2 max-w-full md:max-w-[400px] flex-col items-center overflow-hidden rounded-md px-4 pb-6 shadow-2xl border bg-gray-300 w-full md:w-3/4 md:max-h-50 max-h-full min-h-full md:min-h-40 md:h-auto flex'>
+          <button
+            className='absolute top-2 right-2 p-1 rounded-full bg-gray-400 hover:scale-110'
+            onClick={() => closeModal()}
+          >
+            <X className='w-4 h-4 text-gray-900' />
+          </button>
+          <h2 className='font-bold mb-4 text-center text-lg mt-3'>New Chat</h2>
           <div className='relative mb-2 w-full md:mb-4'>
             <input
               autoFocus
               type='text'
-              className='w-full placeholder-gray-700 bg-transparent border outline-none disabled:bg-gray-400 text-gray-800 border-gray-500 focus:bg-gray-300 focus:border-gray-300  focus:border-2 rounded-xl px-3 py-1'
+              className='font-medium w-full placeholder-gray-700 bg-transparent border outline-none disabled:bg-gray-500 text-gray-800 border-gray-600 focus:bg-gray-400 focus:border-gray-400 focus:border-2 rounded-xl px-3 py-1'
               placeholder='Start typing to search'
               onChange={({ target }) => setSearch(target.value)}
               value={search}

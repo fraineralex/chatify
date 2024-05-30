@@ -12,6 +12,7 @@ interface Props {
   uuid?: uuid
   isPinned?: boolean
   isUnread?: boolean
+  isCleaned?: boolean
 }
 
 export function LastMessage ({
@@ -20,7 +21,8 @@ export function LastMessage ({
   unreadMessages,
   uuid,
   isPinned,
-  isUnread
+  isUnread,
+  isCleaned
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
 
@@ -38,7 +40,7 @@ export function LastMessage ({
   return (
     <aside className='flex items-center text-left  flex-grow w-full justify-between text-gray-500'>
       <p className='text-sm truncate max-w-full inline-block'>
-        {lastMessage && isMe && (
+        {lastMessage && isMe && !isCleaned && (
           <MessageState
             isDelivered={lastMessage.isDelivered}
             isSent={lastMessage.isSent}
@@ -46,7 +48,7 @@ export function LastMessage ({
             isChatItem
           />
         )}
-        {lastMessage && !lastMessage.isDeleted && (
+        {lastMessage && !lastMessage.isDeleted && !isCleaned && (
           <>
             {lastMessage.type !== MESSAGES_TYPES.TEXT && (
               <Icon className='w-4 h-4 inline me-1 align-middle' />
@@ -56,11 +58,11 @@ export function LastMessage ({
                 !lastMessage.content ? 'capitalize' : undefined
               }`}
             >
-              {lastMessageContent}
+              {lastMessage && lastMessageContent}
             </span>
           </>
         )}
-        {lastMessage?.isDeleted && (
+        {lastMessage?.isDeleted && !isCleaned && (
           <>
             <Ban className='w-4 h-4 inline me-1 align-middle' />
             <span className='align-middle'>
@@ -71,12 +73,13 @@ export function LastMessage ({
       </p>
       <span className='flex space-x-2'>
         {isPinned && <Pin className='w-4 h-4 rotate-45' />}
-        {unreadMessages > 0 ||
-          (isUnread && (
-            <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
-              {isUnread ? undefined : unreadMessages}
-            </span>
-          ))}
+        {!isCleaned &&
+          (unreadMessages > 0 ||
+            (isUnread && (
+              <span className='inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white'>
+                {isUnread ? undefined : unreadMessages}
+              </span>
+            )))}
         {uuid && <ChatDropdown uuid={uuid} />}
       </span>
     </aside>

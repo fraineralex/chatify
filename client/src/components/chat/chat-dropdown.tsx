@@ -251,7 +251,10 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   }
 
   return (
-    <Dropdown Icon={<ChevronDown className='w-5 h-5' />}>
+    <Dropdown
+      Icon={<ChevronDown className='w-5 h-5' />}
+      dropdownClassName='max-sm:right-3'
+    >
       <ul
         className='py-2 text-sm text-gray-700 dark:text-gray-200'
         aria-labelledby='dropdownDefaultButton'
