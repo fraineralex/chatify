@@ -148,7 +148,7 @@ export function Message ({
             width='50'
             height='50'
             alt={`Avatar of the user ${user?.name} in the chat`}
-            className='rounded-full align-top h-7 w-7 mt-2'
+            className='hidden md:inline rounded-full align-top h-7 w-7 mt-2'
             style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
           />
           <aside

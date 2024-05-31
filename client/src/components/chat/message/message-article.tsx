@@ -40,9 +40,9 @@ export function MessageArticle ({
   const contentMessage = extractUrlsFromText(message.content)
 
   return (
-    <div className='relative mb-1 max-w-full'>
+    <div className='relative mt-1 max-w-full'>
       <article
-        className={`items-center rounded-lg max-w-xl whitespace-normal break-words border border-transparent ${
+        className={`items-center rounded-lg max-w-xs md:max-w-xl whitespace-normal break-words border border-transparent ${
           isMe ? 'bg-gray-300' : 'bg-gray-100'
         } ${
           (message.type !== MESSAGES_TYPES.STICKER || message.isDeleted) &&
@@ -68,7 +68,7 @@ export function MessageArticle ({
             <img
               src={message.file?.url}
               alt='Image of the message'
-              className='max-w-80 max-h-[640px] w-auto h-auto rounded-lg'
+              className='md:max-w-80 max-h-[640px] w-auto h-auto rounded-lg'
             />
           )}
 
@@ -93,7 +93,7 @@ export function MessageArticle ({
         >
           {!message.isDeleted && (
             <p
-              className={`w-100 inline align-middle font-medium ${
+              className={`w-full md:w-100 inline align-middle font-medium ${
                 message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
               } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${
                 message.type !== MESSAGES_TYPES.TEXT

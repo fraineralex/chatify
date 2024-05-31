@@ -152,7 +152,7 @@ export function Chat () {
             setSearch={setSearch}
           />
           <ul
-            className='flex-1 p-4 space-y-4 overflow-y-auto my-5 scroll-smooth'
+            className='flex-1 p-2 md:p-4 space-y-4 overflow-y-auto scroll-smooth'
             ref={messageListRef}
           >
             {filteredMessages.map((message, index) =>
