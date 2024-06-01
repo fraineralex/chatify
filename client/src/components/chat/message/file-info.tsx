@@ -36,7 +36,7 @@ export function FileInfo ({
   return (
     <figure className='rounded-md bg-gray-200 mx-2 mt-2'>
       <div className='flex space-x-2 border-b p-2 border-gray-400'>
-        <Icon className='w-12 h-12' />
+        <Icon className='w-12 h-12 align-middle' />
         <span className='text-gray-500'>
           <h6 className='font-medium text-base w-64 truncate block text-gray-800'>
             {file.filename}

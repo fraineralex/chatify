@@ -245,14 +245,14 @@ export function Header ({
           className='rounded-full'
           style={{ aspectRatio: 36 / 36, objectFit: 'cover' }}
         />
-        <h2 className='text-base font-bold my-auto'>{name}</h2>
+        <h2 className='text-sm md:text-base font-bold my-auto'>{name}</h2>
       </article>
-      <aside className='flex mt-3'>
-        <div className='flex place-content-center text-center me-6 mt-1 flex-row-reverse'>
+      <aside className='flex mt-3 space-x-3 md:space-x-6 md:me-3'>
+        <div className='flex place-content-center text-center mt-1 flex-row-reverse'>
           {messageFilter?.map(filter => (
             <span
               key={filter}
-              className='bg-blue-400 text-xs text-gray-800 px-2 py-1 rounded-full align-middle h-fit flex font-normal mx-1'
+              className='bg-blue-400 text-xs text-gray-800 px-2 py-1 rounded-full align-middle h-fit md:flex font-normal mx-1'
             >
               <button
                 className='hover:scale-105 text-gray-700 hover:text-gray-800'
@@ -268,7 +268,7 @@ export function Header ({
           {search !== null && (
             <input
               ref={searchInputRef}
-              className='flex md:w-80 border-input me-6 bg-background px-3 py-1 text-xs ring-offset-background placeholder:text-muted-foreground outline-none ring-2 ring-ring ring-offset-2 rounded-full border-0 flex-1'
+              className='flex md:w-80 border-input md:me-6 bg-background px-3 py-1 text-xs ring-offset-background placeholder:text-muted-foreground outline-none ring-2 ring-ring ring-offset-2 rounded-full border-0 flex-1'
               placeholder='Search in chat...'
               autoFocus
               onBlur={() => setSearch(null)}
@@ -288,7 +288,7 @@ export function Header ({
         </span>
         <Dropdown
           Icon={<ListFilter className='w-5 h-5' />}
-          buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
+          buttonClassName='hover:scale-110 hover:contrast-200 align-middle'
           dropdownClassName='right-16 mt-2'
         >
           <ul
@@ -326,8 +326,8 @@ export function Header ({
           </ul>
         </Dropdown>
         <Dropdown
-          Icon={<EllipsisVertical className='w-5 h-5 me-5' />}
-          buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
+          Icon={<EllipsisVertical className='w-5 h-5' />}
+          buttonClassName='hover:scale-110 hover:contrast-200 align-middle'
           dropdownClassName='right-9 mt-2'
         >
           <ul
