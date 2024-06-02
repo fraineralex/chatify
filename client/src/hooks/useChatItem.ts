@@ -84,7 +84,6 @@ export function useChatItem ({
     const newChat: Chat = {
       uuid: crypto.randomUUID(),
       user,
-      lastMessage: undefined,
       createdAt: new Date(),
       unreadMessages: 0
     }

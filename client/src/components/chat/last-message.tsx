@@ -55,7 +55,7 @@ export function LastMessage ({
             )}
             <span
               className={`align-middle font-medium ${
-                !lastMessage.content ? 'capitalize' : undefined
+                !lastMessage.content && 'capitalize'
               }`}
             >
               {lastMessage && lastMessageContent}
