@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   CircleX,
   EllipsisVertical,
   Eraser,
@@ -237,44 +238,60 @@ export function Header ({
   return (
     <header className='flex border-b py-3 justify-between'>
       <article className='flex gap-2'>
+        <button
+          className='align-middle hover:scale-110 -ms-2 inline md:hidden'
+          onClick={() => setCurrentChat(null)}
+        >
+          <ArrowLeft className='w-7 h-7' strokeWidth={2} />
+        </button>
         <img
           src={picture}
           width='40'
           height='40'
           alt={`Contact avatar of ${name}`}
-          className='rounded-full'
+          className='rounded-full w-10 h-10'
           style={{ aspectRatio: 36 / 36, objectFit: 'cover' }}
         />
-        <h2 className='text-sm md:text-base font-bold my-auto'>{name}</h2>
+        {
+          <h2
+            className={`text-sm md:text-base font-bold my-auto whitespace-nowrap ${
+              messageFilter && 'hidden'
+            }`}
+          >
+            {name}
+          </h2>
+        }
       </article>
       <aside className='flex mt-3 space-x-3 md:space-x-6 md:me-3'>
         <div className='flex place-content-center text-center mt-1 flex-row-reverse'>
           {messageFilter?.map(filter => (
             <span
               key={filter}
-              className='bg-blue-400 text-xs text-gray-800 px-2 py-1 rounded-full align-middle h-fit md:flex font-normal mx-1'
+              className='capitalize bg-blue-400 text-xs text-gray-800 px-2 py-1 rounded-full align-middle h-fit mx-1 flex font-normal whitespace-nowrap'
             >
               <button
                 className='hover:scale-105 text-gray-700 hover:text-gray-800'
                 onClick={updateMessageFilter(filter)}
               >
-                <CircleX className='w-4 h-4 me-2 align-middle' />
+                <CircleX className='w-3 h-3 md:w-4 md:h-4 me-1 md:me-2 align-middle' />
               </button>
-              {filter === 'media' ? 'Photos & videos' : 'Shared files'}
+              {filter === 'media' ? 'Photos & Videos' : filter}
             </span>
           ))}
         </div>
         <span className='flex'>
           {search !== null && (
-            <input
-              ref={searchInputRef}
-              className='flex md:w-80 border-input md:me-6 bg-background px-3 py-1 text-xs ring-offset-background placeholder:text-muted-foreground outline-none ring-2 ring-ring ring-offset-2 rounded-full border-0 flex-1'
-              placeholder='Search in chat...'
-              autoFocus
-              onBlur={() => setSearch(null)}
-              value={search ?? ''}
-              onChange={event => setSearch(event.target.value)}
-            />
+            <div className='absolute right-3 top-20 z-10'>
+              <input
+                ref={searchInputRef}
+                className='flex w-80 border-input md:me-6 bg-background px-3 py-1 text-xs ring-offset-background placeholder:text-muted-foreground outline-none ring-2 ring-ring ring-offset-2 rounded-full border-0 flex-1'
+                placeholder='Search in chat...'
+                autoFocus
+                onBlur={() => setSearch(null)}
+                value={search ?? ''}
+                onChange={event => setSearch(event.target.value)}
+              />
+            </div>
           )}
           <button
             disabled={search !== null}
