@@ -40,7 +40,7 @@ export function MessageArticle ({
   const contentMessage = extractUrlsFromText(message.content)
 
   return (
-    <div className='relative mt-1 max-w-full'>
+    <div className='relative mt-1 max-w-full '>
       <article
         className={`items-center rounded-lg max-w-xs md:max-w-xl whitespace-normal break-words border border-transparent ${
           isMe ? 'bg-gray-300' : 'bg-gray-100'
@@ -165,8 +165,8 @@ export function MessageArticle ({
       </article>
       <span
         className={`${
-          isMe ? 'right-2' : 'left-2'
-        } absolute -mt-2 flex space-x-1 z-10`}
+          isMe ? 'justify-end me-2' : 'justify-start ms-2'
+        }   flex z-20 m-0`}
       >
         {reactions &&
           Object.entries(reactions).map(([reaction, count]) => (
@@ -176,7 +176,7 @@ export function MessageArticle ({
                 isMe
                   ? 'bg-gray-100 border border-gray-200'
                   : 'bg-gray-200 border border-gray-100'
-              } py-[1px] px-[5px] rounded-full text-sm`}
+              } py-[1px] px-[5px] rounded-full text-sm -mt-2 mb-0`}
             >
               {reaction}
               {count > 1 && (

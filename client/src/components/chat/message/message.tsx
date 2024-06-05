@@ -116,7 +116,7 @@ export function Message ({
   return (
     <>
       <li
-        className={`flex flex-col space-y-2 relative max-w-full  ${
+        className={`flex flex-col space-y-2 relative max-w-full ${
           isMe ? 'items-end' : 'items-start'
         }`}
         data-uuid={uuid}
