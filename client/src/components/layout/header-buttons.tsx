@@ -66,10 +66,10 @@ export function HeaderButtons () {
 
   return (
     <>
-      <aside className='flex items-center justify-between px-3 py-2 flex-row-reverse text-gray-700 space-x-7'>
+      <aside className='flex items-center justify-between px-3 py-2 flex-row-reverse text-gray-700 space-x-6 md:space-x-2 lg:space-x-5'>
         <Dropdown
           Icon={<EllipsisVertical className='w-5 h-5' />}
-          buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6'
+          buttonClassName='hover:scale-110 hover:contrast-200 align-middle ps-6 md:ps-2 lg:ps-6'
           dropdownClassName='max-sm:right-3 mt-2'
         >
           <ul

@@ -255,14 +255,14 @@ export function Header ({
         {
           <h2
             className={`text-sm md:text-base font-bold my-auto whitespace-nowrap ${
-              messageFilter && 'hidden'
+              messageFilter && 'hidden md:inline'
             }`}
           >
             {name}
           </h2>
         }
       </article>
-      <aside className='flex mt-3 space-x-3 md:space-x-6 md:me-3'>
+      <aside className='flex mt-3 space-x-3 md:space-x-6 me-2 md:me-3'>
         <div className='flex place-content-center text-center mt-1 flex-row-reverse'>
           {messageFilter?.map(filter => (
             <span
@@ -275,7 +275,10 @@ export function Header ({
               >
                 <CircleX className='w-3 h-3 md:w-4 md:h-4 me-1 md:me-2 align-middle' />
               </button>
-              {filter === 'media' ? 'Photos & Videos' : filter}
+              <span className='sm:hidden capitalize'>{filter}</span>
+              <span className='hidden sm:inline capitalize'>
+                {filter === 'media' ? 'Photos & Videos' : 'Shared Files'}
+              </span>
             </span>
           ))}
         </div>
