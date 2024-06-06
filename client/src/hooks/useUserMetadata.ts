@@ -5,14 +5,19 @@ import { useSocketStore } from '../store/socket'
 const domain = import.meta.env.VITE_SERVER_DOMAIN ?? ''
 
 export function useUserMetadata () {
-  const { user } = useAuth0()
+  const { user, getAccessTokenSilently } = useAuth0()
   const { setUserMetadata } = useSocketStore()
 
   useEffect(() => {
     if (!user) return
     const getUserMetadata = async () => {
       try {
-        const response = await fetch(`${domain}/users/metadata/${user.sub}`)
+        const response = await fetch(`${domain}/users/metadata/${user.sub}`, {
+          headers: {
+            Authorization: `Bearer ${await getAccessTokenSilently()}`
+          }
+        
+        })
         if (response.status !== 200) {
           console.log('Failed to get user metadata:', response.statusText)
           return

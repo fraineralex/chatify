@@ -45,7 +45,7 @@ export function Header ({
   const chat = chats.find(chat => chat.uuid === currentChat?.uuid)
   const searchInputRef = useRef<HTMLInputElement>(null)
   if (!chat || !userMetadata) return null
-  const user = useAuth0().user
+  const { user, getAccessTokenSilently } = useAuth0()
 
   useEffect(() => {
     if (!currentChat) return
@@ -74,7 +74,8 @@ export function Header ({
 
     const response = await toggleChatBlock(
       chat.uuid,
-      chat.blockedBy ? undefined : user?.sub
+      chat.blockedBy ? undefined : user?.sub,
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -115,7 +116,8 @@ export function Header ({
           muted: muttedChats
         }
       },
-      user?.sub ?? ''
+      user?.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -153,7 +155,8 @@ export function Header ({
       {
         chat_preferences: newChatPreferences
       },
-      user?.sub ?? ''
+      user?.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -214,7 +217,8 @@ export function Header ({
       {
         chat_preferences: newChatPreferences
       },
-      user?.sub ?? ''
+      user?.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {

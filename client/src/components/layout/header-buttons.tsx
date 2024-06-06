@@ -22,7 +22,7 @@ import { Dropdown } from '../common/dropdown'
 export function HeaderButtons () {
   const { isOpen, closeModal, openModal } = useNewChatModalStore()
   const [users, setUsers] = useState<User[]>([])
-  const { user: loggedUser, logout } = useAuth0()
+  const { user: loggedUser, logout, getAccessTokenSilently } = useAuth0()
   const [search, setSearch] = useState('')
   const { chats, setChatFilterState, chatFilterState } = useSocketStore()
 
@@ -59,7 +59,7 @@ export function HeaderButtons () {
   useEffect(() => {
     if (!open) return
     ;(async () => {
-      const users = await getAllUsers()
+      const users = await getAllUsers(await getAccessTokenSilently())
       setUsers(users ?? [])
     })()
   }, [open])

@@ -24,7 +24,7 @@ const SERVER_DOMAIN =
 
 export const useChatMessage = () => {
   const { getCurrentChat, setCurrentChat, currentChat } = useChatStore()
-  const { user: loggedUser } = useAuth0()
+  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
 
   const {
     addMessage,
@@ -55,7 +55,7 @@ export const useChatMessage = () => {
 
       setSocket(newSocket)
       const loadedChats: Chats | undefined = chats
-      const allChats = (await getAllChats(loggedUser?.sub)) ?? []
+      const allChats = (await getAllChats(loggedUser?.sub, await getAccessTokenSilently())) ?? []
 
       if (allChats.length > 0 && loadedChats.length !== allChats?.length) {
         for (const chat of allChats) {
@@ -96,7 +96,7 @@ export const useChatMessage = () => {
           let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
           let isChatFromApi = false
           if (!chat) {
-            chat = await getChatById(newMessage.chatId, loggedUser?.sub)
+            chat = await getChatById(newMessage.chatId, loggedUser?.sub, await getAccessTokenSilently())
             if (!chat) return
             isChatFromApi = true
             addChat(chat)
@@ -155,7 +155,8 @@ export const useChatMessage = () => {
           const updatedChat = await updateChatLastMessage(
             loadedChats,
             message,
-            loggedUser
+            loggedUser,
+            await getAccessTokenSilently()
           )
           if (!updatedChat) return
           const unreadMessages = messages.filter(
@@ -190,7 +191,8 @@ export const useChatMessage = () => {
             const updatedChat = await updateChatLastMessage(
               loadedChats,
               message,
-              loggedUser
+              loggedUser,
+              await getAccessTokenSilently()
             )
             if (!updatedChat) return
             replaceChat(updatedChat)
@@ -234,7 +236,7 @@ export const useChatMessage = () => {
         const expiredFileUUIDs = messages
           .filter(msg => isFileExpired(msg))
           .map(msg => msg.uuid)
-        const updatedSignedUrls = await getSignedUrls(expiredFileUUIDs)
+        const updatedSignedUrls = await getSignedUrls(expiredFileUUIDs, await getAccessTokenSilently())
         for (const signedFile of updatedSignedUrls) {
           const message = messages.find(msg => msg.uuid === signedFile.uuid)
           if (!message) return

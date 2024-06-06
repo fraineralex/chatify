@@ -26,7 +26,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   const { chats, replaceChat, socket, userMetadata, setUserMetadata } =
     useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
-  const { user } = useAuth0()
+  const { user, getAccessTokenSilently } = useAuth0()
   const chat = chats.find(chat => chat.uuid === uuid)
   if (!chat || !userMetadata || !user) return null
 
@@ -66,7 +66,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       {
         chat_preferences: newChatPreferences
       },
-      user.sub ?? ''
+      user.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -106,7 +107,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           pinned: pinnedChats
         }
       },
-      user.sub ?? ''
+      user.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -147,7 +149,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           archived: hiddenChats
         }
       },
-      user.sub ?? ''
+      user.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -187,7 +190,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           muted: muttedChats
         }
       },
-      user.sub ?? ''
+      user.sub ?? '',
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -218,7 +222,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
 
     const response = await toggleChatBlock(
       chat.uuid,
-      chat.blockedBy ? undefined : user?.sub
+      chat.blockedBy ? undefined : user?.sub,
+      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {

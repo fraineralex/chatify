@@ -11,8 +11,10 @@ import { useImageSliderStore } from '../../store/imageSlider'
 import 'react-photo-view/dist/react-photo-view.css'
 import { MESSAGES_TYPES } from '../../constants'
 import { getSignedUrls } from '../../services/chat'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export function Chat () {
+  const { getAccessTokenSilently } = useAuth0()
   const currentChat = useChatStore(state => state.currentChat)
   const { messages, replaceMessage } = useSocketStore()
   const messageListRef = useRef<HTMLUListElement>(null)
@@ -91,7 +93,8 @@ export function Chat () {
     if (!visible) return
     ;(async () => {
       const updatedSignedUrls = await getSignedUrls(
-        chatImageMessages.map(c => c.uuid)
+        chatImageMessages.map(c => c.uuid),
+        await getAccessTokenSilently()
       )
 
       for (const signedFile of updatedSignedUrls) {

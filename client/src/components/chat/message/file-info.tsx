@@ -3,6 +3,7 @@ import { FILE_ICONS } from '../../../constants'
 import { StaticFile, uuid } from '../../../types/chat'
 import { FileMetadata } from './file-metadata'
 import { downloadFile, openFile } from '../../../services/message'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export function FileInfo ({
   fileMsg,
@@ -12,6 +13,7 @@ export function FileInfo ({
   msgId: uuid
 }) {
   const [file, setFile] = useState<StaticFile>(fileMsg)
+  const { getAccessTokenSilently } = useAuth0()
 
   const fileExtension =
     file.filename?.split('.').pop()?.toLowerCase() ?? 'unknown'
@@ -19,7 +21,11 @@ export function FileInfo ({
 
   const handleOpenClick = async (event: React.MouseEvent) => {
     event.preventDefault()
-    const updatedFile = await openFile(file, msgId)
+    const updatedFile = await openFile(
+      file,
+      msgId,
+      await getAccessTokenSilently()
+    )
     if (updatedFile && updatedFile.url !== file.url) {
       setFile(updatedFile)
     }
@@ -27,7 +33,11 @@ export function FileInfo ({
 
   const handleDownloadClick = async (event: React.MouseEvent) => {
     event.preventDefault()
-    const updatedFile = await downloadFile(file, msgId)
+    const updatedFile = await downloadFile(
+      file,
+      msgId,
+      await getAccessTokenSilently()
+    )
     if (updatedFile && updatedFile.url !== file.url) {
       setFile(updatedFile)
     }

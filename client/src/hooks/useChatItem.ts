@@ -23,7 +23,7 @@ export function useChatItem ({
     userMetadata
   } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
-  const { user: loggedUser } = useAuth0()
+  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
   const isCurrentChat =
     currentChat &&
     (currentChat.uuid === uuid ||
@@ -92,7 +92,7 @@ export function useChatItem ({
     setCurrentChat(newChat)
     closeModal()
 
-    const newChatDB = await createChat(loggedUser?.sub, user.id, newChat.uuid)
+    const newChatDB = await createChat(loggedUser?.sub, user.id, newChat.uuid, await getAccessTokenSilently())
     if (!newChatDB) {
       alert('Failed to create chat')
       removeChat(newChat.uuid)
