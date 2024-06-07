@@ -246,6 +246,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
         sender_id: user.sub!,
         receiver_id: chat.user.id
       }
+      
       return socket?.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)
     }
 

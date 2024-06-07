@@ -49,7 +49,8 @@ export const useChatMessage = () => {
       const newSocket = io(SERVER_DOMAIN, {
         auth: {
           serverOffset,
-          userId: loggedUser?.sub
+          userId: loggedUser?.sub,
+          token: await getAccessTokenSilently()
         }
       })
 
@@ -202,6 +203,19 @@ export const useChatMessage = () => {
         }
       )
 
+      newSocket.on(SOCKET_EVENTS.CONNECT_ERROR, async error => {
+        if (error.message === 'unauthorized') {
+          newSocket.auth = {
+            ...newSocket.auth,
+            token: await getAccessTokenSilently()
+            }
+          newSocket.connect()
+        } else {
+          console.log(error.message)
+          alert(error)
+        }
+      })
+
       if (
         loadedChats.length > 0 &&
         (messages.length === 0 || serverOffset < new Date())
@@ -214,9 +228,10 @@ export const useChatMessage = () => {
         newSocket.off(SOCKET_EVENTS.READ_MESSAGE)
         newSocket.off(SOCKET_EVENTS.UPDATE_MESSAGE)
         newSocket.off(SOCKET_EVENTS.DELIVERED_MESSAGE)
+        newSocket.off(SOCKET_EVENTS.CONNECT_ERROR)
       }
     })()
-  }, [loggedUser, userMetadata])
+  }, [loggedUser, userMetadata, getAccessTokenSilently])
 
   useEffect(() => {
     if (!currentChat) return

@@ -11,7 +11,6 @@ export function ChatScreen () {
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768)
-    console.log('handleResize', window.innerWidth, window.innerWidth <= 768)
   }
 
   useEffect(() => {
