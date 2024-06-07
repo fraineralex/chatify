@@ -5,21 +5,16 @@ import { Server } from 'socket.io'
 import { createServer } from 'node:http'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { auth,  } from 'express-oauth2-jwt-bearer'
 import { userRouter } from './src/router/user.js'
 import { createTables } from './src/database/index.js'
 import { createClient } from '@libsql/client'
 import { SocketRouter } from './src/router/socket.js'
 import { ChatRouter } from './src/router/chat.js'
+import { checkJwtMiddleware } from './src/middlewares/auth.js'
 
 dotenv.config({ path: '.env.local' })
 const port = process.env.PORT ?? 3000
 const clientDomain = process.env.CLIENT_DOMAIN ?? 'http://localhost:5173'
-
-const checkJwt = auth({
-  audience: process.env.AUTH0_API_IDENTIFIER ?? '',
-  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}` ?? '',
-})
 
 const client = createClient({
   url: process.env.DB_URL ?? '',
@@ -42,7 +37,7 @@ const chatRouter = new ChatRouter(client)
 
 
 app.use(cors({ origin: clientDomain }))
-app.use(checkJwt)
+app.use(checkJwtMiddleware)
 socketRouter.init()
 app.use(express.json())
 app.use(logger('dev'))
