@@ -74,8 +74,8 @@ export function Header ({
 
     const response = await toggleChatBlock(
       chat.uuid,
-      chat.blockedBy ? undefined : user?.sub,
-      await getAccessTokenSilently()
+      await getAccessTokenSilently(),
+      chat.blockedBy ? undefined : user?.sub
     )
 
     if (response.status !== 200) {
@@ -116,7 +116,6 @@ export function Header ({
           muted: muttedChats
         }
       },
-      user?.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -155,7 +154,6 @@ export function Header ({
       {
         chat_preferences: newChatPreferences
       },
-      user?.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -217,7 +215,6 @@ export function Header ({
       {
         chat_preferences: newChatPreferences
       },
-      user?.sub ?? '',
       await getAccessTokenSilently()
     )
 

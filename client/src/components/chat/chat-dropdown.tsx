@@ -66,7 +66,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       {
         chat_preferences: newChatPreferences
       },
-      user.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -107,7 +106,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           pinned: pinnedChats
         }
       },
-      user.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -149,7 +147,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           archived: hiddenChats
         }
       },
-      user.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -190,7 +187,6 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
           muted: muttedChats
         }
       },
-      user.sub ?? '',
       await getAccessTokenSilently()
     )
 
@@ -222,8 +218,8 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
 
     const response = await toggleChatBlock(
       chat.uuid,
+      await getAccessTokenSilently(),
       chat.blockedBy ? undefined : user?.sub,
-      await getAccessTokenSilently()
     )
 
     if (response.status !== 200) {
@@ -246,7 +242,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
         sender_id: user.sub!,
         receiver_id: chat.user.id
       }
-      
+
       return socket?.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)
     }
 

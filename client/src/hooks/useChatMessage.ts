@@ -49,14 +49,13 @@ export const useChatMessage = () => {
       const newSocket = io(SERVER_DOMAIN, {
         auth: {
           serverOffset,
-          userId: loggedUser?.sub,
           token: await getAccessTokenSilently()
         }
       })
 
       setSocket(newSocket)
       const loadedChats: Chats | undefined = chats
-      const allChats = (await getAllChats(loggedUser?.sub, await getAccessTokenSilently())) ?? []
+      const allChats = (await getAllChats(await getAccessTokenSilently())) ?? []
 
       if (allChats.length > 0 && loadedChats.length !== allChats?.length) {
         for (const chat of allChats) {
@@ -97,7 +96,7 @@ export const useChatMessage = () => {
           let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
           let isChatFromApi = false
           if (!chat) {
-            chat = await getChatById(newMessage.chatId, loggedUser?.sub, await getAccessTokenSilently())
+            chat = await getChatById(newMessage.chatId, await getAccessTokenSilently())
             if (!chat) return
             isChatFromApi = true
             addChat(chat)
@@ -156,7 +155,6 @@ export const useChatMessage = () => {
           const updatedChat = await updateChatLastMessage(
             loadedChats,
             message,
-            loggedUser,
             await getAccessTokenSilently()
           )
           if (!updatedChat) return
@@ -192,7 +190,6 @@ export const useChatMessage = () => {
             const updatedChat = await updateChatLastMessage(
               loadedChats,
               message,
-              loggedUser,
               await getAccessTokenSilently()
             )
             if (!updatedChat) return

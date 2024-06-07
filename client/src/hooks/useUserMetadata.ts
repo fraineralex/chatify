@@ -12,7 +12,7 @@ export function useUserMetadata () {
     if (!user) return
     const getUserMetadata = async () => {
       try {
-        const response = await fetch(`${domain}/users/metadata/${user.sub}`, {
+        const response = await fetch(`${domain}/users/metadata`, {
           headers: {
             Authorization: `Bearer ${await getAccessTokenSilently()}`
           }

@@ -40,7 +40,7 @@ export function Form ({
 }) {
   const { socket, addMessage, replaceChat } = useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
-  const { user: loggedUser } = useAuth0()
+  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [showGifsPicker, setShowGifsPicker] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
@@ -287,7 +287,7 @@ export function Form ({
       blockedBy: null
     })
 
-    const response = await toggleChatBlock(currentChat.uuid, undefined)
+    const response = await toggleChatBlock(currentChat.uuid, await getAccessTokenSilently())
 
     if (response.status !== 200) {
       replaceChat({ ...currentChat })

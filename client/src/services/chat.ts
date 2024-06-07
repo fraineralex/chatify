@@ -1,4 +1,3 @@
-import { User } from '@auth0/auth0-react'
 import { Chat, Message, SignedFile, uuid } from '../types/chat'
 
 const SERVER_DOMAIN =
@@ -6,12 +5,11 @@ const SERVER_DOMAIN =
 
 export async function getChatById (
   chatId: string,
-  userId: string | undefined,
   token: string
 ): Promise<Chat | undefined> {
   try {
     const response = await fetch(
-      `${SERVER_DOMAIN}/chats/${chatId}?user_id=${userId}`,
+      `${SERVER_DOMAIN}/chats/${chatId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -49,11 +47,11 @@ export async function createChat (
 }
 
 export async function getAllChats (
-  userId: string | undefined, token: string
+  token: string
 ): Promise<Chat[] | undefined> {
   try {
     const response = await fetch(
-      `${SERVER_DOMAIN}/chats${userId && `?user_id=${userId}`}`,
+      `${SERVER_DOMAIN}/chats`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -69,8 +67,8 @@ export async function getAllChats (
 
 export async function toggleChatBlock (
   chatId: uuid,
-  userId: string | undefined,
-  token: string
+  token: string,
+  userId?: string
 ) {
   try {
     const response = await fetch(`${SERVER_DOMAIN}/chats/${chatId}`, {
@@ -91,12 +89,11 @@ export async function toggleChatBlock (
 export async function updateChatLastMessage (
   chats: Chat[],
   message: Message,
-  loggedUser: User | undefined,
   token: string
 ) {
   let chat = chats.find(c => c.uuid === message.chatId)
   if (!chat) {
-    chat = await getChatById(message.chatId, loggedUser?.sub, token)
+    chat = await getChatById(message.chatId, token)
   }
 
   if (!chat || chat.lastMessage?.uuid !== message.uuid) return

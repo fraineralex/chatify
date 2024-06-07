@@ -21,10 +21,9 @@ export async function getAllUsers (token: string): Promise<User[] | undefined> {
 
 export const updateUserMetadata = async (
   metadata: metadata,
-  userSub: string,
   token: string
 ) => {
-  const data = await fetch(`${SERVER_DOMAIN}/users/metadata/${userSub}`, {
+  const data = await fetch(`${SERVER_DOMAIN}/users/metadata`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

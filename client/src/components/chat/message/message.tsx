@@ -34,7 +34,7 @@ export function Message ({
   showEmojiPicker,
   setShowEmojiPicker
 }: Props) {
-  const { user: loggedUser } = useAuth0()
+  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
   if (!loggedUser) return null
   const {
     uuid,
@@ -108,7 +108,11 @@ export function Message ({
 
   const handleDownloadFile = async () => {
     if (!message.file) return
-    const updatedFile = await downloadFile(message.file, message.uuid)
+    const updatedFile = await downloadFile(
+      message.file,
+      message.uuid,
+      await getAccessTokenSilently()
+    )
     if (updatedFile && updatedFile.url !== message.file.url)
       replaceMessage({ ...message, file: updatedFile })
   }
