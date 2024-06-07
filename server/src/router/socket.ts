@@ -1,7 +1,9 @@
 import { Client } from '@libsql/client'
-import { Server } from 'socket.io'
+import { Server  } from 'socket.io'
 import { SOCKET_EVENTS } from '../constants/index.js'
 import { SocketController } from '../controllers/socket.js'
+
+import { authSocketMiddleware } from '../middlewares/auth.js'
 
 export class SocketRouter {
   private io: Server
@@ -13,6 +15,8 @@ export class SocketRouter {
   }
 
   async init () {
+    this.io.use((socket, next) => authSocketMiddleware(socket, next))
+
     this.io.on(SOCKET_EVENTS.CONNECTION, async socket => {
       const loggedUser = socket.handshake.auth.userId
       //console.log('a user connected')
