@@ -176,8 +176,8 @@ export class SocketController {
   }
 
   recoverMessages = (socket: Socket) => async (): Promise<void> => {
-    const offset = socket.handshake.auth.serverOffset ?? 0
-    const loggedUserId = socket.handshake.auth.userId
+    const offset = socket.handshake.auth?.serverOffset ?? 0
+    const loggedUserId: string = socket.handshake.auth?.user?.sub
 
     try {
       const results = await this.client.execute({

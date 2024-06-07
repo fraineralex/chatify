@@ -33,8 +33,17 @@ export class UserController {
     res.status(200).json(users)
   }
 
-  static async getUserMetadata (req: Request, res: Response) {
-    const { userId } = req.params
+  static async getUserMetadata (req: Request & { auth?: { sub?: string } }, res: Response) {
+    const userId = req.auth?.sub
+
+    if(!userId) {
+      res.status(401)
+      .json({ 
+        statusText: 'Something went wrong validating your credentials, please try again later.',
+        status: 401 
+      })
+    return 
+  }
 
     const config = {
       method: 'GET',
@@ -59,14 +68,23 @@ export class UserController {
     }
   }
 
-  static async updateMetadata (req: Request, res: Response) {
-    const { userId } = req.params
+  static async updateMetadata (req: Request & { auth?: { sub?: string } }, res: Response) {
+    const userId = req.auth?.sub
     const { metadata } = req.body as { metadata: metadata }
 
     if (!metadata) {
       res.status(400).json({ statusText: 'Metadata is required', status: 400 })
       return
     }
+
+    if(!userId) {
+      res.status(401)
+      .json({ 
+        statusText: 'Something went wrong validating your credentials, please try again later.',
+        status: 401 
+      })
+    return 
+  }
 
     const config = {
       method: 'PATCH',

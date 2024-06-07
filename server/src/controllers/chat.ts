@@ -12,13 +12,17 @@ export class ChatController {
     this.client = client
   }
 
-  async getAllChats (req: Request, res: Response): Promise<void> {
-    const userId = req.query.user_id as string
+  async getAllChats (req: Request & { auth?: { sub?:string } }, res: Response): Promise<void> {
+    const userId = req.auth?.sub
 
-    if (!userId) {
-      res.status(400).json({ statusText: 'Missing user_id', status: 400 })
-      return
-    }
+    if(!userId) {
+      res.status(401)
+      .json({ 
+        statusText: 'Something went wrong validating your credentials, please try again later.',
+        status: 401 
+      })
+    return 
+  }
 
     try {
       const result = await this.client.execute({
@@ -137,7 +141,8 @@ export class ChatController {
     }
   }
 
-  async createChat (req: Request, res: Response): Promise<void> {
+  async createChat (req: Request &{ auth?: { sub?: string } }, res: Response): Promise<void> {
+    const userId = req.auth?.sub
     const {
       uuid,
       user1_id,
@@ -149,6 +154,24 @@ export class ChatController {
       createdAt: created_at,
       unreadMessages: 0,
       blockedBy: null
+    }
+
+    if(!userId) {
+      res.status(401)
+      .json({ 
+        statusText: 'Something went wrong validating your credentials, please try again later.',
+        status: 401 
+      })
+      return 
+    }
+
+    if(userId !== user1_id && userId !== user2_id) {
+      res.status(403)
+      .json({ 
+        statusText: 'You can only create chats between yourself and another user.',
+        status: 403 
+      })
+      return 
     }
 
     try {
@@ -164,18 +187,22 @@ export class ChatController {
     }
   }
 
-  async getChatById (req: Request, res: Response): Promise<void> {
+  async getChatById (req: Request & { auth?: { sub?: string } }, res: Response): Promise<void> {
     const chatId = req.params.chatId
-    const userId = req.query.user_id as string
+    const userId = req.auth?.sub
 
     if (!chatId) {
       res.status(400).json({ statusText: 'Missing chat_id', status: 400 })
       return
     }
 
-    if (!userId) {
-      res.status(400).json({ statusText: 'Missing user_id', status: 400 })
-      return
+    if(!userId) {
+      res.status(401)
+      .json({ 
+        statusText: 'Something went wrong validating your credentials, please try again later.',
+        status: 401 
+      })
+      return 
     }
 
     try {
@@ -185,7 +212,11 @@ export class ChatController {
       })
 
       if (!result.rows || result.rows.length === 0) {
-        res.status(404).json({ statusText: 'Chat not found', status: 404 })
+        res.status(404)
+        .json({ 
+          statusText: 'The chat you are trying to access does not exist.', 
+          status: 404 
+        })
         return
       }
 

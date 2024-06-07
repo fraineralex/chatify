@@ -18,10 +18,6 @@ export class SocketRouter {
     this.io.use((socket, next) => authSocketMiddleware(socket, next))
 
     this.io.on(SOCKET_EVENTS.CONNECTION, async socket => {
-      const loggedUser = socket.handshake.auth.userId
-      //console.log('a user connected')
-      if (!loggedUser) return
-
       socket.on(
         SOCKET_EVENTS.DISCONNECT,
         this.socketController.disconnect.bind(this.socketController)
