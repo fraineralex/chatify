@@ -22,6 +22,7 @@
   "devDependencies": {
     "@types/cors": "2.8.17",
     "@types/express": "4.17.21",
+    "@types/jsonwebtoken": "9.0.6",
     "@types/morgan": "1.9.9",
     "@types/node": "20.11.30",
     "concurrently": "8.2.2",
@@ -37,6 +38,7 @@
     "dotenv": "16.4.5",
     "express": "4.19.2",
     "express-oauth2-jwt-bearer": "1.6.0",
+    "jsonwebtoken": "9.0.2",
     "morgan": "1.10.0",
     "sharp": "0.33.4",
     "socket.io": "4.7.5"
