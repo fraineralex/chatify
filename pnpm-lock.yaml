@@ -84,6 +84,9 @@ importers:
       tailwindcss:
         specifier: 3.4.3
         version: 3.4.3
+      typescript:
+        specifier: 5.4.4
+        version: 5.4.4
       vite:
         specifier: 5.2.0
         version: 5.2.0
@@ -148,6 +151,9 @@ importers:
       concurrently:
         specifier: 8.2.2
         version: 8.2.2
+      cross-env:
+        specifier: 7.0.3
+        version: 7.0.3
       nodemon:
         specifier: 3.1.0
         version: 3.1.0
@@ -3049,6 +3055,14 @@ packages:
       object-assign: 4.1.1
       vary: 1.1.2
     dev: false
+
+  /cross-env@7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+    dev: true
 
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -6047,6 +6061,12 @@ packages:
       has-proto: 1.0.3
       is-typed-array: 1.1.13
       possible-typed-array-names: 1.0.0
+    dev: true
+
+  /typescript@5.4.4:
+    resolution: {integrity: sha512-dGE2Vv8cpVvw28v8HCPqyb08EzbBURxDpuhJvTrusShUfGnhHBafDsLdS1EhhxyL6BJQE+2cT3dDPAv+MQ6oLw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
     dev: true
 
   /typescript@5.5.0-dev.20240417:

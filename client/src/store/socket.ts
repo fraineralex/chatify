@@ -28,9 +28,24 @@ type SocketState = {
   setUserMetadata: (metadata: metadata) => void
 }
 
-const initialMessages = (await db.messages.toArray()) ?? []
-const initialChats = (await db.chats.toArray()) ?? []
+let initialMessages: Messages 
+db.messages.toArray()
+  .then(messages => {
+    initialMessages = messages
+  })
+  .catch(error => {
+    console.log(error)
+  })
 
+let initialChats: Chats
+db.chats.toArray()
+  .then(chats => {
+    initialChats = chats
+  })
+  .catch(error => {
+    console.log(error)
+  })
+  
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: undefined,
   messages: initialMessages,

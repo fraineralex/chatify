@@ -7,9 +7,10 @@
     "pnpm": ">=6.0.0"
   },
   "scripts": {
-    "build": "pnpm --filter 'client' build",
+    "build": "pnpm --filter client build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "start": "pnpm --filter '**' start",
+    "start:server": "pnpm --filter server start",
+    "start": "pnpm build && pnpm start:server",
     "dev": "pnpm --filter ** dev"
   },
   "repository": {

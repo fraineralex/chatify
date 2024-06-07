@@ -218,7 +218,7 @@ export function Form ({
       updatedFileMessage.caption = event.target.value
       setFileMessages(
         fileMessages.map((fileMsg, index) =>
-          index === selectedFileIndex ?? 0 ? updatedFileMessage : fileMsg
+          index === selectedFileIndex ? updatedFileMessage : fileMsg
         )
       )
     } else {
