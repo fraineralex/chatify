@@ -1,7 +1,7 @@
 import { Chat, Message, SignedFile, uuid } from '../types/chat'
 
-const SERVER_DOMAIN =
-  (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
+const SERVER_URL =
+  (import.meta.env.VITE_SERVER_URL as string) ?? 'http://localhost:3000'
 
 export async function getChatById (
   chatId: string,
@@ -9,7 +9,7 @@ export async function getChatById (
 ): Promise<Chat | undefined> {
   try {
     const response = await fetch(
-      `${SERVER_DOMAIN}/chats/${chatId}`,
+      `${SERVER_URL}/api/chats/${chatId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -30,7 +30,7 @@ export async function createChat (
   token: string
 ): Promise<Chat | undefined> {
   try {
-    const response = await fetch(`${SERVER_DOMAIN}/chats`, {
+    const response = await fetch(`${SERVER_URL}/api/chats`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export async function getAllChats (
 ): Promise<Chat[] | undefined> {
   try {
     const response = await fetch(
-      `${SERVER_DOMAIN}/chats`,
+      `${SERVER_URL}/api/chats`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -71,7 +71,7 @@ export async function toggleChatBlock (
   userId?: string
 ) {
   try {
-    const response = await fetch(`${SERVER_DOMAIN}/chats/${chatId}`, {
+    const response = await fetch(`${SERVER_URL}/api/chats/${chatId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export async function updateChatLastMessage (
 export async function getSignedUrls (messageIds: uuid[], token: string) {
   try {
     const response = await fetch(
-      `${SERVER_DOMAIN}/chats/signed-urls/${messageIds.join(',')}`,
+      `${SERVER_URL}/api/chats/signed-urls/${messageIds.join(',')}`,
       {
         headers: {
           Authorization: `Bearer ${token}`

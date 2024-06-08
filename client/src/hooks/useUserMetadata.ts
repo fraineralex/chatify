@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect } from 'react'
 import { useSocketStore } from '../store/socket'
 
-const domain = import.meta.env.VITE_SERVER_DOMAIN ?? ''
+const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? ''
 
 export function useUserMetadata () {
   const { user, getAccessTokenSilently } = useAuth0()
@@ -12,7 +12,7 @@ export function useUserMetadata () {
     if (!user) return
     const getUserMetadata = async () => {
       try {
-        const response = await fetch(`${domain}/users/metadata`, {
+        const response = await fetch(`${SERVER_URL}/api/users/metadata`, {
           headers: {
             Authorization: `Bearer ${await getAccessTokenSilently()}`
           }

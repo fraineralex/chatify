@@ -19,8 +19,8 @@ import {
   updateChatLastMessage
 } from '../services/chat'
 
-const SERVER_DOMAIN =
-  (import.meta.env.VITE_SERVER_DOMAIN as string) ?? 'http://localhost:3000'
+const SERVER_URL =
+  (import.meta.env.VITE_SERVER_URL as string) ?? 'http://localhost:3000'
 
 export const useChatMessage = () => {
   const { getCurrentChat, setCurrentChat, currentChat } = useChatStore()
@@ -46,7 +46,7 @@ export const useChatMessage = () => {
   useEffect(() => {
     if (!userMetadata) return
     ;(async () => {
-      const newSocket = io(SERVER_DOMAIN, {
+      const newSocket = io(SERVER_URL, {
         auth: {
           serverOffset,
           token: await getAccessTokenSilently()
