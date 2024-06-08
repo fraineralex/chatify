@@ -37,4 +37,3 @@ export interface metadata {
     cleaned: { [key: uuid]: string }
   }
 }
-

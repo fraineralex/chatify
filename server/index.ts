@@ -1,6 +1,5 @@
 import express from 'express'
 import logger from 'morgan'
-import path from 'path'
 import { Server } from 'socket.io'
 import { createServer } from 'node:http'
 import cors from 'cors'
@@ -13,7 +12,6 @@ import { ChatRouter } from './src/router/chat.js'
 import { checkJwtMiddleware } from './src/middlewares/auth.js'
 
 dotenv.config({ path: '.env.local' })
-const mode = process.env.MODE ?? 'DEV'
 const port = process.env.PORT ?? 3000
 const clientDomain = process.env.CLIENT_DOMAIN ?? 'http://localhost:5173'
 
@@ -33,25 +31,18 @@ const io = new Server(server, {
     skipMiddlewares: true
   }
 })
+
 const socketRouter = new SocketRouter(io, client)
 const chatRouter = new ChatRouter(client)
 
-
 app.use(cors({ origin: clientDomain }))
-app.use(checkJwtMiddleware)
 socketRouter.init()
 app.use(express.json())
 app.use(logger('dev'))
-app.use('/users', userRouter)
-app.use('/chats', chatRouter.init())
 
-if (mode === 'PROD') {
-  app.use(express.static(path.join(process.cwd(), '../client/dist')))
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(process.cwd(), '../client/dist/index.html'))
-  })
-}
+app.get('/api', (req, res) => res.send('Welcome to Chatify API'))
+app.use('/api/users', checkJwtMiddleware, userRouter)
+app.use('/api/chats', checkJwtMiddleware, chatRouter.init())
+app.use((req, res) => res.status(404).send('404 Not Found'))
 
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`)
-})
+server.listen(port, () => console.log(`Server is running on http://localhost:${port}`))

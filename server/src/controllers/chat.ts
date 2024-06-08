@@ -12,8 +12,8 @@ export class ChatController {
     this.client = client
   }
 
-  async getAllChats (req: Request & { auth?: { sub?:string } }, res: Response): Promise<void> {
-    const userId = req.auth?.sub
+  async getAllChats (req: Request, res: Response): Promise<void> {
+    const userId = req.auth?.payload?.sub
 
     if(!userId) {
       res.status(401)
@@ -141,8 +141,8 @@ export class ChatController {
     }
   }
 
-  async createChat (req: Request &{ auth?: { sub?: string } }, res: Response): Promise<void> {
-    const userId = req.auth?.sub
+  async createChat (req: Request, res: Response): Promise<void> {
+    const userId = req.auth?.payload?.sub
     const {
       uuid,
       user1_id,
@@ -187,9 +187,9 @@ export class ChatController {
     }
   }
 
-  async getChatById (req: Request & { auth?: { sub?: string } }, res: Response): Promise<void> {
+  async getChatById (req: Request, res: Response): Promise<void> {
     const chatId = req.params.chatId
-    const userId = req.auth?.sub
+    const userId = req.auth?.payload?.sub
 
     if (!chatId) {
       res.status(400).json({ statusText: 'Missing chat_id', status: 400 })

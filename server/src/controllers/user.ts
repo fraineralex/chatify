@@ -33,8 +33,8 @@ export class UserController {
     res.status(200).json(users)
   }
 
-  static async getUserMetadata (req: Request & { auth?: { sub?: string } }, res: Response) {
-    const userId = req.auth?.sub
+  static async getUserMetadata (req: Request, res: Response) {
+    const userId = req.auth?.payload?.sub
 
     if(!userId) {
       res.status(401)
@@ -68,8 +68,8 @@ export class UserController {
     }
   }
 
-  static async updateMetadata (req: Request & { auth?: { sub?: string } }, res: Response) {
-    const userId = req.auth?.sub
+  static async updateMetadata (req: Request, res: Response) {
+    const userId = req.auth?.payload?.sub
     const { metadata } = req.body as { metadata: metadata }
 
     if (!metadata) {
