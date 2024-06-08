@@ -9,7 +9,7 @@
   "scripts": {
     "build": "pnpm --filter client build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "start:server": "pnpm --filter server start",
+    "start:server": "cd server && pnpm start",
     "start": "pnpm --filter ** start",
     "dev": "pnpm --filter ** dev"
   },

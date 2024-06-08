@@ -40,9 +40,10 @@ socketRouter.init()
 app.use(express.json())
 app.use(logger('dev'))
 
+app.get('/', (req, res) => res.send('Welcome to Chatify API'))
 app.get('/api', (req, res) => res.send('Welcome to Chatify API'))
 app.use('/api/users', checkJwtMiddleware, userRouter)
 app.use('/api/chats', checkJwtMiddleware, chatRouter.init())
 app.use((req, res) => res.status(404).send('404 Not Found'))
 
-server.listen(port, () => console.log(`Server is running on http://localhost:${port}`))
+server.listen(port, () => console.log(`Server is running in port ${port}`))
