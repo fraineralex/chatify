@@ -5,7 +5,7 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "cross-env MODE=PROD tsc && node dist/index.js",
+    "start": "tsc && node dist/index.js",
     "ts:watch": "tsc -w",
     "dev": "concurrently \"npm run ts:watch\" \"nodemon dist/index.js\"",
     "dev:watch": "nodemon dist/index.js",
@@ -26,7 +26,6 @@
     "@types/morgan": "1.9.9",
     "@types/node": "20.11.30",
     "concurrently": "8.2.2",
-    "cross-env": "7.0.3",
     "nodemon": "3.1.0"
   },
   "dependencies": {
