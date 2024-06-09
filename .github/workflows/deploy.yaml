@@ -12,14 +12,24 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: 20
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-            version: latest
+            version: 9
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --no-optional
+
+      - name: Lint the server code  
+        run: pnpm run lint:server
 
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -29,7 +39,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            cd /home/ubuntu/chatify
-            git pull origin main
+            cd /home/${{ secrets.EC2_USERNAME }}/chatify
+            sudo git pull origin main
             pnpm install
             pm2 restart index

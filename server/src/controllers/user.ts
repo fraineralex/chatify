@@ -61,8 +61,41 @@ export class UserController {
           .status(data.status)
           .json({ statusText: data.statusText, status: data.status })
       }
+      
+      let userMetadata:metadata = data.data.user_metadata
+      if(!userMetadata){
+        userMetadata = {
+          chat_preferences: {
+            archived: [],
+            cleaned: {},
+            deleted: [],
+            muted: [],
+            pinned: []
+          }
+        }
 
-      res.status(200).json(data.data.user_metadata)
+        const config = {
+          method: 'PATCH',
+          url: `https://${DOMAIN}/api/v2/users/${userId}`,
+          headers: {
+            authorization: `Bearer ${API_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            user_metadata: userMetadata
+          }
+        }
+
+        const data = await axios.request(config)
+        if (data.status !== 200) {
+          return res
+            .status(data.status)
+            .json({ statusText: data.statusText, status: data.status })
+        }
+      }
+
+      res.status(200).json(userMetadata)
+      console.log(userMetadata)
     } catch (error) {
       console.error(error)
     }
