@@ -1,5 +1,4 @@
 name: "Deploy to AWS"
-description: "Deploy the repository to AWS EC2"
 
 on:
   push:
@@ -29,4 +28,4 @@ jobs:
             git pull origin main
             pnpm install
             pm2 restart index
-            
+
