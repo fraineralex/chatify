@@ -1,4 +1,4 @@
-name: "Deploy to AWS"
+name: "EC2 Deployment Pipeline"
 
 on:
   push:
@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: main-deployment
+      cancel-in-progress: true
 
     steps:
       - name: Checkout Repository
@@ -44,4 +47,5 @@ jobs:
             # Añadir el PATH a pnpm y pm2
             export PATH=$PATH:/home/ubuntu/.local/share/pnpm:/run/user/1000/fnm_multishells/12656_1717970489054/bin
             pnpm install
+            pnpm run build:server
             pm2 restart index

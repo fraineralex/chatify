@@ -7,7 +7,8 @@
     "pnpm": ">=6.0.0"
   },
   "scripts": {
-    "build": "pnpm --filter client build",
+    "build:client": "cd client && pnpm run build",
+    "build:server": "cd server && tsc",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start:server": "cd server && pnpm start",
     "start": "pnpm --filter ** start",
