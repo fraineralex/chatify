@@ -1,16 +1,15 @@
 import axios from 'axios'
 import { User } from '../types/user.js'
 
-const DOMAIN = process.env.AUTH0_DOMAIN ?? ''
-const API_ACCESS_TOKEN = process.env.AUTH0_MGMT_API_TOKEN ?? ''
+const AUTH0_AUDIENCE = process.env.AUTH0_API_IDENTIFIER ?? ''
 
-export async function getUserById (id: string) {
+export async function getUserById(id: string, accessToken: string) {
   const config = {
     method: 'GET',
-    url: `https://${DOMAIN}/api/v2/users/${id}`,
+    url: `${AUTH0_AUDIENCE}users/${id}`,
     headers: {
-      authorization: `Bearer ${API_ACCESS_TOKEN}`
-    }
+      authorization: `Bearer ${accessToken}`,
+    },
   }
 
   const response = await axios.request(config)
