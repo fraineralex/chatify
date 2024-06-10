@@ -3,3 +3,4 @@ node_modules
 dist
 *.pem
 pnpm-lock.yaml
+client_secret_google.json
