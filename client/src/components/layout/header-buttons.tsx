@@ -56,13 +56,14 @@ export function HeaderButtons() {
       : setChatFilterState("unread");
   };
 
+
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     (async () => {
       const users = await getAllUsers(await getAccessTokenSilently());
       setUsers(() => users || []);
     })();
-  }, [open]);
+  }, [isOpen]);
 
   return (
     <>

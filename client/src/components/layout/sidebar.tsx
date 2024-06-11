@@ -49,7 +49,7 @@ export function Sidebar () {
     })
 
   return (
-    <div className='border-r h-screen md:col-span-2'>
+    <div className='border-r h-dvh md:col-span-2'>
       <Header />
       <div className='relative mb-2 w-full px-3 mt-2'>
         <input

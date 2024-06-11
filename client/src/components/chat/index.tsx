@@ -143,7 +143,7 @@ export function Chat () {
   }
 
   return (
-    <main className='flex flex-col h-screen p-4 pr-1 pt-0 border-b col-span-5 max-w-full'>
+    <main className='flex flex-col h-dvh p-4 pr-1 pt-0 border-b col-span-5 max-w-full'>
       {currentChat ? (
         <>
           <Header

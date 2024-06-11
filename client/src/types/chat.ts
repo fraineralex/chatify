@@ -1,6 +1,6 @@
 import { MESSAGES_TYPES } from '../constants'
 
-type uuid = `${string}-${string}-${string}-${string}-${string}`
+export type uuid = `${string}-${string}-${string}-${string}-${string}`
 
 export interface Message {
   uuid: uuid
@@ -28,7 +28,7 @@ export interface ReplyMessage {
   user: User
 }
 
-interface ResourceData {
+export interface ResourceData {
   file: string
   filename: string
   fileType: string
@@ -68,7 +68,7 @@ export interface ServerMessage {
 
 export type Messages = Message[]
 
-interface User {
+export interface User {
   id: string
   name: string
   picture: string

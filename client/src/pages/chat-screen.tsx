@@ -21,7 +21,7 @@ export function ChatScreen () {
 
   return (
     <section
-      className={`h-screen border rounded-lg overflow-hidden font-inter w-full ${
+      className={`h-dvh border rounded-lg overflow-hidden font-inter w-full ${
         !isMobile && 'grid grid-cols-7'
       }`}
     >
