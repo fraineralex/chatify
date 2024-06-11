@@ -48,4 +48,4 @@ jobs:
             export PATH=$PATH:/home/ubuntu/.local/share/pnpm:/run/user/1000/fnm_multishells/12656_1717970489054/bin
             pnpm install
             pnpm run build:server
-            pm2 restart index
+            pm2 restart index --update-env 
