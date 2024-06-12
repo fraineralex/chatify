@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Message, ServerChat, StaticFile, uuid } from '../types/chat.js'
 import { Client } from '@libsql/client'
-import { getUserById } from '../utils/user.js'
+import { getUserById, getUsersByIds } from '../utils/user.js'
 import { MESSAGES_TYPES } from '../constants/index.js'
 import { getObjectSignedUrl } from '../utils/s3.js'
 
@@ -12,7 +12,11 @@ export class ChatController {
     this.client = client
   }
 
-  async getAllChats(req: Request & { accessToken?: string }, res: Response, next: NextFunction): Promise<void> {
+  async getAllChats(
+    req: Request & { accessToken?: string },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const userId = req.auth?.payload?.sub
 
     if (!userId || !req.accessToken) {
@@ -30,31 +34,84 @@ export class ChatController {
         args: { user_id: userId },
       })
 
+      if (result.rows.length === 0) res.status(200).json([])
+
+      const chatUUIDs = result.rows
+        .map((chat) => chat.uuid as string)
+        .map((id) => `'${id}'`)
+        .join(',')
+
+      const lastMsgAndUnreadCount = await this.client.execute({
+        sql: `
+          SELECT
+            m1.*,
+            COALESCE(unread.count, 0) as unread_count
+          FROM
+            messages m1
+          LEFT JOIN (
+            SELECT
+              chat_id,
+              COUNT(*) as count
+            FROM
+              messages
+            WHERE
+              chat_id IN (${chatUUIDs}) AND
+              receiver_id = :receiver_id AND
+              is_read = false
+            GROUP BY
+              chat_id
+          ) unread
+          ON m1.chat_id = unread.chat_id
+          WHERE
+            m1.created_at = (
+              SELECT
+                MAX(m2.created_at)
+              FROM
+                messages m2
+              WHERE
+                m2.chat_id = m1.chat_id
+            )
+            AND m1.chat_id IN (${chatUUIDs})
+          LIMIT ${chatUUIDs.length}
+        `,
+        args: {
+          receiver_id: userId,
+        },
+      })
+
       const chats: ServerChat[] = []
-      const loggedUser = await getUserById(userId, req.accessToken)
+      const usersIds = result.rows.map((chat) =>
+        chat.user1_id === userId
+          ? (chat.user2_id as string)
+          : (chat.user1_id as string)
+      )
+      const users = await getUsersByIds([...usersIds, userId], req.accessToken)
+      const loggedUser = users.find((user) => user.user_id === userId)
+
       for (const chat of result.rows) {
         const id =
           chat.user1_id === userId
             ? (chat.user2_id as string)
             : (chat.user1_id as string)
 
-        const chatUser = await getUserById(id, req.accessToken)
+        const chatUser = users.find((user) => user.user_id === id)
+        if (!chatUser || !loggedUser) continue
         const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
 
         let lastMessage: Message | undefined = undefined
         let unreadMessages: number = 0
 
-        const resultMessage = await this.client.execute({
-          sql: 'SELECT * FROM messages WHERE chat_id = :chat_id ORDER BY created_at DESC LIMIT 1',
-          args: { chat_id: chat.uuid },
-        })
-
-        if (resultMessage.rows?.length > 0) {
-          const message = resultMessage.rows[0]
+        if (
+          lastMsgAndUnreadCount.rows?.length > 0 &&
+          lastMsgAndUnreadCount.rows?.find((msg) => msg.chat_id === chat.uuid)
+        ) {
+          const message = lastMsgAndUnreadCount.rows.find(
+            (msg) => msg.chat_id === chat.uuid
+          )
           let staticFile: StaticFile | null = null
 
           if (
-            message.resource_url &&
+            message?.resource_url &&
             (message.type === MESSAGES_TYPES.IMAGE ||
               message.type === MESSAGES_TYPES.DOCUMENT)
           ) {
@@ -62,7 +119,7 @@ export class ChatController {
               message.resource_url as string
             )
           } else if (
-            message.resource_url &&
+            message?.resource_url &&
             message.type === MESSAGES_TYPES.STICKER
           ) {
             staticFile = {
@@ -73,30 +130,25 @@ export class ChatController {
           }
 
           lastMessage = {
-            uuid: message.uuid as uuid,
+            uuid: message?.uuid as uuid,
             chatId: chat.uuid as uuid,
-            content: message.content as string,
-            createdAt: message.created_at as string,
-            isDeleted: !!message.is_deleted as unknown as boolean,
-            isEdited: !!message.is_edited as unknown as boolean,
-            isRead: !!message.is_read as unknown as boolean,
-            isDelivered: !!message.is_delivered as unknown as boolean,
-            receiverId: message.receiver_id as string,
-            replyToId: message.reply_to_id as uuid | null,
+            content: message?.content as string,
+            createdAt: message?.created_at as string,
+            isDeleted: !!message?.is_deleted as unknown as boolean,
+            isEdited: !!message?.is_edited as unknown as boolean,
+            isRead: !!message?.is_read as unknown as boolean,
+            isDelivered: !!message?.is_delivered as unknown as boolean,
+            receiverId: message?.receiver_id as string,
+            replyToId: message?.reply_to_id as uuid | null,
             file: staticFile,
-            senderId: message.sender_id as string,
-            type: message.type as (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES],
-            reactions: message.reactions
-              ? JSON.parse(message.reactions as string)
+            senderId: message?.sender_id as string,
+            type: message?.type as (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES],
+            reactions: message?.reactions
+              ? JSON.parse(message?.reactions as string)
               : null,
           }
 
-          const resultUnreadMessages = await this.client.execute({
-            sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
-            args: { chat_id: chat.uuid, receiver_id: userId },
-          })
-
-          unreadMessages = resultUnreadMessages.rows[0].count as number
+          unreadMessages = message?.unread_count as number
         }
 
         const newChat: ServerChat = {
@@ -140,7 +192,11 @@ export class ChatController {
     }
   }
 
-  async createChat(req: Request & { accessToken?: string }, res: Response, next: NextFunction): Promise<void> {
+  async createChat(
+    req: Request & { accessToken?: string },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const userId = req.auth?.payload?.sub
     const {
       uuid,
@@ -185,7 +241,11 @@ export class ChatController {
     }
   }
 
-  async getChatById(req: Request & { accessToken?: string }, res: Response, next: NextFunction): Promise<void> {
+  async getChatById(
+    req: Request & { accessToken?: string },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const chatId = req.params.chatId
     const userId = req.auth?.payload?.sub
 
@@ -229,13 +289,44 @@ export class ChatController {
       let lastMessage: Message | undefined = undefined
       let unreadMessages: number = 0
 
-      const resultMessage = await this.client.execute({
-        sql: 'SELECT * FROM messages WHERE chat_id = :chat_id ORDER BY created_at DESC LIMIT 1',
-        args: { chat_id: chatDB.uuid },
+      const lastMsgAndUnreadCount = await this.client.execute({
+        sql: `
+          SELECT
+            m1.*,
+            COALESCE(unread.count, 0) as unread_count
+          FROM
+            messages m1
+          LEFT JOIN (
+            SELECT
+              chat_id,
+              COUNT(*) as count
+            FROM
+              messages
+            WHERE
+              chat_id = :chat_id AND
+              receiver_id = :receiver_id AND
+              is_read = false
+          ) unread
+          ON m1.chat_id = unread.chat_id
+          WHERE
+            m1.created_at = (
+              SELECT
+                MAX(m2.created_at)
+              FROM
+                messages m2
+              WHERE
+                m2.chat_id = :chat_id
+            )
+          LIMIT 1
+        `,
+        args: {
+          receiver_id: userId,
+          chat_id: chatDB.uuid,
+        },
       })
 
-      if (resultMessage.rows && resultMessage.rows.length > 0) {
-        const message = resultMessage.rows[0]
+      if (lastMsgAndUnreadCount.rows.length > 0) {
+        const message = lastMsgAndUnreadCount.rows[0]
         let staticFile: StaticFile | null = null
         if (
           message.resource_url &&
@@ -273,12 +364,8 @@ export class ChatController {
         }
       }
 
-      const resultUnreadMessages = await this.client.execute({
-        sql: 'SELECT COUNT(*) as count FROM messages WHERE chat_id = :chat_id AND receiver_id = :receiver_id AND is_read = false',
-        args: { chat_id: chatId, receiver_id: userId },
-      })
-
-      unreadMessages = (resultUnreadMessages.rows[0].count as number) ?? 0
+      unreadMessages =
+        (lastMsgAndUnreadCount.rows[0].unread_count as number) ?? 0
 
       const loggedUser = await getUserById(userId, req.accessToken)
       const chat: ServerChat = {
@@ -318,7 +405,11 @@ export class ChatController {
     }
   }
 
-  async getSignedFileUrls(req: Request & { accessToken?: string }, res: Response, next: NextFunction): Promise<void> {
+  async getSignedFileUrls(
+    req: Request & { accessToken?: string },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const messageUUIDs = req.params.messageIds?.split(',')
 
     if (
@@ -380,7 +471,11 @@ export class ChatController {
     }
   }
 
-  async updateChat(req: Request & { accessToken?: string }, res: Response, next: NextFunction): Promise<void> {
+  async updateChat(
+    req: Request & { accessToken?: string },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const chatId = req.params.chatId
     const { blocked_by } = req.body
 

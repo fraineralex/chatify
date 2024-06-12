@@ -1,14 +1,14 @@
-import { MESSAGES_TYPES } from '../constants/index.ts'
+import { MESSAGES_TYPES } from '../constants/index.js'
 
-type uuid = `${string}-${string}-${string}-${string}-${string}`
+export type uuid = `${string}-${string}-${string}-${string}-${string}`
 
-interface ResourceData {
+export interface ResourceData {
   file: string | Buffer
   filename: string
   fileType: string
 }
 
-interface StaticFile {
+export interface StaticFile {
   url: string
   expiresAt?: string
   filename?: string
@@ -54,6 +54,7 @@ export interface Chat {
   blocked_by?: string | null
   created_at: string
 }
+
 export interface Message {
   uuid?: uuid
   content: string
