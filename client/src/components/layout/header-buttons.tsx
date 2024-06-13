@@ -26,11 +26,13 @@ export function HeaderButtons() {
   const [search, setSearch] = useState("");
   const { chats, setChatFilterState, chatFilterState } = useSocketStore();
 
-  const filteredUsers = users.filter(
+  let filteredUsers = users.filter(
     (user) =>
       user.id !== loggedUser?.sub &&
       user.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (users.length === 0) filteredUsers = chats.map(chat => chat.user)
 
   const toggleBlockedChats = () => {
     chatFilterState === "blocked"
@@ -56,12 +58,12 @@ export function HeaderButtons() {
       : setChatFilterState("unread");
   };
 
-
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen && chats.length > 0) return
+
     (async () => {
       const users = await getAllUsers(await getAccessTokenSilently());
-      setUsers(() => users || []);
+      setUsers(() => users ?? []);
     })();
   }, [isOpen]);
 
