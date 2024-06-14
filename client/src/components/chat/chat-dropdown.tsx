@@ -238,9 +238,9 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
 
     if (chat.unreadMessages > 0) {
       const messagesToUpdate: MessagesToUpdate = {
-        chat_id: chat.uuid,
-        sender_id: user.sub!,
-        receiver_id: chat.user.id
+        chatId: chat.uuid,
+        senderId: user.sub!,
+        receiverId: chat.user.id
       }
 
       return socket?.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)

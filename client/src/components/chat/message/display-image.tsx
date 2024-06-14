@@ -14,7 +14,7 @@ export default function DisplayImage ({
     .filter(
       c => c.chatId === chatId && c.type === MESSAGES_TYPES.IMAGE && !!c.file
     )
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     .map(message => message.file?.url ?? '')
     .filter(Boolean)
 

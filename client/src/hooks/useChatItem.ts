@@ -8,103 +8,108 @@ import { useNewChatModalStore } from '../store/newChatModal'
 import { createChat } from '../services/chat'
 import { updateUserMetadata } from '../services/user'
 
-export function useChatItem ({
-  uuid,
-  user,
-  unreadMessages,
-  isNewChat
+export function useChatItem({
+	uuid,
+	user,
+	unreadMessages,
+	isNewChat
 }: ChatItem) {
-  const {
-    socket,
-    addChat: setChat,
-    chats,
-    removeChat,
-    replaceChat,
-    userMetadata
-  } = useSocketStore()
-  const { currentChat, setCurrentChat } = useChatStore()
-  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
-  const isCurrentChat =
-    currentChat &&
-    (currentChat.uuid === uuid ||
-      (isNewChat && currentChat.user.id === user.id))
-      ? true
-      : false
-  const chatExists = chats.some(chat => chat.user.id === user.id)
-  const closeModal = useNewChatModalStore(state => state.closeModal)
+	const {
+		socket,
+		addChat: setChat,
+		chats,
+		removeChat,
+		replaceChat,
+		userMetadata
+	} = useSocketStore()
+	const { currentChat, setCurrentChat } = useChatStore()
+	const { user: loggedUser, getAccessTokenSilently } = useAuth0()
+	const isCurrentChat =
+		currentChat &&
+		(currentChat.uuid === uuid ||
+			(isNewChat && currentChat.user.id === user.id))
+			? true
+			: false
+	const chatExists = chats.some(chat => chat.user.id === user.id)
+	const closeModal = useNewChatModalStore(state => state.closeModal)
 
-  const handleOpenChat = async () => {
-    if (isCurrentChat || !socket || !userMetadata) return
-    const newCurrentChat = chats.find(chat => chat.user.id === user.id)
-    if (!newCurrentChat) return
+	const handleOpenChat = async () => {
+		if (isCurrentChat || !socket || !userMetadata) return
+		const newCurrentChat = chats.find(chat => chat.user.id === user.id)
+		if (!newCurrentChat) return
 
-    if (newCurrentChat.isDeleted) {
-      newCurrentChat.isDeleted = false
-      replaceChat(newCurrentChat)
-      setCurrentChat(newCurrentChat)
-      const deleteChats = userMetadata.chat_preferences.deleted.filter(
-        uuid => uuid !== newCurrentChat.uuid
-      )
+		if (newCurrentChat.isDeleted) {
+			newCurrentChat.isDeleted = false
+			replaceChat(newCurrentChat)
+			setCurrentChat(newCurrentChat)
+			const deleteChats = userMetadata.chat_preferences.deleted.filter(
+				uuid => uuid !== newCurrentChat.uuid
+			)
 
-      const newChatPreferences = {
-        ...userMetadata.chat_preferences,
-        deleted: deleteChats
-      }
+			const newChatPreferences = {
+				...userMetadata.chat_preferences,
+				deleted: deleteChats
+			}
 
-      const response = await updateUserMetadata(
-        {
-          chat_preferences: newChatPreferences
-        },
-        loggedUser?.sub ?? ''
-      )
+			const response = await updateUserMetadata(
+				{
+					chat_preferences: newChatPreferences
+				},
+				loggedUser?.sub ?? ''
+			)
 
-      if (response.status !== 200) {
-        replaceChat({ ...newCurrentChat, isDeleted: true })
-        console.log(response.statusText)
-      }
-      return
-    } else setCurrentChat(newCurrentChat)
+			if (response.status !== 200) {
+				replaceChat({ ...newCurrentChat, isDeleted: true })
+				console.log(response.statusText)
+			}
+			return
+		} else setCurrentChat(newCurrentChat)
 
-    if (isNewChat) closeModal()
+		if (isNewChat) closeModal()
 
-    if (unreadMessages !== undefined && unreadMessages > 0) {
-      const messagesToRead: MessagesToUpdate = {
-        chat_id: newCurrentChat.uuid,
-        sender_id: user.id,
-        receiver_id: loggedUser?.sub
-      }
+		if (unreadMessages !== undefined && unreadMessages > 0) {
+			const messagesToRead: MessagesToUpdate = {
+				chatId: newCurrentChat.uuid,
+				senderId: user.id,
+				receiverId: loggedUser?.sub
+			}
 
-      socket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
-    }
-  }
+			socket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToRead)
+		}
+	}
 
-  const handleCreateChat = async () => {
-    if (!isNewChat || chatExists) return
+	const handleCreateChat = async () => {
+		if (!isNewChat || chatExists) return
 
-    const newChat: Chat = {
-      uuid: crypto.randomUUID(),
-      user,
-      createdAt: new Date(),
-      unreadMessages: 0
-    }
+		const newChat: Chat = {
+			uuid: crypto.randomUUID(),
+			user,
+			createdAt: new Date(),
+			unreadMessages: 0
+		}
 
-    setChat(newChat)
-    setCurrentChat(newChat)
-    closeModal()
+		setChat(newChat)
+		setCurrentChat(newChat)
+		closeModal()
 
-    const newChatDB = await createChat(loggedUser?.sub, user.id, newChat.uuid, await getAccessTokenSilently())
-    if (!newChatDB) {
-      alert('Failed to create chat')
-      removeChat(newChat.uuid)
-      setCurrentChat(currentChat ?? null)
-    }
-  }
+		const newChatDB = await createChat(
+			loggedUser?.sub,
+			user.id,
+			newChat.uuid,
+			await getAccessTokenSilently()
+		)
+		if (!newChatDB) {
+			alert('Failed to create chat')
+			removeChat(newChat.uuid)
+			setCurrentChat(currentChat ?? null)
+		}
+	}
 
-  return {
-    handleOpenChat,
-    isCurrentChat,
-    loggedUser,
-    chatExists,
-    handleCreateChat
-  }
+	return {
+		handleOpenChat,
+		isCurrentChat,
+		loggedUser,
+		chatExists,
+		handleCreateChat
+	}
 }

@@ -22,8 +22,10 @@ export function MessageArticle ({
   const isAnEmoji = isOnlyOneEmoji(message.content)
 
   let reactions: Record<string, number> | null = null
-  if (Object.keys(message.reactions ?? {}).length > 0) {
-    reactions = Object.entries(message.reactions ?? {})
+  const messageReactions: { [key: string]: string }  = JSON.parse(message.reactions ?? '{}')
+
+  if (Object.keys(messageReactions).length > 0) {
+    reactions = Object.entries(messageReactions)
       .map(([, value]) => {
         return value
       })
@@ -146,7 +148,7 @@ export function MessageArticle ({
               <small className='italic text-[10px]'>Edited</small>
             )}
             <time className='text-[10px]'>
-              {message.createdAt
+              {new Date(message.createdAt)
                 .toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit'

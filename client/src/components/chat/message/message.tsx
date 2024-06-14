@@ -84,6 +84,8 @@ export function Message ({
     setShowEmojiPicker(showEmojiPicker === uuid ? null : uuid)
   }
 
+  const messageReactions: { [key: string]: string }  = JSON.parse(message.reactions ?? '{}')
+
   const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
     setShowEmojiPicker(null)
     const unicodeSymbols = emojiEvent.unified.split('_')
@@ -91,16 +93,16 @@ export function Message ({
     unicodeSymbols.forEach(symbol => codePoints.push(parseInt('0x' + symbol)))
     const emojiChar = String.fromCodePoint(...codePoints)
     if (
-      message.reactions &&
-      message.reactions[loggedUser?.sub as string] === emojiChar
+      messageReactions &&
+      messageReactions[loggedUser?.sub as string] === emojiChar
     )
       return
     const newMessage = {
       ...message,
-      reactions: {
-        ...message.reactions,
+      reactions: JSON.stringify({
+        ...messageReactions,
         [loggedUser?.sub as string]: emojiChar
-      }
+      })
     }
     replaceMessage(newMessage)
     socket?.emit(SOCKET_EVENTS.EDIT_MESSAGE, newMessage)

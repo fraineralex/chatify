@@ -33,7 +33,7 @@ export function Chat () {
       !!c.file
   )
   const chatImageUrls = chatImageMessages
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     .map(message => message.file?.url ?? '')
     .filter(Boolean)
   const [serach, setSearch] = useState<string | null>(null)
@@ -45,7 +45,7 @@ export function Chat () {
         new Date(message.createdAt).getTime() >
           (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
     )
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
 
   if (messageFilter) {
     filteredMessages = filteredMessages.filter(

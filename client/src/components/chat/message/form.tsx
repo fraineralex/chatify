@@ -103,9 +103,9 @@ export function Form ({
         const message: ServerMessage = {
           uuid: crypto.randomUUID(),
           content: fileMsg.caption ?? '',
-          sender_id: loggedUser?.sub || '',
-          receiver_id: currentChat.user.id,
-          chat_id: currentChat.uuid,
+          senderId: loggedUser?.sub || '',
+          receiverId: currentChat.user.id,
+          chatId: currentChat.uuid,
           type:
             fileMsg.file.type.startsWith('image') &&
             !fileMsg.file.type.includes('svg')
@@ -113,14 +113,14 @@ export function Form ({
               : fileMsg.file.type.startsWith('video')
               ? MESSAGES_TYPES.VIDEO
               : MESSAGES_TYPES.DOCUMENT,
-          is_deleted: false,
-          is_edited: false,
-          is_delivered: false,
-          is_read: false,
-          reply_to_id: replyingMessage?.uuid || null,
+          isDeleted: false,
+          isEdited: false,
+          isDelivered: false,
+          isRead: false,
+          replyToId: replyingMessage?.uuid || null,
           file: null,
           reactions: null,
-          created_at: new Date().toISOString()
+          createdAt: new Date().toISOString()
         }
 
         socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message, fileData)
@@ -128,17 +128,17 @@ export function Form ({
         const newMessage: Message = {
           uuid: message.uuid,
           content: message.content,
-          createdAt: new Date(),
-          senderId: message.sender_id,
-          receiverId: message.receiver_id,
-          chatId: message.chat_id,
+          createdAt: new Date().toISOString(),
+          senderId: message.senderId,
+          receiverId: message.receiverId,
+          chatId: message.chatId,
           type: message.type,
-          isDeleted: message.is_deleted,
-          isEdited: message.is_edited,
+          isDeleted: message.isDeleted,
+          isEdited: message.isEdited,
           isSent: false,
-          isDelivered: message.is_delivered,
-          isRead: message.is_read,
-          replyToId: message.reply_to_id,
+          isDelivered: message.isDelivered,
+          isRead: message.isRead,
+          replyToId: message.replyToId,
           reactions: null,
           file: {
             expiresAt: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
@@ -166,18 +166,18 @@ export function Form ({
       const message: ServerMessage = {
         uuid: crypto.randomUUID(),
         content: currentChat.draft || '',
-        sender_id: loggedUser?.sub || '',
-        receiver_id: currentChat.user.id,
-        chat_id: currentChat.uuid,
+        senderId: loggedUser?.sub || '',
+        receiverId: currentChat.user.id,
+        chatId: currentChat.uuid,
         type: MESSAGES_TYPES.TEXT,
-        is_deleted: false,
-        is_edited: false,
-        is_delivered: false,
-        is_read: false,
-        reply_to_id: replyingMessage?.uuid || null,
+        isDeleted: false,
+        isEdited: false,
+        isDelivered: false,
+        isRead: false,
+        replyToId: replyingMessage?.uuid || null,
         file: null,
         reactions: null,
-        created_at: new Date().toISOString()
+        createdAt: new Date().toISOString()
       }
 
       socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
@@ -185,17 +185,17 @@ export function Form ({
       const newMessage: Message = {
         uuid: message.uuid,
         content: message.content,
-        createdAt: new Date(),
-        senderId: message.sender_id,
-        receiverId: message.receiver_id,
-        chatId: message.chat_id,
+        createdAt: new Date().toISOString(),
+        senderId: message.senderId,
+        receiverId: message.receiverId,
+        chatId: message.chatId,
         type: message.type,
-        isDeleted: message.is_deleted,
-        isEdited: message.is_edited,
+        isDeleted: message.isDeleted,
+        isEdited: message.isEdited,
         isSent: false,
-        isDelivered: message.is_delivered,
-        isRead: message.is_read,
-        replyToId: message.reply_to_id,
+        isDelivered: message.isDelivered,
+        isRead: message.isRead,
+        replyToId: message.replyToId,
         reactions: null,
         file: message.file as StaticFile
       }
@@ -337,22 +337,22 @@ export function Form ({
     const message: ServerMessage = {
       uuid: crypto.randomUUID(),
       content: '',
-      sender_id: loggedUser?.sub || '',
-      receiver_id: currentChat.user.id,
-      chat_id: currentChat.uuid,
+      senderId: loggedUser?.sub || '',
+      receiverId: currentChat.user.id,
+      chatId: currentChat.uuid,
       type: MESSAGES_TYPES.STICKER,
-      is_deleted: false,
-      is_edited: false,
-      is_delivered: false,
-      is_read: false,
-      reply_to_id: replyingMessage?.uuid || null,
+      isDeleted: false,
+      isEdited: false,
+      isDelivered: false,
+      isRead: false,
+      replyToId: replyingMessage?.uuid || null,
       file: {
         url: gif.url,
         filename: 'Gif message.gif',
         contentType: 'image/gif'
       },
       reactions: null,
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     }
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
@@ -360,17 +360,17 @@ export function Form ({
     const newMessage: Message = {
       uuid: message.uuid,
       content: message.content,
-      createdAt: new Date(),
-      senderId: message.sender_id,
-      receiverId: message.receiver_id,
-      chatId: message.chat_id,
+      createdAt: new Date().toISOString(),
+      senderId: message.senderId,
+      receiverId: message.receiverId,
+      chatId: message.chatId,
       type: message.type,
-      isDeleted: message.is_deleted,
-      isEdited: message.is_edited,
+      isDeleted: message.isDeleted,
+      isEdited: message.isEdited,
       isSent: false,
-      isDelivered: message.is_delivered,
-      isRead: message.is_read,
-      replyToId: message.reply_to_id,
+      isDelivered: message.isDelivered,
+      isRead: message.isRead,
+      replyToId: message.replyToId,
       reactions: null,
       file: message.file as StaticFile
     }

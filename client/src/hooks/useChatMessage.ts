@@ -39,9 +39,10 @@ export const useChatMessage = () => {
 	} = useSocketStore()
 
 	const [areChatsLoaded, setAreChatsLoaded] = useState(false)
-	const serverOffset =
-		messages.sort((a, b) => b.createdAt?.getTime() - a.createdAt?.getTime())[0]
-			?.createdAt ?? 0
+	const lastMsgOffset = messages.sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	)
+	const serverOffset = new Date(lastMsgOffset[0]?.createdAt ?? 0)
 
 	useEffect(() => {
 		if (!userMetadata || currentChat === null) return
@@ -75,23 +76,23 @@ export const useChatMessage = () => {
 					const newMessage: Message = {
 						uuid: message.uuid,
 						content: message.content,
-						createdAt: new Date(message.created_at),
-						senderId: message.sender_id,
-						receiverId: message.receiver_id,
-						chatId: message.chat_id,
+						createdAt: message.createdAt,
+						senderId: message.senderId,
+						receiverId: message.receiverId,
+						chatId: message.chatId,
 						type: message.type,
-						isDeleted: !!message.is_deleted,
-						isEdited: !!message.is_edited,
+						isDeleted: !!message.isDeleted,
+						isEdited: !!message.isEdited,
 						isSent: true,
-						isDelivered: !!message.is_delivered,
-						isRead: !!message.is_read,
-						replyToId: message.reply_to_id,
+						isDelivered: !!message.isDelivered,
+						isRead: !!message.isRead,
+						replyToId: message.replyToId,
 						file: message.file as StaticFile,
-						reactions: message.reactions ? JSON.parse(message.reactions) : null
+						reactions: message.reactions
 					}
 
 					addMessage(newMessage)
-					setServerOffset(new Date(message.created_at))
+					setServerOffset(new Date(message.createdAt))
 
 					let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
 					let isChatFromApi = false
@@ -108,9 +109,9 @@ export const useChatMessage = () => {
 					let unreadMessages = 0
 					if (loggedUser?.sub === newMessage?.receiverId) {
 						const messagesToUpdate: MessagesToUpdate = {
-							chat_id: chat.uuid,
-							sender_id: newMessage.senderId,
-							receiver_id: newMessage.receiverId
+							chatId: chat.uuid,
+							senderId: newMessage.senderId,
+							receiverId: newMessage.receiverId
 						}
 						if (getCurrentChat()?.uuid === chat.uuid) {
 							newSocket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)
@@ -129,7 +130,7 @@ export const useChatMessage = () => {
 						const lastMessage =
 							chat.lastMessage &&
 							new Date(chat.lastMessage.createdAt).getTime() >
-								newMessage.createdAt.getTime()
+								new Date(newMessage.createdAt).getTime()
 								? chat.lastMessage
 								: newMessage
 
