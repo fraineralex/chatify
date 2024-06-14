@@ -1,50 +1,49 @@
 import { Client } from '@libsql/client'
 
-export async function createTables (client: Client) {
-
-  try {
-    await client.execute(`
+export async function createTables(client: Client) {
+	try {
+		await client.execute(`
       CREATE TABLE IF NOT EXISTS messages (
         uuid TEXT PRIMARY KEY,
         content TEXT NOT NULL,
-        sender_id TEXT NOT NULL,
-        receiver_id TEXT NOT NULL,
-        chat_id TEXT NOT NULL,
-        is_delivered BOOLEAN DEFAULT FALSE,
-        is_read BOOLEAN DEFAULT FALSE,
-        is_edited BOOLEAN DEFAULT FALSE,
-        is_deleted BOOLEAN DEFAULT FALSE,
-        reply_to_id TEXT,
+        senderId TEXT NOT NULL,
+        receiverId TEXT NOT NULL,
+        chatId TEXT NOT NULL,
+        isDelivered BOOLEAN DEFAULT FALSE,
+        isRead BOOLEAN DEFAULT FALSE,
+        isEdited BOOLEAN DEFAULT FALSE,
+        isDeleted BOOLEAN DEFAULT FALSE,
+        replyToId TEXT,
         type TEXT NOT NULL DEFAULT 'text' CHECK( type IN ('text', 'image', 'audio', 'video', 'document', 'emoji', 'sticker') ),
         resource_url TEXT,
         reactions TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `)
 
-    await client.execute(
-      `CREATE INDEX IF NOT EXISTS sender_id_receiver_id ON messages (sender_id, receiver_id, chat_id);`
-    )
+		await client.execute(
+			`CREATE INDEX IF NOT EXISTS sender_id_receiver_id ON messages (senderId, receiverId, chatId);`
+		)
 
-    await client.execute(
-      `CREATE INDEX IF NOT EXISTS resource_url ON messages (resource_url);`
-    )
+		await client.execute(
+			`CREATE INDEX IF NOT EXISTS resource_url ON messages (resource_url);`
+		)
 
-    await client.execute(`
+		await client.execute(`
       CREATE TABLE IF NOT EXISTS chats (
         uuid TEXT PRIMARY KEY,
-        user1_id TEXT NOT NULL,
-        user2_id TEXT NOT NULL,
-        blocked_by TEXT DEFAULT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        user1Id TEXT NOT NULL,
+        user2Id TEXT NOT NULL,
+        blockedBy TEXT DEFAULT NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `)
 
-    await client.execute(`
-      CREATE INDEX IF NOT EXISTS user1_id_user2_id ON chats (user1_id, user2_id);
+		await client.execute(`
+      CREATE INDEX IF NOT EXISTS user1_id_user2_id ON chats (user1Id, user2Id);
     `)
-  } catch (error) {
-    console.error(error)
-    return
-  }
+	} catch (error) {
+		console.error(error)
+		return
+	}
 }
