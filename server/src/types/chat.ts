@@ -69,7 +69,7 @@ export interface Message {
 	isEdited: boolean
 	isDeleted: boolean
 	replyToId: uuid | null
-	reactions: { [key: string]: string } | null
+	reactions: string | null
 }
 
 export interface ServerChat {

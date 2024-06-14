@@ -224,20 +224,8 @@ export class SocketController {
 			const chat: ChangeChat = {
 				uuid: result.rows[0].uuid as uuid,
 				lastMessage: {
-					uuid: message.uuid,
-					chatId: message.chatId,
-					content: message.content,
-					createdAt: message.createdAt,
-					isDeleted: message.isDeleted,
-					isEdited: message.isEdited,
-					isDelivered: message.isDelivered,
-					isRead: message.isRead,
-					receiverId: message.receiverId,
-					replyToId: message.replyToId,
-					file: null,
-					senderId: message.senderId,
-					type: message.type,
-					reactions: message.reactions ? JSON.parse(message.reactions) : null
+					...message,
+					file: null
 				}
 			}
 
