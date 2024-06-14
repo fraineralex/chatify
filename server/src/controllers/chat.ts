@@ -46,37 +46,37 @@ export class ChatController {
 
 			const lastMsgAndUnreadCount = await this.client.execute({
 				sql: `
-          SELECT
-            m1.*,
-            COALESCE(unread.count, 0) as unread_count
-          FROM
-            messages m1
-          LEFT JOIN (
-            SELECT
-              chatId,
-              COUNT(*) as count
-            FROM
-              messages
-            WHERE
-              chatId IN (${chatUUIDs}) AND
-              receiverId = :receiverId AND
-              isRead = false
-            GROUP BY
-              chatId
-          ) unread
-          ON m1.chatId = unread.chatId
-          WHERE
-            m1.createdAt = (
-              SELECT
-                MAX(m2.createdAt)
-              FROM
-                messages m2
-              WHERE
-                m2.chatId = m1.chatId
-            )
-            AND m1.chatId IN (${chatUUIDs})
-          LIMIT ${chatUUIDs.length}
-        `,
+					SELECT
+						m1.*,
+						COALESCE(unread.count, 0) as unread_count
+					FROM
+						messages m1
+					LEFT JOIN (
+						SELECT
+						chatId,
+						COUNT(*) as count
+						FROM
+						messages
+						WHERE
+						chatId IN (${chatUUIDs}) AND
+						receiverId = :receiverId AND
+						isRead = false
+						GROUP BY
+						chatId
+					) unread
+					ON m1.chatId = unread.chatId
+					WHERE
+						m1.createdAt = (
+						SELECT
+							MAX(m2.createdAt)
+						FROM
+							messages m2
+						WHERE
+							m2.chatId = m1.chatId
+						)
+						AND m1.chatId IN (${chatUUIDs})
+					LIMIT ${chatUUIDs.length}
+					`,
 				args: {
 					receiverId: userId
 				}
@@ -101,7 +101,7 @@ export class ChatController {
 				if (!chatUser || !loggedUser) continue
 				const name = chatUser.name?.split(' ').slice(0, 2).join(' ') as string
 
-				let lastMessage: Message | undefined = undefined
+				let lastMessage
 				let unreadMessages: number = 0
 
 				if (
@@ -133,38 +133,22 @@ export class ChatController {
 					}
 
 					lastMessage = {
-						uuid: message?.uuid as uuid,
-						chatId: chat.uuid as uuid,
-						content: message?.content as string,
-						createdAt: message?.createdAt as string,
-						isDeleted: !!message?.isDeleted as unknown as boolean,
-						isEdited: !!message?.isEdited as unknown as boolean,
-						isRead: !!message?.isRead as unknown as boolean,
-						isDelivered: !!message?.isDelivered as unknown as boolean,
-						receiverId: message?.receiverId as string,
-						replyToId: message?.replyToId as uuid | null,
+						...message as unknown as Message,
 						file: staticFile,
-						senderId: message?.senderId as string,
-						type: message?.type as (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES],
-						reactions: message?.reactions
-							? JSON.parse(message?.reactions as string)
-							: null
 					}
 
 					unreadMessages = message?.unread_count as number
 				}
 
 				const newChat: ServerChat = {
-					uuid: chat.uuid as uuid,
+					...chat as unknown as ServerChat,
 					user: {
 						id,
 						name,
 						picture: chatUser.picture as string
 					},
-					createdAt: chat.createdAt as string,
 					unreadMessages,
 					lastMessage,
-					blockedBy: (chat.blockedBy as string) ?? null,
 					isArchived:
 						loggedUser.user_metadata?.chat_preferences.archived.includes(
 							chat.uuid as uuid
@@ -209,7 +193,7 @@ export class ChatController {
 		const createdAt = new Date().toISOString()
 		const chat: ServerChat = {
 			uuid,
-			createdAt: createdAt,
+			createdAt,
 			unreadMessages: 0,
 			blockedBy: null
 		}
@@ -294,34 +278,34 @@ export class ChatController {
 
 			const lastMsgAndUnreadCount = await this.client.execute({
 				sql: `
-          SELECT
-            m1.*,
-            COALESCE(unread.count, 0) as unread_count
-          FROM
-            messages m1
-          LEFT JOIN (
-            SELECT
-              chatId,
-              COUNT(*) as count
-            FROM
-              messages
-            WHERE
-              chatId = :chatId AND
-              receiverId = :receiverId AND
-              isRead = false
-          ) unread
-          ON m1.chatId = unread.chatId
-          WHERE
-            m1.createdAt = (
-              SELECT
-                MAX(m2.createdAt)
-              FROM
-                messages m2
-              WHERE
-                m2.chatId = :chatId
-            )
-          LIMIT 1
-        `,
+					SELECT
+						m1.*,
+						COALESCE(unread.count, 0) as unread_count
+					FROM
+						messages m1
+					LEFT JOIN (
+						SELECT
+						chatId,
+						COUNT(*) as count
+						FROM
+						messages
+						WHERE
+						chatId = :chatId AND
+						receiverId = :receiverId AND
+						isRead = false
+					) unread
+					ON m1.chatId = unread.chatId
+					WHERE
+						m1.createdAt = (
+						SELECT
+							MAX(m2.createdAt)
+						FROM
+							messages m2
+						WHERE
+							m2.chatId = :chatId
+						)
+					LIMIT 1
+					`,
 				args: {
 					receiverId: userId,
 					chatId: chatDB.uuid
@@ -348,22 +332,8 @@ export class ChatController {
 					}
 				}
 				lastMessage = {
-					uuid: message.uuid as uuid,
-					chatId: chatDB.uuid as uuid,
-					content: message.content as string,
-					createdAt: message.createdAt as string,
-					isDeleted: !!message.isDeleted as unknown as boolean,
-					isEdited: !!message.isEdited as unknown as boolean,
-					isRead: !!message.isRead as unknown as boolean,
-					isDelivered: !!message.isDelivered as unknown as boolean,
-					receiverId: message.receiverId as string,
-					replyToId: message.replyToId as uuid,
+					...message as unknown as Message,
 					file: staticFile,
-					senderId: message.senderId as string,
-					type: message.type as (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES],
-					reactions: message.reactions
-						? JSON.parse(message.reactions as string)
-						: null
 				}
 			}
 
@@ -372,16 +342,14 @@ export class ChatController {
 
 			const loggedUser = await getUserById(userId, req.accessToken)
 			const chat: ServerChat = {
-				uuid: chatDB.uuid as uuid,
+				...chatDB as unknown as ServerChat,
 				user: {
 					id,
 					name,
 					picture: chatUser.picture as string
 				},
-				createdAt: chatDB.createdAt as string,
 				unreadMessages,
 				lastMessage,
-				blockedBy: (chatDB.blockedBy as string) ?? null,
 				isArchived:
 					loggedUser.user_metadata?.chat_preferences.archived.includes(
 						chatDB.uuid as uuid
@@ -479,10 +447,10 @@ export class ChatController {
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
-		const chatId = req.params.chatId
+		const uuid = req.params.chatId
 		const { blockedBy } = req.body
 
-		if (!chatId) {
+		if (!uuid) {
 			res.status(400).json({ statusText: 'Missing chatId', status: 400 })
 			return
 		}
@@ -497,7 +465,7 @@ export class ChatController {
 		try {
 			const result = await this.client.execute({
 				sql: 'SELECT * FROM chats WHERE uuid = :uuid',
-				args: { uuid: chatId }
+				args: { uuid }
 			})
 
 			if (result.rows?.length === 0) {
@@ -507,7 +475,7 @@ export class ChatController {
 
 			await this.client.execute({
 				sql: 'UPDATE chats SET blockedBy = :blockedBy WHERE uuid = :uuid',
-				args: { blockedBy, uuid: chatId }
+				args: { blockedBy, uuid }
 			})
 
 			res.status(200).json({ statusText: 'OK', status: 200 })
