@@ -4,7 +4,6 @@ import {
 	Message,
 	MessagesToUpdate,
 	ResourceData,
-	ServerMessage,
 	uuid,
 	StaticFile
 } from '../types/chat.js'
@@ -26,7 +25,7 @@ export class SocketController {
 		//console.log('User disconnected')
 	}
 
-	async newMessage(message: ServerMessage, file?: ResourceData): Promise<void> {
+	async newMessage(message: Message, file?: ResourceData): Promise<void> {
 		if (file && message.type !== MESSAGES_TYPES.TEXT) {
 			try {
 				if (message.type === MESSAGES_TYPES.IMAGE) {
@@ -68,7 +67,7 @@ export class SocketController {
 				}
 			}
 
-			const createdMessage: ServerMessage = {
+			const createdMessage: Message = {
 				...message,
 				file: staticFile
 			}
@@ -213,7 +212,7 @@ export class SocketController {
 	}
 
 	private async updateChat(
-		message: ServerMessage
+		message: Message
 	): Promise<ChangeChat | undefined> {
 		try {
 			const result = await this.client.execute({

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { Message, ServerChat, StaticFile, uuid } from '../types/chat.js'
+import { Message, ChatItem, StaticFile, uuid } from '../types/chat.js'
 import { Client } from '@libsql/client'
 import { getUserById, getUsersByIds } from '../utils/user.js'
 import { MESSAGES_TYPES } from '../constants/index.js'
@@ -82,7 +82,7 @@ export class ChatController {
 				}
 			})
 
-			const chats: ServerChat[] = []
+			const chats: ChatItem[] = []
 			const usersIds = result.rows.map(chat =>
 				chat.user1Id === userId
 					? (chat.user2Id as string)
@@ -140,8 +140,8 @@ export class ChatController {
 					unreadMessages = message?.unread_count as number
 				}
 
-				const newChat: ServerChat = {
-					...chat as unknown as ServerChat,
+				const newChat: ChatItem = {
+					...chat as unknown as ChatItem,
 					user: {
 						id,
 						name,
@@ -191,7 +191,7 @@ export class ChatController {
 			user2Id
 		}: { uuid: uuid; user1Id: string; user2Id: string } = req.body
 		const createdAt = new Date().toISOString()
-		const chat: ServerChat = {
+		const chat: ChatItem = {
 			uuid,
 			createdAt,
 			unreadMessages: 0,
@@ -341,8 +341,8 @@ export class ChatController {
 				(lastMsgAndUnreadCount.rows[0].unread_count as number) ?? 0
 
 			const loggedUser = await getUserById(userId, req.accessToken)
-			const chat: ServerChat = {
-				...chatDB as unknown as ServerChat,
+			const chat: ChatItem = {
+				...chatDB as unknown as ChatItem,
 				user: {
 					id,
 					name,

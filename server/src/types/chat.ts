@@ -16,23 +16,6 @@ export interface StaticFile {
 	contentLength?: number
 }
 
-export interface ServerMessage {
-	uuid: uuid
-	content: string
-	senderId: string
-	receiverId: string
-	chatId: uuid
-	type: (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES]
-	file: StaticFile | null
-	isDelivered: boolean
-	isRead: boolean
-	isEdited: boolean
-	isDeleted: boolean
-	replyToId: uuid | null
-	createdAt: string
-	reactions: string | null
-}
-
 export interface MessagesToUpdate {
 	chatId: uuid
 	senderId: string
@@ -72,7 +55,7 @@ export interface Message {
 	reactions: string | null
 }
 
-export interface ServerChat {
+export interface ChatItem {
 	uuid: uuid
 	user?: User
 	lastMessage?: Message
