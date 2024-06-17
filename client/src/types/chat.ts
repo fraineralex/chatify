@@ -20,22 +20,6 @@ export interface Message {
 	reactions: string| null
 }
 
-export interface ServerMessage {
-  uuid: uuid
-  content: string
-  senderId: string
-  receiverId: string
-  chatId: uuid
-  type: (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES]
-  file: StaticFile | null
-  isDelivered: boolean
-  isRead: boolean
-  isEdited: boolean
-  isDeleted: boolean
-  replyToId: uuid | null
-  createdAt: string
-  reactions: string | null
-}
 export interface ReplyMessage {
 	uuid: uuid
 	content: string
@@ -74,6 +58,26 @@ export interface User {
 	picture: string
 }
 
+export interface ChatDB {
+	uuid: uuid
+	user1Id: string
+	user2Id: string
+	blockedBy: string | null
+	createdAt: string
+}
+
+export interface ChatItem {
+	uuid?: uuid
+	user: User
+	lastMessage?: Message
+	createdAt?: Date
+	unreadMessages?: number
+	isNewChat?: boolean
+	isPinned?: boolean
+	isUnread?: boolean
+	cleaned?: Date | null
+}
+
 export interface Chat {
 	uuid: uuid
 	user: User
@@ -91,14 +95,6 @@ export interface Chat {
 }
 
 export type Chats = Chat[]
-
-export interface ChatDB {
-	uuid: uuid
-	user1Id: string
-	user2Id: string
-	blockedBy: string | null
-	createdAt: string
-}
 
 export interface CurrentChat extends Chat {
 	draft: string
@@ -121,17 +117,6 @@ export interface User {
 	picture: string
 }
 
-export interface ChatItem {
-	uuid?: uuid
-	user: User
-	lastMessage?: Message
-	createdAt?: Date
-	unreadMessages?: number
-	isNewChat?: boolean
-	isPinned?: boolean
-	isUnread?: boolean
-	cleaned?: Date | null
-}
 
 export type EmojiEvent = {
 	unified: string

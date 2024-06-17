@@ -7,8 +7,6 @@ import {
 	Chats,
 	Message,
 	MessagesToUpdate,
-	ServerMessage,
-	StaticFile,
 	uuid
 } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
@@ -70,35 +68,19 @@ export const useChatMessage = () => {
 
 			newSocket.on(
 				SOCKET_EVENTS.CHAT_MESSAGE,
-				async (message: ServerMessage) => {
+				async (message: Message) => {
 					if (messages.find(m => m.uuid === message.uuid && m.isSent)) return
 
-					const newMessage: Message = {
-						uuid: message.uuid,
-						content: message.content,
-						createdAt: message.createdAt,
-						senderId: message.senderId,
-						receiverId: message.receiverId,
-						chatId: message.chatId,
-						type: message.type,
-						isDeleted: !!message.isDeleted,
-						isEdited: !!message.isEdited,
-						isSent: true,
-						isDelivered: !!message.isDelivered,
-						isRead: !!message.isRead,
-						replyToId: message.replyToId,
-						file: message.file as StaticFile,
-						reactions: message.reactions
-					}
+					message.isSent = true
 
-					addMessage(newMessage)
+					addMessage(message)
 					setServerOffset(new Date(message.createdAt))
 
-					let chat = loadedChats.find(c => c.uuid === newMessage.chatId)
+					let chat = loadedChats.find(c => c.uuid === message.chatId)
 					let isChatFromApi = false
 					if (!chat) {
 						chat = await getChatById(
-							newMessage.chatId,
+							message.chatId,
 							await getAccessTokenSilently()
 						)
 						if (!chat) return
@@ -107,11 +89,11 @@ export const useChatMessage = () => {
 					}
 
 					let unreadMessages = 0
-					if (loggedUser?.sub === newMessage?.receiverId) {
+					if (loggedUser?.sub === message?.receiverId) {
 						const messagesToUpdate: MessagesToUpdate = {
 							chatId: chat.uuid,
-							senderId: newMessage.senderId,
-							receiverId: newMessage.receiverId
+							senderId: message.senderId,
+							receiverId: message.receiverId
 						}
 						if (getCurrentChat()?.uuid === chat.uuid) {
 							newSocket.emit(SOCKET_EVENTS.READ_MESSAGE, messagesToUpdate)
@@ -130,9 +112,9 @@ export const useChatMessage = () => {
 						const lastMessage =
 							chat.lastMessage &&
 							new Date(chat.lastMessage.createdAt).getTime() >
-								new Date(newMessage.createdAt).getTime()
+								new Date(message.createdAt).getTime()
 								? chat.lastMessage
-								: newMessage
+								: message
 
 						const newChat = {
 							...chat,

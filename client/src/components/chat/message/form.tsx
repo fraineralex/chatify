@@ -4,10 +4,8 @@ import {
   EmojiEvent,
   Message,
   ReplyMessage,
-  ServerMessage,
   FileMessage,
   ResourceData,
-  StaticFile
 } from '../../../types/chat'
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../../../constants'
 import { useSocketStore } from '../../../store/socket'
@@ -91,6 +89,25 @@ export function Form ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if ((!contentMessage && fileMessages.length === 0) || !currentChat) return
+
+    const message: Message = {
+      uuid: crypto.randomUUID(),
+      content: currentChat.draft || '',
+      senderId: loggedUser?.sub || '',
+      receiverId: currentChat.user.id,
+      chatId: currentChat.uuid,
+      type: MESSAGES_TYPES.TEXT,
+      isDeleted: false,
+      isEdited: false,
+      isDelivered: false,
+      isRead: false,
+      replyToId: replyingMessage?.uuid || null,
+      file: null,
+      reactions: null,
+      createdAt: new Date().toISOString(),
+      isSent: false
+    }
+
     if (fileMessages.length > 0) {
       for (const fileMsg of fileMessages) {
         const base64File = await readFileAsBase64(fileMsg.file)
@@ -100,59 +117,27 @@ export function Form ({
           fileType: fileMsg.file.type
         }
 
-        const message: ServerMessage = {
-          uuid: crypto.randomUUID(),
-          content: fileMsg.caption ?? '',
-          senderId: loggedUser?.sub || '',
-          receiverId: currentChat.user.id,
-          chatId: currentChat.uuid,
-          type:
-            fileMsg.file.type.startsWith('image') &&
-            !fileMsg.file.type.includes('svg')
-              ? MESSAGES_TYPES.IMAGE
-              : fileMsg.file.type.startsWith('video')
-              ? MESSAGES_TYPES.VIDEO
-              : MESSAGES_TYPES.DOCUMENT,
-          isDeleted: false,
-          isEdited: false,
-          isDelivered: false,
-          isRead: false,
-          replyToId: replyingMessage?.uuid || null,
-          file: null,
-          reactions: null,
-          createdAt: new Date().toISOString()
+        message.type =  fileMsg.file.type.startsWith('image') &&
+        !fileMsg.file.type.includes('svg')
+          ? MESSAGES_TYPES.IMAGE
+          : fileMsg.file.type.startsWith('video')
+          ? MESSAGES_TYPES.VIDEO
+          : MESSAGES_TYPES.DOCUMENT
+        
+        message.file = {
+          expiresAt: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
+          url: URL.createObjectURL(fileMsg.file),
+          contentLength: fileMsg.file.size,
+          contentType: fileMsg.file.type,
+          filename: fileMsg.file.name
         }
 
         socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message, fileData)
 
-        const newMessage: Message = {
-          uuid: message.uuid,
-          content: message.content,
-          createdAt: new Date().toISOString(),
-          senderId: message.senderId,
-          receiverId: message.receiverId,
-          chatId: message.chatId,
-          type: message.type,
-          isDeleted: message.isDeleted,
-          isEdited: message.isEdited,
-          isSent: false,
-          isDelivered: message.isDelivered,
-          isRead: message.isRead,
-          replyToId: message.replyToId,
-          reactions: null,
-          file: {
-            expiresAt: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
-            url: URL.createObjectURL(fileMsg.file),
-            contentLength: fileMsg.file.size,
-            contentType: fileMsg.file.type,
-            filename: fileMsg.file.name
-          }
-        }
-
-        addMessage(newMessage)
+        addMessage(message)
         const chatUpdated = {
           ...currentChat,
-          lastMessage: newMessage,
+          lastMessage: message,
           draft: ''
         }
         replaceChat(chatUpdated)
@@ -163,45 +148,11 @@ export function Form ({
       setSelectedFileIndex(0)
     } else {
       if (!contentMessage) return
-      const message: ServerMessage = {
-        uuid: crypto.randomUUID(),
-        content: currentChat.draft || '',
-        senderId: loggedUser?.sub || '',
-        receiverId: currentChat.user.id,
-        chatId: currentChat.uuid,
-        type: MESSAGES_TYPES.TEXT,
-        isDeleted: false,
-        isEdited: false,
-        isDelivered: false,
-        isRead: false,
-        replyToId: replyingMessage?.uuid || null,
-        file: null,
-        reactions: null,
-        createdAt: new Date().toISOString()
-      }
 
       socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
 
-      const newMessage: Message = {
-        uuid: message.uuid,
-        content: message.content,
-        createdAt: new Date().toISOString(),
-        senderId: message.senderId,
-        receiverId: message.receiverId,
-        chatId: message.chatId,
-        type: message.type,
-        isDeleted: message.isDeleted,
-        isEdited: message.isEdited,
-        isSent: false,
-        isDelivered: message.isDelivered,
-        isRead: message.isRead,
-        replyToId: message.replyToId,
-        reactions: null,
-        file: message.file as StaticFile
-      }
-
-      addMessage(newMessage)
-      const chatUpdated = { ...currentChat, lastMessage: newMessage, draft: '' }
+      addMessage(message)
+      const chatUpdated = { ...currentChat, lastMessage: message, draft: '' }
       replaceChat(chatUpdated)
       setCurrentChat(chatUpdated)
     }
@@ -333,8 +284,7 @@ export function Form ({
   }
 
   const handleGifClick = (gif: TenorImage) => {
-    console.log(gif)
-    const message: ServerMessage = {
+    const message: Message = {
       uuid: crypto.randomUUID(),
       content: '',
       senderId: loggedUser?.sub || '',
@@ -352,31 +302,14 @@ export function Form ({
         contentType: 'image/gif'
       },
       reactions: null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      isSent: false
     }
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
 
-    const newMessage: Message = {
-      uuid: message.uuid,
-      content: message.content,
-      createdAt: new Date().toISOString(),
-      senderId: message.senderId,
-      receiverId: message.receiverId,
-      chatId: message.chatId,
-      type: message.type,
-      isDeleted: message.isDeleted,
-      isEdited: message.isEdited,
-      isSent: false,
-      isDelivered: message.isDelivered,
-      isRead: message.isRead,
-      replyToId: message.replyToId,
-      reactions: null,
-      file: message.file as StaticFile
-    }
-
-    addMessage(newMessage)
-    const chatUpdated = { ...currentChat, lastMessage: newMessage }
+    addMessage(message)
+    const chatUpdated = { ...currentChat, lastMessage: message }
     replaceChat(chatUpdated)
     setCurrentChat(chatUpdated)
 

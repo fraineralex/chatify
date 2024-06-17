@@ -92,7 +92,7 @@ export async function updateChatLastMessage(
 
 	chat.lastMessage =
 		chat.lastMessage &&
-		chat.lastMessage.createdAt.getTime() > message.createdAt.getTime()
+		new Date(chat.lastMessage.createdAt).getTime() > new Date(message.createdAt).getTime()
 			? chat.lastMessage
 			: message
 
