@@ -48,7 +48,7 @@ export async function refreshAccessToken(
     try {
       await getAuth0Token()
     } catch (error) {
-      return next(error)
+      return next(new Error('Something went wrong validating your credentials, please try again later'))
     }
   }
 

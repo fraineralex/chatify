@@ -175,7 +175,7 @@ export class ChatController {
 			res.status(200).json(chats)
 		} catch (error) {
 			console.error(error)
-			next(error)
+			next(new Error('Something went wrong fetching chats.'))
 		}
 	}
 
@@ -224,7 +224,7 @@ export class ChatController {
 			res.status(201).json(chat)
 		} catch (error) {
 			console.error(error)
-			next(error)
+			next(new Error('Something went wrong creating the chat.'))
 		}
 	}
 
@@ -372,7 +372,7 @@ export class ChatController {
 			res.status(200).json(chat)
 		} catch (error) {
 			console.error(error)
-			next(error)
+			next(new Error('Something went wrong fetching the chat.'))
 		}
 	}
 
@@ -438,7 +438,7 @@ export class ChatController {
 			res.status(200).json(updatedSignedUrls)
 		} catch (error) {
 			console.error(error)
-			next(error)
+			next(new Error('Something went wrong fetching the files.'))
 		}
 	}
 
@@ -481,7 +481,7 @@ export class ChatController {
 			res.status(200).json({ statusText: 'OK', status: 200 })
 		} catch (error) {
 			console.error(error)
-			next(error)
+			next(new Error('Something went wrong updating the chat.'))
 		}
 	}
 }

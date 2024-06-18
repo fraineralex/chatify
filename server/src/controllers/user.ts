@@ -37,7 +37,7 @@ export class UserController {
       res.status(200).json(users)
     } catch (error) {
       console.error(error)
-      next(error)
+      next(new Error('Something went wrong fetching users'))
     }
   }
 
@@ -109,7 +109,7 @@ export class UserController {
       res.status(200).json(userMetadata)
     } catch (error) {
       console.error(error)
-      next(error)
+      next(new Error('Something went wrong fetching user metadata'))
     }
   }
 
@@ -158,7 +158,7 @@ export class UserController {
       res.status(200).json({ statusText: data.statusText, status: data.status })
     } catch (error) {
       console.error(error)
-      next(error)
+      next(new Error('Something went wrong updating user metadata'))
     }
   }
 }
