@@ -301,14 +301,13 @@ export function Form({
         contentType: 'image/gif'
       },
       reactions: null,
-      createdAt: new Date().toISOString(),
-      isSent: false
+      createdAt: new Date().toISOString()
     }
 
     socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
 
-    addMessage(message)
-    const chatUpdated = { ...currentChat, lastMessage: message }
+    addMessage({ ...message, isSent: false })
+    const chatUpdated = { ...currentChat, lastMessage: { ...message, isSent: false } }
     replaceChat(chatUpdated)
     setCurrentChat(chatUpdated)
 

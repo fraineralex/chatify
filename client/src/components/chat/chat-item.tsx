@@ -53,7 +53,7 @@ export function ChatItem ({
       <article className='items-center text-left w-full overflow-hidden'>
         <div className='flex text-left flex-grow w-full justify-between'>
           <h2 className='text-base font-medium inline-flex items-center capitalize'>
-            {user.name.toLowerCase()}
+            {user.name.split('@')[0].toLowerCase()}
           </h2>
           {!isNewChat && lastMessage && !isCleaned && (
             <LastMessageTime createdAt={lastMessageDate} />

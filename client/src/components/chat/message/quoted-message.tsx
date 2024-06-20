@@ -42,7 +42,7 @@ export function QuotedMessage ({
       <p className='font-medium text-xs my-1'>
         {isMe
           ? 'You'
-          : chats.find(chat => chat.user.id === message.senderId)?.user.name}
+          : chats.find(chat => chat.user.id === message.senderId)?.user.name.split('@')[0]}
       </p>
       <p className='text-gray-600 text-xs pb-2 line-clamp-2 max-w-md truncate inline-block pr-10'>
         {message.content}

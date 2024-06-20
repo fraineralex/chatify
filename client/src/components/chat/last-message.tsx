@@ -42,9 +42,9 @@ export function LastMessage({
       <p className="text-sm truncate max-w-full inline-block">
         {lastMessage && isMe && !isCleaned && (
           <MessageState
-            isDelivered={lastMessage.isDelivered}
+            isDelivered={!!lastMessage.isDelivered}
             isSent={lastMessage.isSent}
-            isRead={lastMessage.isRead}
+            isRead={!!lastMessage.isRead}
             isChatItem
           />
         )}

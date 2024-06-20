@@ -26,7 +26,7 @@ export function ReplyingMessage ({
       >
         <X className='w-5 h-5' />
       </button>
-      <p className='font-medium text-xs'>{`Replying to ${replyingMessage.user.name}`}</p>
+      <p className='font-medium text-xs'>{`Replying to ${replyingMessage.user.name.split('@')[0]}`}</p>
       <p className='text-gray-600 text-xs mt-1 line-clamp-2 max-w-full pr-10'>
         {replyingMessage.content}
       </p>

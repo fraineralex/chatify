@@ -96,7 +96,7 @@ export function MessageArticle({
             <p
               className={`w-full md:w-100 inline align-middle font-medium ${message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
                 } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${message.type !== MESSAGES_TYPES.TEXT
-                  ? message.content && 'mt-1'
+                  ? message.content && 'my-0'
                   : 'mt-1 pb-1'
                 }`}
             >
@@ -121,6 +121,36 @@ export function MessageArticle({
                   </a>
                 )
               )}
+
+              <span
+                className={`text-gray-500 items-end float-end inline-flex space-x-1 ms-2 whitespace-nowrap font-normal text-xs ${message.type === MESSAGES_TYPES.TEXT ||
+                  message.type === MESSAGES_TYPES.DOCUMENT ||
+                  !!message.isDeleted
+                  ? isAnEmoji
+                    ? 'mt-1'
+                    : 'mt-2'
+                  : 'absolute bottom-1 right-2 text-white'
+                  }`}
+              >
+                {!!message.isEdited && !message.isDeleted && (
+                  <small className='italic text-[10px]'>Edited</small>
+                )}
+                <time className='text-[10px]'>
+                  {new Date(message.createdAt)
+                    .toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })
+                    .toLowerCase()}
+                </time>
+                {!message.isDeleted && isMe && (
+                  <MessageState
+                    isSent={!!message.isSent}
+                    isDelivered={!!message.isDelivered}
+                    isRead={!!message.isRead}
+                  />
+                )}
+              </span>
             </p>
           )}
           {!!message.isDeleted && (
@@ -129,36 +159,6 @@ export function MessageArticle({
               {isMe ? 'You deleted this message.' : 'This message was deleted.'}
             </p>
           )}
-
-          <span
-            className={`text-gray-500 items-end ms-2 flex space-x-1 self-end whitespace-nowrap ${message.type === MESSAGES_TYPES.TEXT ||
-              message.type === MESSAGES_TYPES.DOCUMENT ||
-              !!message.isDeleted
-              ? isAnEmoji
-                ? 'mt-1'
-                : 'mt-2'
-              : 'absolute bottom-1 right-2 text-white'
-              }`}
-          >
-            {!!message.isEdited && !message.isDeleted && (
-              <small className='italic text-[10px]'>Edited</small>
-            )}
-            <time className='text-[10px]'>
-              {new Date(message.createdAt)
-                .toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })
-                .toLowerCase()}
-            </time>
-            {!message.isDeleted && isMe && (
-              <MessageState
-                isSent={!!message.isSent}
-                isDelivered={!!message.isDelivered}
-                isRead={!!message.isRead}
-              />
-            )}
-          </span>
         </div>
       </article>
       <span

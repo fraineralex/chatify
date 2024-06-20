@@ -259,7 +259,7 @@ export function Header ({
               messageFilter && 'hidden md:inline'
             }`}
           >
-            {name.toLocaleLowerCase()}
+            {name.split('@')[0].toLocaleLowerCase()}
           </h2>
         }
       </article>
