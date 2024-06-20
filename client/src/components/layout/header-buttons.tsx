@@ -3,10 +3,10 @@ import {
   MegaphoneOff,
   MessageSquareDot,
   SquarePlus,
-  Settings,
   Archive,
   Lock,
   X,
+  CircleAlert,
 } from "lucide-react";
 import Modal from "../common/modal";
 import { useEffect, useState } from "react";
@@ -93,13 +93,16 @@ export function HeaderButtons() {
               <LogoutButton />
             </li>
             <li>
-              <button
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/fraineralex/chatify"
                 title="Settings"
                 aria-label="Settings"
                 className="flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left align-middle"
               >
-                <Settings className="w-5 h-5 inline me-2" /> Settings
-              </button>
+                <CircleAlert className="w-5 h-5 inline me-2" /> About
+              </a>
             </li>
           </ul>
         </Dropdown>

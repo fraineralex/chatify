@@ -2,7 +2,7 @@ interface Props {
   className?: string
 }
 
-export function Emoji ({ className }: Props) {
+export function Emoji({ className }: Props) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -24,7 +24,7 @@ export function Emoji ({ className }: Props) {
   )
 }
 
-export function AttachFile ({ className }: Props) {
+export function AttachFile({ className }: Props) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -43,7 +43,7 @@ export function AttachFile ({ className }: Props) {
   )
 }
 
-export function PDFIcon ({ className }: Props) {
+export function PDFIcon({ className }: Props) {
   return (
     <svg
       height='800px'
@@ -83,7 +83,7 @@ export function PDFIcon ({ className }: Props) {
   )
 }
 
-export function XLSIcon ({ className }: Props) {
+export function XLSIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -119,7 +119,7 @@ export function XLSIcon ({ className }: Props) {
   )
 }
 
-export function DOCIcon ({ className }: Props) {
+export function DOCIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -154,7 +154,7 @@ export function DOCIcon ({ className }: Props) {
   )
 }
 
-export function XLSXIcon ({ className }: Props) {
+export function XLSXIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -191,7 +191,7 @@ export function XLSXIcon ({ className }: Props) {
   )
 }
 
-export function PPTIcon ({ className }: Props) {
+export function PPTIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -228,7 +228,7 @@ export function PPTIcon ({ className }: Props) {
   )
 }
 
-export function UnknownFileIcon ({ className }: Props) {
+export function UnknownFileIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -258,7 +258,7 @@ export function UnknownFileIcon ({ className }: Props) {
   )
 }
 
-export function CSSIcon ({ className }: Props) {
+export function CSSIcon({ className }: Props) {
   return (
     <svg
       height='800px'
@@ -317,7 +317,7 @@ export function CSSIcon ({ className }: Props) {
   )
 }
 
-export function CSVIcon ({ className }: Props) {
+export function CSVIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -354,7 +354,7 @@ export function CSVIcon ({ className }: Props) {
   )
 }
 
-export function EXEIcon ({ className }: Props) {
+export function EXEIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -391,7 +391,7 @@ export function EXEIcon ({ className }: Props) {
   )
 }
 
-export function HTMLIcon ({ className }: Props) {
+export function HTMLIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -428,7 +428,7 @@ export function HTMLIcon ({ className }: Props) {
   )
 }
 
-export function JSIcon ({ className }: Props) {
+export function JSIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -446,7 +446,7 @@ export function JSIcon ({ className }: Props) {
   )
 }
 
-export function JSXIcon ({ className }: Props) {
+export function JSXIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -470,7 +470,7 @@ export function JSXIcon ({ className }: Props) {
   )
 }
 
-export function TXTIcon ({ className }: Props) {
+export function TXTIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -507,7 +507,7 @@ export function TXTIcon ({ className }: Props) {
   )
 }
 
-export function TSIcon ({ className }: Props) {
+export function TSIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -525,7 +525,7 @@ export function TSIcon ({ className }: Props) {
   )
 }
 
-export function SVGIcon ({ className }: Props) {
+export function SVGIcon({ className }: Props) {
   return (
     <svg
       height='800px'
@@ -583,7 +583,7 @@ export function SVGIcon ({ className }: Props) {
   )
 }
 
-export function XMLIcon ({ className }: Props) {
+export function XMLIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -620,7 +620,7 @@ export function XMLIcon ({ className }: Props) {
   )
 }
 
-export function ZIPIcon ({ className }: Props) {
+export function ZIPIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -657,7 +657,7 @@ export function ZIPIcon ({ className }: Props) {
   )
 }
 
-export function PYIcon ({ className }: Props) {
+export function PYIcon({ className }: Props) {
   return (
     <svg
       width='800px'
@@ -707,7 +707,7 @@ export function PYIcon ({ className }: Props) {
   )
 }
 
-export function SQLIcon ({ className }: Props) {
+export function SQLIcon({ className }: Props) {
   return (
     <svg
       height='800px'
@@ -765,7 +765,7 @@ export function SQLIcon ({ className }: Props) {
   )
 }
 
-export function OutlineGif ({ className }: Props) {
+export function OutlineGif({ className }: Props) {
   return (
     <svg
       stroke='currentColor'
@@ -780,6 +780,27 @@ export function OutlineGif ({ className }: Props) {
     >
       <defs></defs>
       <path d='M944 299H692c-4.4 0-8 3.6-8 8v406c0 4.4 3.6 8 8 8h59.2c4.4 0 8-3.6 8-8V549.9h168.2c4.4 0 8-3.6 8-8V495c0-4.4-3.6-8-8-8H759.2V364.2H944c4.4 0 8-3.6 8-8V307c0-4.4-3.6-8-8-8zM588 300h-56c-4.4 0-8 3.6-8 8v406c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V308c0-4.4-3.6-8-8-8zM452 500.9H290.5c-4.4 0-8 3.6-8 8v43.7c0 4.4 3.6 8 8 8h94.9l-0.3 8.9c-1.2 58.8-45.6 98.5-110.9 98.5-76.2 0-123.9-59.7-123.9-156.7 0-95.8 46.8-155.2 121.5-155.2 54.8 0 93.1 26.9 108.5 75.4h76.2c-13.6-87.2-86-143.4-184.7-143.4C150 288 72 375.2 72 511.9 72 650.2 149.1 736 273 736c114.1 0 187-70.7 187-181.6v-45.5c0-4.4-3.6-8-8-8z'></path>
+    </svg>
+  )
+}
+
+export function ChatifyLogo({ className }: Props) {
+  return (
+    <svg
+      height="800px"
+      width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+      viewBox="0 0 58 58" xmlSpace="preserve"
+      className={className}
+    >
+      <g>
+        <path style={{ fill: '#049CFF' }} d="M23.936,54.07c0.539-0.12,0.879-0.654,0.76-1.193c-0.121-0.539-0.663-0.874-1.193-0.759
+        l-7.252,1.614c-0.003-0.002-0.007-0.003-0.01-0.005l-0.171,0.045l-0.326,0.073c-0.027,0.006-0.047,0.024-0.073,0.032L0,58
+        l4.988-14.963C2.457,38.78,1,33.812,1,28.5C1,12.76,13.76,0,29.5,0S58,12.76,58,28.5S45.24,57,29.5,57
+        c-3.603,0-7.048-0.673-10.221-1.894L23.936,54.07z"/>
+        <path style={{ fill: '#FFFFFF' }} d="M30,22H16c-0.552,0-1-0.448-1-1s0.448-1,1-1h14c0.552,0,1,0.448,1,1S30.552,22,30,22z" />
+        <path style={{ fill: '#FFFFFF' }} d="M43,30H16c-0.552,0-1-0.448-1-1s0.448-1,1-1h27c0.552,0,1,0.448,1,1S43.552,30,43,30z" />
+        <path style={{ fill: '#FFFFFF' }} d="M43,38H16c-0.552,0-1-0.448-1-1s0.448-1,1-1h27c0.552,0,1,0.448,1,1S43.552,38,43,38z" />
+      </g>
     </svg>
   )
 }

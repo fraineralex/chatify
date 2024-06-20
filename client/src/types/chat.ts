@@ -11,7 +11,7 @@ export interface Message {
 	chatId: uuid
 	type: (typeof MESSAGES_TYPES)[keyof typeof MESSAGES_TYPES]
 	file: StaticFile | null
-	isSent: boolean
+	isSent?: boolean
 	isDelivered: boolean
 	isRead: boolean
 	isEdited: boolean
