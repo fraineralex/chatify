@@ -12,9 +12,10 @@ interface Props {
   message: Message
   messageListRef?: React.RefObject<HTMLUListElement>
   isMe?: boolean
+  setShowMsgDropdown?: (show: boolean) => void
 }
 
-export function MessageArticle ({
+export function MessageArticle({
   message,
   messageListRef,
   isMe = true
@@ -22,7 +23,7 @@ export function MessageArticle ({
   const isAnEmoji = isOnlyOneEmoji(message.content)
 
   let reactions: Record<string, number> | null = null
-  const messageReactions: { [key: string]: string }  = JSON.parse(message.reactions ?? '{}')
+  const messageReactions: { [key: string]: string } = JSON.parse(message.reactions ?? '{}')
 
   if (Object.keys(messageReactions).length > 0) {
     reactions = Object.entries(messageReactions)
@@ -42,14 +43,12 @@ export function MessageArticle ({
   const contentMessage = extractUrlsFromText(message.content)
 
   return (
-    <div className='relative mt-1 max-w-full '>
+    <div className='relative mt-1 max-w-full'>
       <article
-        className={`items-center rounded-lg max-w-xs md:max-w-xl whitespace-normal break-words border border-transparent ${
-          isMe ? 'bg-gray-300' : 'bg-gray-100'
-        } ${
-          (message.type !== MESSAGES_TYPES.STICKER || message.isDeleted) &&
+        className={`items-center rounded-lg max-w-xs md:max-w-xl whitespace-normal break-words border border-transparent ${isMe ? 'bg-gray-300' : 'bg-gray-100'
+          } ${(message.type !== MESSAGES_TYPES.STICKER || !!message.isDeleted) &&
           'pt-1 pb-1 px-1 ps-1'
-        }`}
+          }`}
       >
         {!message.isDeleted && message.replyToId && (
           <QuotedMessage
@@ -91,17 +90,15 @@ export function MessageArticle ({
           )}
 
         <div
-          className={`${!isAnEmoji && 'flex justify-between h-full ps-1'}  `}
+          className={`${!isAnEmoji && 'flex justify-between h-full ps-1'}`}
         >
           {!message.isDeleted && (
             <p
-              className={`w-full md:w-100 inline align-middle font-medium ${
-                message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
-              } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${
-                message.type !== MESSAGES_TYPES.TEXT
+              className={`w-full md:w-100 inline align-middle font-medium ${message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
+                } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${message.type !== MESSAGES_TYPES.TEXT
                   ? message.content && 'mt-1'
                   : 'mt-1 pb-1'
-              }`}
+                }`}
             >
               {contentMessage.map((word, index) =>
                 typeof word === 'string' ? (
@@ -116,7 +113,7 @@ export function MessageArticle ({
                         : word.link
                     }
                     target='_blank'
-                    rel='noreferrer'
+                    rel='noopener noreferrer'
                     key={index}
                     className='text-blue-600 me-1 hover:underline underline-offset-[3px] hover:text-blue-800'
                   >
@@ -126,7 +123,7 @@ export function MessageArticle ({
               )}
             </p>
           )}
-          {message.isDeleted && (
+          {!!message.isDeleted && (
             <p className='text-sm font-light w-100 inline text-gray-400 italic'>
               <Ban className='w-4 h-4 text-gray-400 inline me-2 align-middle' />
               {isMe ? 'You deleted this message.' : 'This message was deleted.'}
@@ -134,17 +131,16 @@ export function MessageArticle ({
           )}
 
           <span
-            className={`text-gray-500 items-end ms-2 flex space-x-1 self-end whitespace-nowrap ${
-              message.type === MESSAGES_TYPES.TEXT ||
+            className={`text-gray-500 items-end ms-2 flex space-x-1 self-end whitespace-nowrap ${message.type === MESSAGES_TYPES.TEXT ||
               message.type === MESSAGES_TYPES.DOCUMENT ||
-              message.isDeleted
-                ? isAnEmoji
-                  ? 'mt-1'
-                  : 'mt-2'
-                : 'absolute bottom-1 right-2 text-white'
-            }`}
+              !!message.isDeleted
+              ? isAnEmoji
+                ? 'mt-1'
+                : 'mt-2'
+              : 'absolute bottom-1 right-2 text-white'
+              }`}
           >
-            {message.isEdited && !message.isDeleted && (
+            {!!message.isEdited && !message.isDeleted && (
               <small className='italic text-[10px]'>Edited</small>
             )}
             <time className='text-[10px]'>
@@ -157,28 +153,26 @@ export function MessageArticle ({
             </time>
             {!message.isDeleted && isMe && (
               <MessageState
-                isSent={message.isSent}
-                isDelivered={message.isDelivered}
-                isRead={message.isRead}
+                isSent={!!message.isSent}
+                isDelivered={!!message.isDelivered}
+                isRead={!!message.isRead}
               />
             )}
           </span>
         </div>
       </article>
       <span
-        className={`${
-          isMe ? 'justify-end me-2' : 'justify-start ms-2'
-        }   flex z-20 m-0`}
+        className={`${isMe ? 'justify-end me-2' : 'justify-start ms-2'
+          }   flex z-20 m-0`}
       >
         {reactions &&
           Object.entries(reactions).map(([reaction, count]) => (
             <span
               key={reaction}
-              className={`${
-                isMe
-                  ? 'bg-gray-100 border border-gray-200'
-                  : 'bg-gray-200 border border-gray-100'
-              } py-[1px] px-[5px] rounded-full text-sm -mt-2 mb-0`}
+              className={`${isMe
+                ? 'bg-gray-100 border border-gray-200'
+                : 'bg-gray-200 border border-gray-100'
+                } py-[1px] px-[5px] rounded-full text-sm -mt-2 mb-0`}
             >
               {reaction}
               {count > 1 && (

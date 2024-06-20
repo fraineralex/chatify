@@ -6,7 +6,7 @@ export function MessageState ({
   isRead,
   isChatItem
 }: {
-  isSent: boolean
+  isSent?: boolean
   isDelivered: boolean
   isRead: boolean
   isChatItem?: boolean

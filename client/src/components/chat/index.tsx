@@ -13,7 +13,7 @@ import { MESSAGES_TYPES } from '../../constants'
 import { getSignedUrls } from '../../services/chat'
 import { useAuth0 } from '@auth0/auth0-react'
 
-export function Chat () {
+export function Chat() {
   const { getAccessTokenSilently } = useAuth0()
   const currentChat = useChatStore(state => state.currentChat)
   const { messages, replaceMessage } = useSocketStore()
@@ -43,7 +43,7 @@ export function Chat () {
       message =>
         message.chatId === currentChat?.uuid &&
         new Date(message.createdAt).getTime() >
-          (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
+        (new Date(currentChat.cleaned ?? 0).getTime() ?? 0)
     )
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
 
@@ -91,21 +91,21 @@ export function Chat () {
 
   useEffect(() => {
     if (!visible) return
-    ;(async () => {
-      const updatedSignedUrls = await getSignedUrls(
-        chatImageMessages.map(c => c.uuid),
-        await getAccessTokenSilently()
-      )
+      ; (async () => {
+        const updatedSignedUrls = await getSignedUrls(
+          chatImageMessages.map(c => c.uuid),
+          await getAccessTokenSilently()
+        )
 
-      for (const signedFile of updatedSignedUrls) {
-        const message = chatImageMessages.find(c => c.uuid === signedFile.uuid)
-        if (!message) return
-        replaceMessage({
-          ...message,
-          file: signedFile.file
-        })
-      }
-    })()
+        for (const signedFile of updatedSignedUrls) {
+          const message = chatImageMessages.find(c => c.uuid === signedFile.uuid)
+          if (!message) return
+          replaceMessage({
+            ...message,
+            file: signedFile.file
+          })
+        }
+      })()
   }, [visible])
 
   useEffect(() => {
@@ -160,18 +160,21 @@ export function Chat () {
           >
             {filteredMessages.map((message, index) =>
               message.type !== MESSAGES_TYPES.TEXT &&
-              message.file &&
-              message.file.expiresAt &&
-              new Date(message.file.expiresAt) < new Date() ? null : (
-                <Message
-                  key={message.uuid ?? index}
-                  message={message}
-                  setReplyingMessage={setReplyingMessage}
-                  messageListRef={messageListRef}
-                  showEmojiPicker={showEmojiPicker}
-                  setShowEmojiPicker={setShowEmojiPicker}
-                  emojiPickerPosition={emojiPickerPosition}
-                />
+                message.file &&
+                message.file.expiresAt &&
+                new Date(message.file.expiresAt) < new Date() ? null : (
+                <>
+                {index === 0 && <span className='mb-5 block' />}
+                  <Message
+                    key={message.uuid ?? index}
+                    message={message}
+                    setReplyingMessage={setReplyingMessage}
+                    messageListRef={messageListRef}
+                    showEmojiPicker={showEmojiPicker}
+                    setShowEmojiPicker={setShowEmojiPicker}
+                    emojiPickerPosition={emojiPickerPosition}
+                  />
+                </>
               )
             )}
           </ul>

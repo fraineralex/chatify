@@ -255,11 +255,11 @@ export function Header ({
         />
         {
           <h2
-            className={`text-sm md:text-base font-bold my-auto whitespace-nowrap ${
+            className={`text-sm md:text-base font-bold my-auto whitespace-nowrap capitalize ${
               messageFilter && 'hidden md:inline'
             }`}
           >
-            {name}
+            {name.toLocaleLowerCase()}
           </h2>
         }
       </article>

@@ -26,7 +26,7 @@ interface Props {
   setShowEmojiPicker: React.Dispatch<React.SetStateAction<uuid | null>>
 }
 
-export function Message ({
+export function Message({
   setReplyingMessage,
   messageListRef,
   message,
@@ -84,7 +84,7 @@ export function Message ({
     setShowEmojiPicker(showEmojiPicker === uuid ? null : uuid)
   }
 
-  const messageReactions: { [key: string]: string }  = JSON.parse(message.reactions ?? '{}')
+  const messageReactions: { [key: string]: string } = JSON.parse(message.reactions ?? '{}')
 
   const handleEmojiSelect = (emojiEvent: EmojiEvent) => {
     setShowEmojiPicker(null)
@@ -122,9 +122,8 @@ export function Message ({
   return (
     <>
       <li
-        className={`flex flex-col space-y-2 relative max-w-full ${
-          isMe ? 'items-end' : 'items-start'
-        }`}
+        className={`flex flex-col space-y-2 relative max-w-full ${isMe ? 'items-end' : 'items-start'
+          }`}
         data-uuid={uuid}
       >
         {showEmojiPicker === uuid && (
@@ -145,9 +144,8 @@ export function Message ({
           </div>
         )}
         <div
-          className={`flex items-start gap-2 ${
-            isMe ? 'flex-row-reverse' : 'flex-row'
-          }`}
+          className={`flex items-start gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'
+            }`}
         >
           <img
             src={user?.picture}
@@ -158,9 +156,8 @@ export function Message ({
             style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
           />
           <aside
-            className={`group flex items-center ${
-              isMe ? 'place-content-start' : 'place-content-end'
-            }`}
+            className={`group flex items-center ${isMe ? 'place-content-start' : 'place-content-end'
+              }`}
           >
             <MessageArticle
               message={message}
@@ -168,7 +165,7 @@ export function Message ({
               isMe={isMe}
             />
             {!isDeleted && !showEmojiPicker && (
-              <span className='absolute -top-11 invisible group-hover:visible ease-in-out duration-150 backdrop-blur-3xl border-1 rounded-md p-2 flex items-center space-x-2'>
+              <span className='absolute -top-10 invisible group-selection:visible group-hover:visible ease-in-out duration-150 backdrop-blur-3xl border-1 rounded-md p-2 flex items-center space-x-2'>
                 <button
                   name='emoji'
                   className='text-gray-800 cursor-pointer ease-linear duration-100 hover:scale-150 hover:text-blue-500'

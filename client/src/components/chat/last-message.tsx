@@ -62,7 +62,7 @@ export function LastMessage({
             </span>
           </>
         )}
-        {lastMessage?.isDeleted && !isCleaned && (
+        {!!lastMessage?.isDeleted && !isCleaned && (
           <>
             <Ban className="w-4 h-4 inline me-1 align-middle" />
             <span className="align-middle">

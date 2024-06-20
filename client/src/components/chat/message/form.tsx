@@ -29,7 +29,7 @@ import GifPicker, { TenorImage } from 'gif-picker-react'
 
 const tenorApiKey = (import.meta.env.VITE_TENOR_API_KEY as string) ?? ''
 
-export function Form ({
+export function Form({
   replyingMessage,
   handleReplyMessage
 }: {
@@ -104,8 +104,7 @@ export function Form ({
       replyToId: replyingMessage?.uuid || null,
       file: null,
       reactions: null,
-      createdAt: new Date().toISOString(),
-      isSent: false
+      createdAt: new Date().toISOString()
     }
 
     if (fileMessages.length > 0) {
@@ -117,13 +116,13 @@ export function Form ({
           fileType: fileMsg.file.type
         }
 
-        message.type =  fileMsg.file.type.startsWith('image') &&
-        !fileMsg.file.type.includes('svg')
+        message.type = fileMsg.file.type.startsWith('image') &&
+          !fileMsg.file.type.includes('svg')
           ? MESSAGES_TYPES.IMAGE
           : fileMsg.file.type.startsWith('video')
-          ? MESSAGES_TYPES.VIDEO
-          : MESSAGES_TYPES.DOCUMENT
-        
+            ? MESSAGES_TYPES.VIDEO
+            : MESSAGES_TYPES.DOCUMENT
+
         message.file = {
           expiresAt: new Date(Date.now() + 1000 * 60 * 30).toISOString(),
           url: URL.createObjectURL(fileMsg.file),
@@ -134,10 +133,10 @@ export function Form ({
 
         socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message, fileData)
 
-        addMessage(message)
+        addMessage({ ...message, isSent: false })
         const chatUpdated = {
           ...currentChat,
-          lastMessage: message,
+          lastMessage: { ...message, isSent: false },
           draft: ''
         }
         replaceChat(chatUpdated)
@@ -151,8 +150,8 @@ export function Form ({
 
       socket?.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
 
-      addMessage(message)
-      const chatUpdated = { ...currentChat, lastMessage: message, draft: '' }
+      addMessage({ ...message, isSent: false })
+      const chatUpdated = { ...currentChat, lastMessage: { ...message, isSent: false }, draft: '' }
       replaceChat(chatUpdated)
       setCurrentChat(chatUpdated)
     }
@@ -340,9 +339,8 @@ export function Form ({
             <button
               name='emoji'
               title='Emojis'
-              className={`hover:scale-125 ease-out duration-100 ${
-                showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
-              }`}
+              className={`hover:scale-125 ease-out duration-100 ${showEmojiPicker ? 'text-blue-500' : 'text-gray-600'
+                }`}
               onClick={handleEmojiClick}
             >
               <Emoji className='w-6 h-6' />
@@ -361,9 +359,8 @@ export function Form ({
               name='gif'
               title='Gifs and Stickers'
               onClick={handleGifsClick}
-              className={`hover:scale-125 ease-out duration-100 ${
-                showGifsPicker ? 'text-blue-500' : 'text-gray-600'
-              }`}
+              className={`hover:scale-125 ease-out duration-100 ${showGifsPicker ? 'text-blue-500' : 'text-gray-600'
+                }`}
             >
               <Sticker className='w-6 h-6' />
               <span className='sr-only'>Insert a Gif</span>

@@ -52,8 +52,8 @@ export function ChatItem ({
       />
       <article className='items-center text-left w-full overflow-hidden'>
         <div className='flex text-left flex-grow w-full justify-between'>
-          <h2 className='text-base font-medium inline-flex items-center'>
-            {user.name}
+          <h2 className='text-base font-medium inline-flex items-center capitalize'>
+            {user.name.toLowerCase()}
           </h2>
           {!isNewChat && lastMessage && !isCleaned && (
             <LastMessageTime createdAt={lastMessageDate} />
