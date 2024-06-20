@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import LoginButton from '../auth/login-button'
+import { Sparkles } from 'lucide-react'
 
 export function GitHubStars() {
   const [starCounter, setStarCounter] = useState(0)
@@ -49,7 +50,7 @@ export function GitHubStars() {
           >
           </div>
           <div
-            className="overflow-hidden flex flex-col h-8 items-center rounded-md bg-gray-100 px-4 font-medium text-xs justify-center group-hover:bg-yellow-200 transition w-40 relative"
+            className="overflow-hidden flex flex-col h-8 items-center rounded-md bg-gray-100 px-4 font-semibold text-xs justify-center group-hover:bg-yellow-200 transition w-40 relative"
           >
             <span className="absolute">
               {`${formatToK(starCounter)} stars on GitHub`}</span>
@@ -59,8 +60,9 @@ export function GitHubStars() {
           </div>
         </div>
       </a>
-      <LoginButton className='ms-2 px-3 py-1 border-2 border-blue-500 rounded-md bg-blue-500 hover:scale-105 hover:bg-blue-600 hover:border-blue-600 ease-in-out duration-300 text-white font-semibold text-sm'>
-        Start Chatting
+      <LoginButton className='ms-2 px-4 py-1 border-2 border-blue-500 rounded-md bg-blue-500 hover:scale-105 text-white font-semibold text-sm flex place-items-center'>
+        <Sparkles className='w-4 h-4 inline me-1' />
+        <span>Start Chatting</span>
       </LoginButton>
     </div>
   )
