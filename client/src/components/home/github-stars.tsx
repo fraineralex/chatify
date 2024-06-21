@@ -26,7 +26,7 @@ export function GitHubStars() {
   }
 
   return (
-    <div className="absolute left-0 right-0 md:top-4 md:mr-4 md:justify-end mx-auto w-full flex justify-center">
+    <div className="absolute left-0 right-0 top-4 md:mr-4 md:justify-end mx-auto w-full flex justify-center px-2 md:px-0">
       <a
         href="https://github.com/fraineralex/chatify"
         className="flex hover:scale-105 group transition cursor-pointer"
@@ -46,11 +46,11 @@ export function GitHubStars() {
 
         <div className="flex items-center">
           <div
-            className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-gray-100 border-y-transparent group-hover:border-x-yellow-200"
+            className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-orange-200 border-y-transparent group-hover:border-x-orange-300"
           >
           </div>
           <div
-            className="overflow-hidden flex flex-col h-8 items-center rounded-md bg-gray-100 px-4 font-semibold text-xs justify-center group-hover:bg-yellow-200 transition w-40 relative"
+            className="overflow-hidden flex flex-col h-8 items-center rounded-md border-orange-200 bg-orange-200 px-4 font-semibold text-xs justify-center group-hover:bg-orange-300 transition w-40 relative"
           >
             <span className="absolute">
               {`${formatToK(starCounter)} stars on GitHub`}</span>
@@ -60,7 +60,7 @@ export function GitHubStars() {
           </div>
         </div>
       </a>
-      <LoginButton className='ms-2 px-4 py-1 border-2 border-blue-500 rounded-md bg-blue-500 hover:scale-105 text-white font-semibold text-sm flex place-items-center'>
+      <LoginButton className='ms-2 px-2 md:px-4 py-1 border-2 border-blue-500 rounded-md bg-blue-500 hover:scale-105 text-white font-semibold text-sm flex place-items-center'>
         <Sparkles className='w-4 h-4 inline me-1' />
         <span>Start Chatting</span>
       </LoginButton>
