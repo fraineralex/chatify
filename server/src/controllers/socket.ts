@@ -42,13 +42,13 @@ export class SocketController {
 				return
 			}
 		}
-
+		const resource = message.type === MESSAGES_TYPES.STICKER ? message.file?.url : file?.filename
 		try {
 			await this.client.execute({
 				sql: 'INSERT INTO messages (uuid, content, senderId, receiverId, isRead, isDelivered, isEdited, isDeleted, replyToId, type, resource_url, chatId, reactions, createdAt) VALUES (:uuid, :content, :senderId, :receiverId, :isRead, :isDelivered, :isEdited, :isDeleted, :replyToId, :type, :file, :chatId, :reactions, :createdAt)',
 				args: {
 					...message,
-					file: message.file?.url ?? file?.filename ?? null
+					file: resource ?? null
 				}
 			})
 

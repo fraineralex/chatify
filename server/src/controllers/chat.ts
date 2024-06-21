@@ -308,7 +308,7 @@ export class ChatController {
 					`,
 				args: {
 					receiverId: userId,
-					chatId: chatDB.uuid
+					chatId
 				}
 			})
 
