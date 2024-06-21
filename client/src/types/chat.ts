@@ -74,6 +74,7 @@ export interface ChatItem {
 	unreadMessages?: number
 	isNewChat?: boolean
 	isPinned?: boolean
+	isMuted?: boolean
 	isUnread?: boolean
 	cleaned?: Date | null
 }

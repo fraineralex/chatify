@@ -53,9 +53,7 @@ export function GitHubStars() {
             className="overflow-hidden flex flex-col h-8 items-center rounded-md border-orange-200 bg-orange-200 px-4 font-semibold text-xs justify-center group-hover:bg-orange-300 transition w-40 relative"
           >
             <span className="absolute">
-              {`${formatToK(starCounter)} stars on GitHub`}</span>
-            <span className="absolute opacity-0 -translate-y-5 ">
-              Give it a star!
+              {starCounter >= 16 ? `${formatToK(starCounter)} stars on GitHub` : 'Give it a star on GitHub!'}
             </span>
           </div>
         </div>

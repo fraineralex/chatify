@@ -3,7 +3,7 @@ import { useChatItem } from '../../hooks/useChatItem'
 import { LastMessage } from './last-message'
 import { LastMessageTime } from './last-message-time'
 
-export function ChatItem ({
+export function ChatItem({
   uuid,
   user,
   lastMessage,
@@ -11,7 +11,8 @@ export function ChatItem ({
   isNewChat,
   isPinned,
   isUnread,
-  cleaned
+  cleaned,
+  isMuted
 }: Props) {
   const {
     handleOpenChat,
@@ -24,7 +25,8 @@ export function ChatItem ({
     user,
     unreadMessages,
     isNewChat,
-    isUnread
+    isUnread,
+    isMuted
   })
 
   const lastMessageDate = new Date(lastMessage?.createdAt ?? 0)
@@ -35,11 +37,10 @@ export function ChatItem ({
 
   return (
     <li
-      className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full group ${
-        isCurrentChat
+      className={`flex items-center space-x-2 border border-transparent border-b-gray-300 cursor-pointer px-2 py-2 w-full group ${isCurrentChat
           ? 'bg-gray-300 rounded-md'
           : 'rounded-sm hover:bg-gray-200 hover:rounded-md bg-transparent'
-      }`}
+        }`}
       onClick={chatExists ? handleOpenChat : handleCreateChat}
     >
       <img
@@ -67,6 +68,7 @@ export function ChatItem ({
             uuid={uuid}
             isPinned={isPinned}
             isUnread={isUnread}
+            isMuted={isMuted}
             isCleaned={isCleaned}
           />
         )}

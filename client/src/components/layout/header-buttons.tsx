@@ -7,65 +7,65 @@ import {
   Lock,
   X,
   CircleAlert,
-} from "lucide-react";
-import Modal from "../common/modal";
-import { useEffect, useState } from "react";
-import { User } from "../../types/chat";
-import { ChatItem } from "../chat/chat-item";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useNewChatModalStore } from "../../store/newChatModal";
-import { getAllUsers } from "../../services/user";
-import { useSocketStore } from "../../store/socket";
-import { Dropdown } from "../common/dropdown";
-import { LogoutButton } from "../auth/logout-button";
+} from "lucide-react"
+import Modal from "../common/modal"
+import { useEffect, useState } from "react"
+import { User } from "../../types/chat"
+import { ChatItem } from "../chat/chat-item"
+import { useAuth0 } from "@auth0/auth0-react"
+import { useNewChatModalStore } from "../../store/newChatModal"
+import { getAllUsers } from "../../services/user"
+import { useSocketStore } from "../../store/socket"
+import { Dropdown } from "../common/dropdown"
+import { LogoutButton } from "../auth/logout-button"
 
 export function HeaderButtons() {
-  const { isOpen, closeModal, openModal } = useNewChatModalStore();
-  const [users, setUsers] = useState<User[]>([]);
-  const { user: loggedUser, getAccessTokenSilently } = useAuth0();
-  const [search, setSearch] = useState("");
-  const { chats, setChatFilterState, chatFilterState } = useSocketStore();
+  const { isOpen, closeModal, openModal } = useNewChatModalStore()
+  const [users, setUsers] = useState<User[]>([])
+  const { user: loggedUser, getAccessTokenSilently } = useAuth0()
+  const [search, setSearch] = useState("")
+  const { chats, setChatFilterState, chatFilterState } = useSocketStore()
 
   let filteredUsers = users.filter(
     (user) =>
       user.id !== loggedUser?.sub &&
       user.name.toLowerCase().includes(search.toLowerCase())
-  );
+  )
 
   if (users.length === 0) filteredUsers = chats.map(chat => chat.user)
 
   const toggleBlockedChats = () => {
     chatFilterState === "blocked"
       ? setChatFilterState("all")
-      : setChatFilterState("blocked");
-  };
+      : setChatFilterState("blocked")
+  }
 
   const toggleArchivedChats = () => {
     chatFilterState === "archived"
       ? setChatFilterState("all")
-      : setChatFilterState("archived");
-  };
+      : setChatFilterState("archived")
+  }
 
   const toggleMutedChats = () => {
     chatFilterState === "muted"
       ? setChatFilterState("all")
-      : setChatFilterState("muted");
-  };
+      : setChatFilterState("muted")
+  }
 
   const toggleUnreadChats = () => {
     chatFilterState === "unread"
       ? setChatFilterState("all")
-      : setChatFilterState("unread");
-  };
+      : setChatFilterState("unread")
+  }
 
   useEffect(() => {
-    if (!isOpen && chats.length > 0) return
+    if (!isOpen ||(!isOpen && chats.length === 0)) return
 
     (async () => {
-      const users = await getAllUsers(await getAccessTokenSilently());
-      setUsers(() => users ?? []);
-    })();
-  }, [isOpen]);
+      const users = await getAllUsers(await getAccessTokenSilently())
+      setUsers(() => users ?? [])
+    })()
+  }, [isOpen])
 
   return (
     <>
@@ -109,18 +109,16 @@ export function HeaderButtons() {
         <button
           title="New Chat"
           aria-label="New Chat"
-          className={`hover:scale-110 hover:contrast-200 ${
-            chats.length === 0
-              ? "text-blue-700 animate-pulse duration-300 ease-in-out"
-              : "text-gray-700"
-          }`}
+          className={`hover:scale-110 hover:contrast-200 ${chats.length === 0
+            ? "text-blue-700 animate-pulse duration-300 ease-in-out"
+            : "text-gray-700"
+            }`}
         >
           <SquarePlus className="w-5 h-5" onClick={openModal} />
         </button>
         <button
-          className={`hover:scale-110 hover:contrast-200 ${
-            chatFilterState === "unread" ? "text-blue-700" : "text-gray-700"
-          }`}
+          className={`hover:scale-110 hover:contrast-200 ${chatFilterState === "unread" ? "text-blue-700" : "text-gray-700"
+            }`}
           title="Unread Chats"
           aria-label="Unread Chats"
           onClick={toggleUnreadChats}
@@ -128,9 +126,8 @@ export function HeaderButtons() {
           <MessageSquareDot className="w-5 h-5" />
         </button>
         <button
-          className={`hover:scale-110 hover:contrast-200 ${
-            chatFilterState === "archived" ? "text-blue-700" : "text-gray-700"
-          }`}
+          className={`hover:scale-110 hover:contrast-200 ${chatFilterState === "archived" ? "text-blue-700" : "text-gray-700"
+            }`}
           title="Hidden Chats"
           aria-label="Hidden Chats"
           onClick={toggleArchivedChats}
@@ -138,9 +135,8 @@ export function HeaderButtons() {
           <Archive className="w-5 h-5" />
         </button>
         <button
-          className={`hover:scale-110 hover:contrast-200 ${
-            chatFilterState === "muted" ? "text-blue-700" : "text-gray-700"
-          }`}
+          className={`hover:scale-110 hover:contrast-200 ${chatFilterState === "muted" ? "text-blue-700" : "text-gray-700"
+            }`}
           title="Muted Chats"
           aria-label="Muted Chats"
           onClick={toggleMutedChats}
@@ -150,7 +146,7 @@ export function HeaderButtons() {
       </aside>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
-        <article className="fixed md:left-60 top-0 mt-16 z-50 md:mx-2 max-w-full md:max-w-[400px] flex-col items-center overflow-hidden rounded-md px-4 pb-6 shadow-2xl border bg-gray-300 w-full md:w-3/4 md:max-h-50 max-h-full min-h-full md:min-h-40 md:h-auto flex">
+        <article className="fixed md:left-60 top-0 mt-16 z-50 md:mx-2 max-w-full md:max-w-[400px] flex-col items-center overflow-hidden rounded-md px-4 pb-6 shadow-2xl border bg-gray-300 w-full md:w-3/4 md:max-h-50 max-h-full md:h-5/6 flex">
           <button
             className="absolute top-2 right-2 p-1 rounded-full bg-gray-400 hover:scale-110"
             onClick={() => closeModal()}
@@ -168,8 +164,8 @@ export function HeaderButtons() {
               value={search}
             />
           </div>
-          <nav className="self-start w-full">
-            <ul className="space-y-1">
+          <nav className="self-start w-full h-full overflow-y-auto scroll-smooth">
+            <ul className="space-y-1 pb-14 md:pb-0">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user, index) => (
                   <ChatItem key={index} user={user} isNewChat />
@@ -184,5 +180,5 @@ export function HeaderButtons() {
         </article>
       </Modal>
     </>
-  );
+  )
 }

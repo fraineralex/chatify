@@ -1,7 +1,7 @@
 import { User } from '@auth0/auth0-react'
 import { Message, uuid } from '../../types/chat'
 import { MessageState } from './message/message-state'
-import { Ban, Pin, ShieldQuestion } from 'lucide-react'
+import { Ban, MegaphoneOff, Pin, ShieldQuestion } from 'lucide-react'
 import { ChatDropdown } from './chat-dropdown'
 import { MESSAGE_TYPE_ICONS, MESSAGES_TYPES } from '../../constants'
 
@@ -12,6 +12,7 @@ interface Props {
   uuid?: uuid
   isPinned?: boolean
   isUnread?: boolean
+  isMuted?: boolean
   isCleaned?: boolean
 }
 
@@ -23,13 +24,14 @@ export function LastMessage({
   isPinned,
   isUnread,
   isCleaned,
+  isMuted
 }: Props) {
   const isMe = loggedUser?.sub === lastMessage?.senderId
 
   const lastMessageContent =
     lastMessage?.content ||
     MESSAGES_TYPES[
-      lastMessage?.type.toUpperCase() as keyof typeof MESSAGES_TYPES
+    lastMessage?.type.toUpperCase() as keyof typeof MESSAGES_TYPES
     ]
 
   const Icon =
@@ -54,9 +56,8 @@ export function LastMessage({
               <Icon className="w-4 h-4 inline me-1 align-middle" />
             )}
             <span
-              className={`align-middle font-medium ${
-                !lastMessage.content && 'capitalize'
-              }`}
+              className={`align-middle font-medium ${!lastMessage.content && 'capitalize'
+                }`}
             >
               {lastMessage && lastMessageContent}
             </span>
@@ -72,6 +73,7 @@ export function LastMessage({
         )}
       </p>
       <span className="flex space-x-2">
+        {isMuted && <MegaphoneOff className="w-4 h-4" />}
         {isPinned && <Pin className="w-4 h-4 rotate-45" />}
         {(unreadMessages > 0 || isUnread) && !isCleaned && (
           <span className="inline-flex items-center justify-center whitespace-nowrap text-xs font-medium border border-input bg-background h-5 w-5 px-1 py-2 rounded-full border-blue-500 bg-blue-600 text-white">

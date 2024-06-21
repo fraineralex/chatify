@@ -5,7 +5,7 @@ import { Header } from './header'
 import { Chat } from '../../types/chat'
 import { useState } from 'react'
 
-export function Sidebar () {
+export function Sidebar() {
   const { areChatsLoaded } = useChatMessage()
   const { chatFilterState, setChatFilterState, chats } = useSocketStore()
   const [search, setSearch] = useState('')
@@ -75,14 +75,14 @@ export function Sidebar () {
         )}
       </div>
       <nav className='pb-2 px-1 space-y-4 h-[90%]'>
-        <ul>
+        <ul className='overflow-y-auto scroll-smooth h-full pb-12'>
           {filteredChats.length > 0
             ? filteredChats.map((chat, index) => (
-                <ChatItem key={index} {...chat} />
-              ))
+              <ChatItem key={index} {...chat} />
+            ))
             : search && (
-                <p className='text-center font-medium'>Chat not found</p>
-              )}
+              <p className='text-center font-medium'>Chat not found</p>
+            )}
           {chats.length === 0 && (
             <p className='text-center font-medium'>
               {areChatsLoaded ? notChatsText : 'Loading chats...'}

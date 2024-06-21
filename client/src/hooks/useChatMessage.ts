@@ -79,6 +79,7 @@ export const useChatMessage = () => {
 					let chat = loadedChats.find(c => c.uuid === message.chatId)
 					let isChatFromApi = false
 					if (!chat) {
+						console.log(loadedChats, message)
 						chat = await getChatById(
 							message.chatId,
 							await getAccessTokenSilently()
