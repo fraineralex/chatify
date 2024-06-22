@@ -92,11 +92,7 @@ export function Message({
     const codePoints: Array<number> = []
     unicodeSymbols.forEach(symbol => codePoints.push(parseInt('0x' + symbol)))
     const emojiChar = String.fromCodePoint(...codePoints)
-    if (
-      messageReactions &&
-      messageReactions[loggedUser?.sub as string] === emojiChar
-    )
-      return
+    if (messageReactions[loggedUser?.sub as string] === emojiChar) return
     const newMessage = {
       ...message,
       reactions: JSON.stringify({
@@ -104,6 +100,7 @@ export function Message({
         [loggedUser?.sub as string]: emojiChar
       })
     }
+
     replaceMessage(newMessage)
     socket?.emit(SOCKET_EVENTS.EDIT_MESSAGE, newMessage)
   }
