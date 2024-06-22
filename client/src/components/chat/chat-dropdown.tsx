@@ -21,8 +21,9 @@ import { toggleChatBlock } from '../../services/chat'
 import { useAuth0 } from '@auth0/auth0-react'
 import { SOCKET_EVENTS } from '../../constants'
 import { updateUserMetadata } from '../../services/user'
+import { toast } from 'sonner'
 
-export function ChatDropdown ({ uuid }: { uuid: uuid }) {
+export function ChatDropdown({ uuid }: { uuid: uuid }) {
   const { chats, replaceChat, socket, userMetadata, setUserMetadata } =
     useSocketStore()
   const { currentChat, setCurrentChat } = useChatStore()
@@ -45,6 +46,17 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     })
 
     if (currentChat?.uuid === uuid) setCurrentChat(null)
+
+    toast.success('Chat has been deleted', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
+    })
 
     const deleteChats = chat.isDeleted
       ? userMetadata.chat_preferences.deleted.filter(uuid => uuid !== chat.uuid)
@@ -74,7 +86,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to delete chat, try again later')
     }
   }
 
@@ -86,6 +98,17 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     replaceChat({
       ...chat,
       isPinned: !chat.isPinned
+    })
+
+    toast.success('Chat has been pinned', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
     })
 
     const pinnedChats = chat.isPinned
@@ -114,7 +137,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to pin chat, try again later')
     }
   }
 
@@ -127,10 +150,21 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       isArchived: !chat.isArchived
     })
 
+    toast.success('Chat has been hidden', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
+    })
+
     const hiddenChats = chat.isArchived
       ? userMetadata.chat_preferences.archived.filter(
-          uuid => uuid !== chat.uuid
-        )
+        uuid => uuid !== chat.uuid
+      )
       : [...userMetadata.chat_preferences.archived, chat.uuid]
 
     setUserMetadata({
@@ -155,7 +189,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to hide chat, try again later')
     }
   }
 
@@ -167,6 +201,17 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     replaceChat({
       ...chat,
       isMuted: !chat.isMuted
+    })
+
+    toast.success('Chat has been muted', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
     })
 
     const muttedChats = chat.isMuted
@@ -195,7 +240,7 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to mute chat, try again later')
     }
   }
 
@@ -204,9 +249,10 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
   ) => {
     event.stopPropagation()
 
+    const isBlockedByMe = chat.blockedBy === user?.sub
     replaceChat({
       ...chat,
-      blockedBy: chat.blockedBy ? null : user?.sub,
+      blockedBy: isBlockedByMe ? null : chat.blockedBy || user?.sub,
       isMuted: false,
       isArchived: false,
       isPinned: false,
@@ -216,17 +262,32 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
 
     if (currentChat?.uuid === uuid) setCurrentChat(null)
 
+    toast.success(`Chat has been ${isBlockedByMe ? 'unblocked' : 'blocked'}`, {
+      action: {
+        label: 'Undo',
+        onClick: async () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          await toggleChatBlock(
+            chat.uuid,
+            await getAccessTokenSilently(),
+            chat.blockedBy || undefined
+          )
+        }
+      }
+    })
+
     const response = await toggleChatBlock(
       chat.uuid,
       await getAccessTokenSilently(),
-      chat.blockedBy ? undefined : user?.sub,
+      isBlockedByMe ? undefined : chat.blockedBy || user?.sub,
     )
 
     if (response.status !== 200) {
       replaceChat({ ...chat })
       if (currentChat?.uuid === uuid) setCurrentChat(currentChat)
 
-      return console.error(response.statusText)
+      toast.error(`Failed to ${isBlockedByMe ? 'unblock' : 'block'} chat, try again later`)
     }
   }
 
@@ -249,6 +310,15 @@ export function ChatDropdown ({ uuid }: { uuid: uuid }) {
     replaceChat({
       ...chat,
       isUnread: !chat.isUnread
+    })
+
+    toast.success(`Chat has been ${chat.isUnread ? 'read' : 'unread'}`, {
+      action: {
+        label: 'Undo',
+        onClick: async () => {
+          replaceChat({ ...chat })
+        }
+      }
     })
   }
 

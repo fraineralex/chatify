@@ -22,6 +22,7 @@ import { toggleChatBlock } from '../../services/chat'
 import { updateUserMetadata } from '../../services/user'
 import { MessageFilter } from '../../types/chat'
 import React, { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 interface Props {
   name: string
@@ -32,7 +33,7 @@ interface Props {
   setSearch: (state: string | null) => void
 }
 
-export function Header ({
+export function Header({
   name,
   picture,
   messageFilter,
@@ -58,9 +59,10 @@ export function Header ({
   ) => {
     event.stopPropagation()
 
+    const isBlockedByMe = chat.blockedBy === user?.sub
     const updatedChat = {
       ...chat,
-      blockedBy: chat.blockedBy ? null : user?.sub,
+      blockedBy: isBlockedByMe ? null : chat.blockedBy || user?.sub,
       isMuted: false,
       isArchived: false,
       isPinned: false,
@@ -72,17 +74,32 @@ export function Header ({
     if (chat.blockedBy) setCurrentChat(updatedChat)
     else setCurrentChat(null)
 
+    toast.success(`Chat has been ${isBlockedByMe ? 'unblocked' : 'blocked'}`, {
+      action: {
+        label: 'Undo',
+        onClick: async () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          await toggleChatBlock(
+            chat.uuid,
+            await getAccessTokenSilently(),
+            chat.blockedBy || undefined
+          )
+        }
+      }
+    })
+
     const response = await toggleChatBlock(
       chat.uuid,
       await getAccessTokenSilently(),
-      chat.blockedBy ? undefined : user?.sub
+      isBlockedByMe ? undefined : chat.blockedBy || user?.sub
     )
 
     if (response.status !== 200) {
       replaceChat({ ...chat })
       setCurrentChat(currentChat)
 
-      return console.error(response.statusText)
+      toast.error(`Failed to ${isBlockedByMe ? 'unblock' : 'block'} chat, try again later`)
     }
   }
 
@@ -97,6 +114,17 @@ export function Header ({
     })
 
     setCurrentChat({ ...chat, isMuted: !chat.isMuted })
+
+    toast.success(`Chat has been ${chat.isMuted ? 'unmuted' : 'muted'}`, {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
+    })
 
     const muttedChats = chat.isMuted
       ? userMetadata.chat_preferences.muted.filter(uuid => uuid !== chat.uuid)
@@ -124,7 +152,7 @@ export function Header ({
       replaceChat({ ...chat })
       setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to mute chat, try again later')
     }
   }
 
@@ -138,6 +166,17 @@ export function Header ({
     })
 
     setCurrentChat({ ...chat, cleaned: new Date() })
+
+    toast.success('Chat has been cleared', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
+    })
 
     const newChatPreferences = {
       ...userMetadata.chat_preferences,
@@ -161,7 +200,7 @@ export function Header ({
       setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
       replaceChat({ ...chat })
 
-      return console.log(response.statusText)
+      toast.error('Failed to clear chat, try again later')
     }
   }
 
@@ -195,6 +234,17 @@ export function Header ({
 
     setCurrentChat(null)
 
+    toast.success('Chat has been deleted', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          replaceChat({ ...chat })
+          setCurrentChat(currentChat)
+          setUserMetadata({ chat_preferences: userMetadata.chat_preferences })
+        }
+      }
+    })
+
     const deleteChats = chat.isDeleted
       ? userMetadata.chat_preferences.deleted.filter(uuid => uuid !== chat.uuid)
       : [...userMetadata.chat_preferences.deleted, chat.uuid]
@@ -223,7 +273,7 @@ export function Header ({
       replaceChat({ ...chat })
       setCurrentChat(currentChat)
 
-      return console.log(response.statusText)
+      toast.error('Failed to delete chat, try again later')
     }
   }
 
@@ -255,9 +305,8 @@ export function Header ({
         />
         {
           <h2
-            className={`text-sm md:text-base font-bold my-auto whitespace-nowrap capitalize ${
-              messageFilter && 'hidden md:inline'
-            }`}
+            className={`text-sm md:text-base font-bold my-auto whitespace-nowrap capitalize ${messageFilter && 'hidden md:inline'
+              }`}
           >
             {name.split('@')[0].toLocaleLowerCase()}
           </h2>
@@ -299,9 +348,8 @@ export function Header ({
           )}
           <button
             disabled={search !== null}
-            className={`hover:scale-110 p-1 rounded-md ${
-              search || (search === '' && 'bg-gray-200')
-            }`}
+            className={`hover:scale-110 p-1 rounded-md ${search || (search === '' && 'bg-gray-200')
+              }`}
             onClick={handleSearchClick}
           >
             <Search className='w-5 h-5' />
@@ -318,10 +366,9 @@ export function Header ({
           >
             <li>
               <button
-                className={`flex px-4 py-2 w-full text-left align-middle ${
-                  !messageFilter?.includes('media') &&
+                className={`flex px-4 py-2 w-full text-left align-middle ${!messageFilter?.includes('media') &&
                   'hover:bg-gray-600 hover:text-white'
-                }`}
+                  }`}
                 title='Shared photos & videos'
                 aria-label='Shared photos & videos'
                 onClick={updateMessageFilter('media')}
@@ -334,10 +381,9 @@ export function Header ({
               <button
                 title='Shared files'
                 aria-label='Shared files'
-                className={`flex px-4 py-2 w-full text-left align-middle ${
-                  !messageFilter?.includes('files') &&
+                className={`flex px-4 py-2 w-full text-left align-middle ${!messageFilter?.includes('files') &&
                   'hover:bg-gray-600 hover:text-white'
-                }`}
+                  }`}
                 onClick={updateMessageFilter('files')}
                 disabled={messageFilter?.includes('files')}
               >

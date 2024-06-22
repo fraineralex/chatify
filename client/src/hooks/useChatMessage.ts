@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useSocketStore } from '../store/socket'
-import { MESSAGES_TYPES, SOCKET_EVENTS } from '../constants'
+import { SOCKET_EVENTS } from '../constants'
 import { Chats, Message, MessagesToUpdate, uuid } from '../types/chat'
 import { useChatStore } from '../store/currenChat'
 import {
@@ -11,6 +11,7 @@ import {
   getSignedUrls,
   updateChatLastMessage
 } from '../services/chat'
+import { toast } from 'sonner'
 
 const SERVER_URL =
   (import.meta.env.VITE_SERVER_URL as string) ?? 'http://localhost:3000'
@@ -187,8 +188,7 @@ export const useChatMessage = () => {
           }
           newSocket.connect()
         } else {
-          console.log(error.message)
-          alert(error)
+          toast.error(error.message)
         }
       })
 
@@ -219,7 +219,6 @@ export const useChatMessage = () => {
         msg.file.expiresAt &&
         new Date(msg.file?.expiresAt).getTime() <= new Date().getTime()
 
-				console.log(messages.filter(m => m.type === MESSAGES_TYPES.IMAGE))
       if (messages.some(msg => isFileExpired(msg))) {
         const expiredFileUUIDs = messages
           .filter(msg => isFileExpired(msg))

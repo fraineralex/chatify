@@ -26,6 +26,7 @@ import './form.css'
 import { FilePreview } from './file-preview'
 import { readFileAsBase64 } from '../../../utils/chat'
 import GifPicker, { TenorImage } from 'gif-picker-react'
+import { toast } from 'sonner'
 
 const tenorApiKey = (import.meta.env.VITE_TENOR_API_KEY as string) ?? ''
 
@@ -243,7 +244,7 @@ export function Form({
       replaceChat({ ...currentChat })
       setCurrentChat(currentChat)
 
-      return console.error(response.statusText)
+      toast.error('Failed to unblock chat, try again later')
     }
   }
 
@@ -258,15 +259,15 @@ export function Form({
       const newFiles = fileMessages
         ? fileMessages.concat(uploadedFiles)
         : uploadedFiles
-      if (newFiles.length >= 100)
-        return alert('You can only send 10 files at once')
-      const maximumSize = 1000 * 1024 * 1024 // 100MB
+      if (newFiles.length > 10)
+        return toast.warning('You can only send 10 files at once')
+      const maximumSize = 100 * 1024 * 1024 // 100MB
       const totalSize = newFiles.reduce(
         (acc, fileMsg) => acc + fileMsg.file.size,
         0
       )
       if (totalSize > maximumSize) {
-        alert('The total size of the files exceeds the limit of 100MB')
+        toast.warning('The total size of the files exceeds the limit of 100MB')
         return
       }
       setFileMessages(newFiles)
