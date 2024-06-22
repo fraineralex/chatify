@@ -133,12 +133,9 @@ export class SocketController {
 
 	async editMessage(message: Message) {
 		try {
-			const reactions = message.reactions
-				? JSON.stringify(message.reactions)
-				: null
 			const updateResult = await this.client.execute({
 				sql: 'UPDATE messages SET isEdited = TRUE, content = :content, reactions = :reactions WHERE uuid = :uuid;',
-				args: { content: message.content, uuid: message.uuid!, reactions }
+				args: { content: message.content, uuid: message.uuid!, reactions: message.reactions }
 			})
 
 			if (updateResult.rowsAffected === 1) {
