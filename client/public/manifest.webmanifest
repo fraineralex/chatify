@@ -1,0 +1,23 @@
+{
+	"short_name": "Chatify",
+	"name": "Chatify",
+	"icons": [
+		{
+			"src": "/logo.png",
+			"type": "image/png",
+			"sizes": "800x800"
+		},
+		{
+			"src": "/favicon.ico",
+			"type": "image/x-icon",
+			"sizes": "32x32"
+		}
+	],
+	"start_url": "/",
+	"background_color": "#ffffff",
+	"display": "standalone",
+	"scope": "/",
+	"theme_color": "#ffffff",
+	"description": "Chatify is an instant messaging application designed to instantly connect you with developers globally. Engage in conversations, share memes, stickers, GIFs, media, files, and explore a plethora of interactive features.",
+	"orientation": "portrait"
+}
