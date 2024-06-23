@@ -94,10 +94,10 @@ export function MessageArticle({
         >
           {!message.isDeleted && (
             <p
-              className={`w-full md:w-100 inline align-middle font-medium ${message.type === MESSAGES_TYPES.DOCUMENT && 'ms-2'
+              className={`w-full md:w-100 inline align-middle font-medium ${message.type === MESSAGES_TYPES.DOCUMENT ? 'ms-2' : ''
                 } ${isAnEmoji ? 'text-5xl' : 'text-sm'} ${message.type !== MESSAGES_TYPES.TEXT
-                  ? message.content && 'my-0'
-                  : 'mt-1 pb-1'
+                  ? message.content ? 'mt-1 pb-1' : 'my-0'
+                  : ''
                 }`}
             >
               {contentMessage.map((word, index) =>
@@ -129,7 +129,7 @@ export function MessageArticle({
                   ? isAnEmoji
                     ? 'mt-1'
                     : 'mt-2'
-                  : 'absolute bottom-1 right-2 text-white'
+                  : `absolute bottom-1 right-2 ${!message.content ? 'text-white' : ''}`
                   }`}
               >
                 {!!message.isEdited && !message.isDeleted && (
