@@ -2,7 +2,7 @@
 
 A realtime chat app built with TypeScript, React, Node.js, and AWS. It allows users to log in easily using OAuth 2.0 (Google, GitHub, email/password). Users can connect with others and send text messages, emojis, stickers, media, files, and more. The chat offers many features found in popular messaging apps like WhatsApp.
 
-![Open graph image of Chatify](/og.webp)
+![Open graph image of Chatify](/client/public/og.webp)
 
 ## 📦 Technologies
 
