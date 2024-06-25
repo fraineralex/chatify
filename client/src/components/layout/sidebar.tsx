@@ -4,6 +4,7 @@ import { ChatItem } from '../chat/chat-item'
 import { Header } from './header'
 import { Chat } from '../../types/chat'
 import { useState } from 'react'
+import Loading from '../chat/loading'
 
 export function Sidebar() {
   const { areChatsLoaded } = useChatMessage()
@@ -85,7 +86,7 @@ export function Sidebar() {
             )}
           {chats.length === 0 && (
             <p className='text-center font-medium'>
-              {areChatsLoaded ? notChatsText : 'Loading chats...'}
+              {areChatsLoaded ? notChatsText : <Loading />}
             </p>
           )}
         </ul>
