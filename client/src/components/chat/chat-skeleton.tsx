@@ -1,15 +1,10 @@
-import { Clock } from "lucide-react";
+import { Clock, User } from "lucide-react";
 
 export default function ChatSkeleton() {
   return (
     <li className='flex items-center space-x-2 border border-transparent cursor-pointer px-2 py-2 w-full group rounded-sm animate-pulse border-b-gray-300'>
-      <img
-        src='/profile-placeholder.webp'
-        width='50'
-        height='50'
-        className='rounded-full w-12 h-12 opacity-50'
-        style={{ aspectRatio: 50 / 50, objectFit: 'cover' }}
-      />
+      <figure className='flex-shrink-0 w-12 h-12 bg-gray-100 rounded-full place-content-center'><User className="flex m-auto h-10 w-10 text-gray-400" /></figure>
+
       <article className='items-center text-left w-full overflow-hidden'>
         <div className='flex text-left flex-grow w-full justify-between'>
           <h2 className='text-base font-medium inline-flex items-center capitalize h-3 rounded-xl w-44 bg-gray-100'></h2>
