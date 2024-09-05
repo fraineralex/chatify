@@ -1,5 +1,2 @@
-node_modules
-.env.local
-dist
 *.pem
 client_secret_google.json
