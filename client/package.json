@@ -1,7 +1,8 @@
 {
   "name": "client",
+  "description": "Realtime chat app, built with node.js, express and react.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -31,6 +32,31 @@
     "postcss": "8.4.38",
     "tailwindcss": "3.4.3",
     "typescript": "5.4.4",
-    "vite": "5.2.6"
-  }
+    "vite": "5.2.6",
+    "@typescript-eslint/eslint-plugin": "7.2.0",
+    "@typescript-eslint/parser": "7.2.0",
+    "eslint": "8.57.0",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.6",
+    "ts-standard": "12.0.2"
+  },
+  "keywords": [
+    "chat",
+    "realtime",
+    "react",
+    "vite"
+  ],
+  "author": "Frainer Encarnación",
+  "license": "MIT",
+  "eslintConfig": {
+    "extends": "./node_modules/ts-standard/eslintrc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraineralex/chatify.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fraineralex/chatify/issues"
+  },
+  "homepage": "https://github.com/fraineralex/chatify#readme"
 }

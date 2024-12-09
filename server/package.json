@@ -2,32 +2,18 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Server of the realtime chat app.",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "node dist/index.js",
     "build": "tsc",
     "ts:watch": "tsc -w",
     "dev": "concurrently \"npm run ts:watch\" \"nodemon dist/index.js\"",
     "dev:watch": "nodemon dist/index.js",
     "debug": "node dist/index.js --inspect"
-  },
-  "keywords": [
-    "api",
-    "server",
-    "express",
-    "realtime"
-  ],
-  "author": "Frainer Encarnación",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/cors": "2.8.17",
-    "@types/express": "4.17.21",
-    "@types/jsonwebtoken": "9.0.6",
-    "@types/morgan": "1.9.9",
-    "@types/node": "20.11.30",
-    "concurrently": "8.2.2",
-    "nodemon": "3.1.0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.577.0",
@@ -43,5 +29,41 @@
     "morgan": "1.10.0",
     "sharp": "0.33.4",
     "socket.io": "4.7.5"
-  }
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.5.9",
+    "@types/cors": "2.8.17",
+    "@types/express": "4.17.21",
+    "@types/jsonwebtoken": "9.0.6",
+    "@types/morgan": "1.9.9",
+    "@types/node": "20.11.30",
+    "@typescript-eslint/eslint-plugin": "7.2.0",
+    "@typescript-eslint/parser": "7.2.0",
+    "concurrently": "8.2.2",
+    "eslint": "8.57.0",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.6",
+    "nodemon": "3.1.0",
+    "ts-standard": "12.0.2",
+    "typescript": "5.4.5"
+  },
+  "keywords": [
+    "api",
+    "server",
+    "express",
+    "realtime"
+  ],
+  "author": "Frainer Encarnación",
+  "license": "MIT",
+  "eslintConfig": {
+    "extends": "./node_modules/ts-standard/eslintrc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraineralex/chatify.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fraineralex/chatify/issues"
+  },
+  "homepage": "https://github.com/fraineralex/chatify#readme"
 }

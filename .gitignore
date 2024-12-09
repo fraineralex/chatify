@@ -1,5 +1,9 @@
 node_modules
 .env.local
-dist
+client/dist
 *.pem
 client_secret_google.json
+.dockerignore
+Dockerfile
+fly.toml
+
