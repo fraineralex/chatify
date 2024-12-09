@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for chatify on 2024-09-04T17:48:56-04:00
+# fly.toml app configuration file generated for chatify on 2024-12-08T18:46:48-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -18,4 +18,4 @@ primary_region = 'mia'
 
 [[vm]]
   size = 'shared-cpu-1x'
-  memory = "2gb"
+  memory = '2gb'
