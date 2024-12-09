@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.js",
+    "build": "tsc",
     "ts:watch": "tsc -w",
     "dev": "concurrently \"npm run ts:watch\" \"nodemon dist/index.js\"",
     "dev:watch": "nodemon dist/index.js",
