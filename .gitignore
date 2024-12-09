@@ -1,9 +1,10 @@
 node_modules
 .env.local
-client/dist
+dist
 *.pem
 client_secret_google.json
 .dockerignore
 Dockerfile
 fly.toml
+.sentryclirc
 

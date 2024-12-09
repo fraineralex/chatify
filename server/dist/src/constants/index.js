@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="38a65454-d19d-57e4-a5bd-682b6d94ac11")}catch(e){}}();
 export const SOCKET_EVENTS = {
     CONNECTION: 'connection',
     DISCONNECT: 'disconnect',
@@ -20,3 +22,5 @@ export const MESSAGES_TYPES = {
     STICKER: 'sticker',
     UNKNOWN: 'unknown'
 };
+//# sourceMappingURL=index.js.map
+//# debugId=38a65454-d19d-57e4-a5bd-682b6d94ac11

@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4a6edb49-ea3b-5380-967e-e97146d711d7")}catch(e){}}();
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 const AUTH0_M2M_CLIENT_ID = process.env.AUTH0_M2M_CLIENT_ID ?? '';
@@ -46,3 +48,5 @@ export async function refreshAccessToken(req, res, next) {
     req.accessToken = token;
     next();
 }
+//# sourceMappingURL=refreshAccessToken.js.map
+//# debugId=4a6edb49-ea3b-5380-967e-e97146d711d7

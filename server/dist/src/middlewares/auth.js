@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7f15490a-6941-5966-a8cb-a6870930bd88")}catch(e){}}();
 import { auth } from 'express-oauth2-jwt-bearer';
 import jwt from 'jsonwebtoken';
 const publicSigningKey = process.env.AUTH0_PUBLIC_SIGNING_KEY ?? '';
@@ -23,3 +25,5 @@ export const authSocketMiddleware = (socket, next) => {
     }
     next();
 };
+//# sourceMappingURL=auth.js.map
+//# debugId=7f15490a-6941-5966-a8cb-a6870930bd88

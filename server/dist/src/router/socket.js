@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="252c067a-7ab7-5a92-9af3-6a1dc29f8a32")}catch(e){}}();
 import { SOCKET_EVENTS } from '../constants/index.js';
 import { SocketController } from '../controllers/socket.js';
 import { authSocketMiddleware } from '../middlewares/auth.js';
@@ -22,3 +24,5 @@ export class SocketRouter {
         });
     }
 }
+//# sourceMappingURL=socket.js.map
+//# debugId=252c067a-7ab7-5a92-9af3-6a1dc29f8a32

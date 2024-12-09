@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c104dbc3-3af2-5e65-8538-4027e5debc4c")}catch(e){}}();
 import { MESSAGES_TYPES, SOCKET_EVENTS } from '../constants/index.js';
 import { deleteObject, getObjectSignedUrl, uploadFile } from '../utils/s3.js';
 import { generateRandomFileName, optimizeImage } from '../utils/chat.js';
@@ -198,3 +200,5 @@ export class SocketController {
         }
     }
 }
+//# sourceMappingURL=socket.js.map
+//# debugId=c104dbc3-3af2-5e65-8538-4027e5debc4c

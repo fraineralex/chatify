@@ -1,14 +1,21 @@
 {
   "compilerOptions": {
-  "lib": ["ESNext"],
-  "module": "NodeNext",
-  "moduleResolution": "NodeNext",
-  "esModuleInterop": true, 
-  "target": "ES2021",
-  "forceConsistentCasingInFileNames": true,
-  "types": ["node"],
-  "strict": true,
-  "outDir": "./dist"
-},
+    "lib": ["ESNext"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "target": "ES2021",
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
+    "strict": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "inlineSources": true,
+
+    // Set `sourceRoot` to  "/" to strip the build path prefix
+    // from generated source code references.
+    // This improves issue grouping in Sentry.
+    "sourceRoot": "/"
+  },
 "exclude": ["node_modules"]
 }

@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2cfd2db4-c7e5-5ab4-ab7c-3ab5b4f55c18")}catch(e){}}();
 import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
 const s3BucketName = process.env.S3_BUCKET_NAME ?? '';
@@ -90,3 +92,5 @@ export async function deleteObject(key) {
         console.error(error);
     }
 }
+//# sourceMappingURL=s3.js.map
+//# debugId=2cfd2db4-c7e5-5ab4-ab7c-3ab5b4f55c18

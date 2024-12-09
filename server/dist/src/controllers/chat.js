@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6d309ad5-a4fd-544b-bb37-02f479f95f0b")}catch(e){}}();
 import { getUserById, getUsersByIds } from '../utils/user.js';
 import { MESSAGES_TYPES } from '../constants/index.js';
 import { getObjectSignedUrl } from '../utils/s3.js';
@@ -355,3 +357,5 @@ export class ChatController {
         }
     }
 }
+//# sourceMappingURL=chat.js.map
+//# debugId=6d309ad5-a4fd-544b-bb37-02f479f95f0b

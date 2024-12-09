@@ -1,3 +1,5 @@
+
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="35aadedd-1c9e-536c-8bfd-de7aa9d9f1a2")}catch(e){}}();
 export async function createTables(client) {
     try {
         await client.execute(`
@@ -38,3 +40,5 @@ export async function createTables(client) {
         return;
     }
 }
+//# sourceMappingURL=index.js.map
+//# debugId=35aadedd-1c9e-536c-8bfd-de7aa9d9f1a2
