@@ -20,13 +20,14 @@
 		"url": "git+https://github.com/fraineralex/chatify.git"
 	},
 	"devDependencies": {
-    "@typescript-eslint/eslint-plugin": "7.2.0",
+		"@flydotio/dockerfile": "^0.5.9",
+		"@typescript-eslint/eslint-plugin": "7.2.0",
 		"@typescript-eslint/parser": "7.2.0",
 		"eslint": "8.57.0",
 		"eslint-plugin-react-hooks": "4.6.0",
 		"eslint-plugin-react-refresh": "0.4.6",
-    "typescript": "5.4.5",
-		"ts-standard": "12.0.2"
+		"ts-standard": "12.0.2",
+		"typescript": "5.4.5"
 	},
 	"eslintConfig": {
 		"extends": "./node_modules/ts-standard/eslintrc.json"
