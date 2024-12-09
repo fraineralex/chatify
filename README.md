@@ -67,8 +67,8 @@ To run the project in your local environment, follow these steps:
 2. Rename the files: `client/.env.example` to `.env.local` and `/server/.env.example` to `.env.local`.
 3. Fill in the values of the environment variables in the newly created `.env.local` files with your own data.
 4. Ensure you have [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/) installed on your machine.
-5. Navigate to the root directory of the project and install dependencies by running `pnpm install`.
-6. Once the dependencies are installed, start the project by running `pnpm run start`.
+5. Navigate to the `server` directory of the project and install dependencies and run the server by running `npm i && npm start`.
+6. Open another terminal, navigate to the `client` directory, install the dependencies, and start the client by running: `npm i && npm start`
 7. You can access the app at: [http://localhost:5173](http://localhost:5173).
 
 That's it! Your project should now be up and running locally.
