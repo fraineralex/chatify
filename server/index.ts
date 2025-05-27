@@ -19,20 +19,20 @@ const port = process.env.PORT ?? 3000;
 const clientDomain = process.env.CLIENT_DOMAIN ?? 'http://localhost:5173';
 
 const client = createClient({
-  url: process.env.DB_URL ?? '',
-  authToken: process.env.DB_AUTH_TOKEN ?? '',
+	url: process.env.DB_URL ?? '',
+	authToken: process.env.DB_AUTH_TOKEN ?? ''
 });
-createTables(client);
+await createTables(client);
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: clientDomain },
-  maxHttpBufferSize: 2e8,
-  connectionStateRecovery: {
-    maxDisconnectionDuration: 2 * 60 * 1000,
-    skipMiddlewares: true,
-  },
+	cors: { origin: clientDomain },
+	maxHttpBufferSize: 2e8,
+	connectionStateRecovery: {
+		maxDisconnectionDuration: 2 * 60 * 1000,
+		skipMiddlewares: true
+	}
 });
 
 const socketRouter = new SocketRouter(io, client);
