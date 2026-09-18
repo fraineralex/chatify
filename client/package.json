@@ -8,6 +8,9 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "tsc && vite build",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -38,7 +41,8 @@
     "eslint": "8.57.0",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.6",
-    "ts-standard": "12.0.2"
+    "ts-standard": "12.0.2",
+    "vitest": "3.0.9"
   },
   "keywords": [
     "chat",
