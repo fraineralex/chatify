@@ -1,0 +1,22 @@
+{
+  "name": "chatify",
+  "private": true,
+  "scripts": {
+    "lint": "pnpm run lint:server && pnpm run lint:client",
+    "lint:server": "pnpm --filter chatify run lint",
+    "lint:client": "pnpm --filter client run lint",
+    "typecheck": "pnpm run typecheck:server && pnpm run typecheck:client",
+    "typecheck:server": "pnpm --filter chatify run typecheck",
+    "typecheck:client": "pnpm --filter client run typecheck",
+    "test": "pnpm run test:server && pnpm run test:client",
+    "test:server": "pnpm --filter chatify run test",
+    "test:client": "pnpm --filter client run test",
+    "build": "pnpm run build:server && pnpm run build:client",
+    "build:server": "pnpm --filter chatify run build",
+    "build:client": "pnpm --filter client run build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}
